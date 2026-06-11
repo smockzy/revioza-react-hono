@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revioza - Tarifs & Abonnements | Gamification Locale</title>
+    <meta name="description"
+        content="Découvrez nos formules d'abonnement sans engagement. Choisissez le plan idéal pour booster vos avis Google et fidéliser vos clients physiques.">
+    <!-- FontAwesome & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="pricing.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <div class="logo-text">RE<span class="v-accent">V</span>IOZA</div>
+                <span class="logo-tagline">L'avis qui vous rapporte</span>
+            </a>
+            <a href="index.html" class="cta-pitch"
+                style="text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-arrow-left"></i> Retour à la démo
+            </a>
+        </div>
+    </header>
+
+    <main class="pricing-container">
+        <!-- Hero Title -->
+        <section class="pricing-hero">
+            <h1>Des tarifs simples, <span>sans engagement</span></h1>
+            <p>Boostez votre e-réputation locale avec la solution de loterie interactive la plus performante du marché.
+            </p>
+
+            <!-- Monthly/Annual Toggle -->
+            <div class="billing-toggle-wrap">
+                <span class="toggle-label active" id="billing-monthly">Facturation mensuelle</span>
+                <button class="billing-switch" id="billing-switch-btn" aria-label="Toggle billing cycle">
+                    <span class="switch-dot"></span>
+                </button>
+                <span class="toggle-label" id="billing-annual">
+                    Facturation annuelle
+                    <span class="discount-badge">-20%</span>
+                </span>
+            </div>
+        </section>
+
+        <!-- Pricing Grid -->
+        <section class="pricing-grid-plans">
+
+            <!-- Plan 1: Starter -->
+            <div class="pricing-card">
+                <div class="plan-header">
+                    <span class="plan-tier">Solo / Starter</span>
+                    <h2 class="plan-price" id="price-starter">49€<span>/mois</span></h2>
+                    <div class="annual-saving-text"
+                        style="display: none; font-size: 0.72rem; color: var(--green); font-weight: 700; margin-top: 0.2rem;">
+                        soit 120€ économisés par an</div>
+                    <p class="plan-desc" style="margin-top: 0.5rem;">Idéal pour les petits commerces de quartier et les
+                        food-trucks.</p>
+                </div>
+                <div class="plan-divider"></div>
+                <ul class="plan-features-list">
+                    <li><i class="fa-solid fa-check"></i> 1 établissement physique</li>
+                    <li><i class="fa-solid fa-check"></i> Jusqu'à 250 avis / mois</li>
+                    <li><i class="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)</li>
+                    <li><i class="fa-solid fa-check"></i> QR Code de table prêt à imprimer</li>
+                    <li><i class="fa-solid fa-check"></i> Statistiques de base (scans)</li>
+                    <li class="disabled"><i class="fa-solid fa-xmark"></i> Logo personnalisé au centre de la roue</li>
+                    <li class="disabled"><i class="fa-solid fa-xmark"></i> Filtrage intelligent des avis négatifs</li>
+                </ul>
+                <button class="btn-plan-select"
+                    onclick="alert('Merci pour votre intérêt ! Cette page est une démonstration interactive.')">Essayer
+                    gratuitement</button>
+                <p class="plan-reassurance"
+                    style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 0.6rem; opacity: 0.8; line-height: 1.3;">
+                    🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai</p>
+            </div>
+
+            <!-- Plan 2: Business (Featured) -->
+            <div class="pricing-card featured">
+                <div class="featured-ribbon">Recommandé</div>
+                <div class="plan-header">
+                    <span class="plan-tier">Business / Growth</span>
+                    <h2 class="plan-price" id="price-business">99€<span>/mois</span></h2>
+                    <div class="annual-saving-text"
+                        style="display: none; font-size: 0.72rem; color: var(--green); font-weight: 700; margin-top: 0.2rem;">
+                        soit 240€ économisés par an</div>
+                    <p class="plan-desc" style="margin-top: 0.5rem;">Le choix idéal pour les restaurants et boutiques
+                        physiques dynamiques.</p>
+                </div>
+                <div class="plan-divider"></div>
+                <ul class="plan-features-list">
+                    <li><i class="fa-solid fa-check"></i> 1 établissement physique</li>
+                    <li><i class="fa-solid fa-check"></i> Avis & Scans illimités</li>
+                    <li><i class="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)</li>
+                    <li><i class="fa-solid fa-check"></i> QR Code de table prêt à imprimer et personnalisable</li>
+                    <li><i class="fa-solid fa-check"></i> Filtrage intelligent (triage des avis privés)</li>
+                    <li
+                        style="font-size: 0.78rem; padding-left: 1.6rem; color: var(--text-muted); font-style: italic; margin-top: -0.6rem; margin-bottom: 0.25rem; display: block; line-height: 1.35;">
+                        "Les clients insatisfaits (1–3 ⭐) sont redirigés vers un retour privé, invisible sur Google."
+                    </li>
+                    <li><i class="fa-solid fa-check"></i> Logo personnalisé et charte graphique</li>
+                    <li><i class="fa-solid fa-check"></i> Image d'accueil mobile personnalisée (.jpg)</li>
+                    <li><i class="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)</li>
+                    <li><i class="fa-solid fa-check"></i> Notifications en temps réel à chaque nouvel avis</li>
+                    <li><i class="fa-solid fa-check"></i> Widget avis intégrable sur votre site web</li>
+                    <li><i class="fa-solid fa-check"></i> Support client prioritaire 7j/7</li>
+                </ul>
+                <button class="btn-plan-select featured"
+                    onclick="alert('Merci pour votre intérêt ! Cette page est une démonstration interactive.')">Essayer
+                    gratuitement</button>
+                <p class="plan-reassurance"
+                    style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 0.6rem; opacity: 0.8; line-height: 1.3;">
+                    🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai</p>
+            </div>
+
+            <!-- Plan 3: Multi-commerces -->
+            <div class="pricing-card">
+                <div class="plan-header">
+                    <span class="plan-tier">Franchise & Réseau</span>
+                    <h2 class="plan-price" id="price-franchise">199€<span>/mois</span></h2>
+                    <div class="annual-saving-text"
+                        style="display: none; font-size: 0.72rem; color: var(--green); font-weight: 700; margin-top: 0.2rem;">
+                        soit 480€ économisés par an</div>
+                    <p class="plan-desc" style="margin-top: 0.5rem; margin-bottom: 0.25rem;">Tout ce qui est inclus dans
+                        Business, multiplié par 5 établissements — avec un tableau de bord centralisé pour piloter
+                        l'ensemble.</p>
+                    <div
+                        style="display: inline-block; background: rgba(229, 9, 20, 0.05); border: 1px solid rgba(229, 9, 20, 0.15); border-radius: 6px; padding: 4px 10px; font-size: 0.72rem; font-weight: 600; color: var(--primary); width: fit-content;">
+                        +19€/mois par adresse supplémentaire</div>
+                </div>
+                <div class="plan-divider" style="margin-top: 1rem;"></div>
+                <ul class="plan-features-list">
+                    <li><i class="fa-solid fa-check"></i> <strong>Jusqu'à 5 adresses incluses</strong></li>
+                    <li><i class="fa-solid fa-check"></i> Tableau de bord multi-commerces centralisé</li>
+                    <li><i class="fa-solid fa-check"></i> QR codes uniques par table et serveur</li>
+                    <li><i class="fa-solid fa-check"></i> Statistiques par serveur et établissement</li>
+                    <li><i class="fa-solid fa-check"></i> Intégrations caisse & API</li>
+                    <li><i class="fa-solid fa-check"></i> Accompagnement et conseiller dédié</li>
+                </ul>
+                <button class="btn-plan-select"
+                    onclick="alert('Merci pour votre intérêt ! Cette page est une démonstration interactive.')">Contacter
+                    le service commercial</button>
+                <span
+                    style="font-size: 0.78rem; color: var(--primary); font-weight: 700; margin-top: 0.4rem; display: block; text-align: center;">Démo
+                    gratuite disponible</span>
+                <p class="plan-reassurance"
+                    style="font-size: 0.7rem; color: var(--text-muted); text-align: center; margin-top: 0.6rem; opacity: 0.8; line-height: 1.3;">
+                    🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai</p>
+            </div>
+
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="pricing-faq">
+            <h2>Questions Fréquentes</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Y a-t-il un engagement de durée ?</h3>
+                    <p>Non, toutes nos offres mensuelles sont 100% sans engagement. Vous pouvez suspendre, résilier ou
+                        modifier votre abonnement à tout moment en un clic depuis votre espace gérant.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Comment fonctionne l'offre d'essai de 14 jours ?</h3>
+                    <p>L'essai gratuit de 14 jours est universel et disponible sur toutes nos formules. Aucune carte
+                        bancaire n'est requise. Vous pouvez configurer votre compte, imprimer des QR codes temporaires
+                        et tester le système immédiatement.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Qu'est-ce que le filtrage intelligent des avis ?</h3>
+                    <p>Si un client sélectionne une note basse (1 à 3 étoiles), le système lui propose de rédiger une
+                        critique constructive privée destinée uniquement à la direction, évitant ainsi un avis négatif
+                        public sur votre fiche Google Maps.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Comment sont générés et imprimés les QR codes ?</h3>
+                    <p>Depuis votre espace d'administration, vous pouvez télécharger un fichier PDF prêt à l'emploi
+                        contenant vos chevalets de table avec votre code QR unique. Il vous suffit de les imprimer et de
+                        les placer sur vos tables ou comptoirs.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Est-ce que c'est légal ?</h3>
+                    <p>Oui, totalement. Revioza incite vos clients à partager leur expérience sincère — nous ne
+                        demandons jamais explicitement une note de 5 étoiles. La récompense est offerte en échange d'un
+                        avis honnête, ce qui est conforme aux conditions d'utilisation de Google.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Combien d'avis vais-je vraiment obtenir ?</h3>
+                    <p>Nos clients obtiennent en moyenne 40 à 80 nouveaux avis dès le premier mois d'utilisation, selon
+                        la fréquentation de leur établissement. Certains restaurants ont doublé leur nombre total d'avis
+                        en moins de 6 semaines.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Puis-je résilier mon abonnement annuel ?</h3>
+                    <p>Oui, vous pouvez résilier à tout moment depuis votre espace gérant. L'abonnement annuel est
+                        facturé en une fois et n'est pas remboursable, mais vous conservez un accès complet à Revioza
+                        jusqu'au dernier jour de votre période de 12 mois.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-branding">
+                <div class="logo">
+                    <div class="logo-text">RE<span class="v-accent">V</span>IOZA</div>
+                </div>
+                <p>La solution ultime de gamification pour propulser les commerces de proximité sur le devant de la
+                    scène locale.</p>
+            </div>
+            <div
+                style="font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; width: 100%;">
+                &copy; 2026 Revioza. Tous droits réservés. Version Démo Interactive.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toggle Billing logic
+        const switchBtn = document.getElementById("billing-switch-btn");
+        const labelMonthly = document.getElementById("billing-monthly");
+        const labelAnnual = document.getElementById("billing-annual");
+
+        const priceStarter = document.getElementById("price-starter");
+        const priceBusiness = document.getElementById("price-business");
+        const priceFranchise = document.getElementById("price-franchise");
+
+        let isAnnual = false;
+
+        function updatePrices() {
+            const savingTexts = document.querySelectorAll(".annual-saving-text");
+            const reassuranceTexts = document.querySelectorAll(".plan-reassurance");
+            if (isAnnual) {
+                switchBtn.classList.add("active");
+                labelMonthly.classList.remove("active");
+                labelAnnual.classList.add("active");
+
+                // 20% discount prices (Starter: 49 -> 39, Business: 99 -> 79, Franchise: 199 -> 159)
+                priceStarter.innerHTML = "39€<span>/mois</span>";
+                priceBusiness.innerHTML = "79€<span>/mois</span>";
+                priceFranchise.innerHTML = "159€<span>/mois</span>";
+
+                savingTexts.forEach(el => el.style.display = "block");
+                reassuranceTexts.forEach(el => el.textContent = "🔒 Facturé en une fois · Non remboursable · Accès garanti 12 mois complets");
+            } else {
+                switchBtn.classList.remove("active");
+                labelMonthly.classList.add("active");
+                labelAnnual.classList.remove("active");
+
+                priceStarter.innerHTML = "49€<span>/mois</span>";
+                priceBusiness.innerHTML = "99€<span>/mois</span>";
+                priceFranchise.innerHTML = "199€<span>/mois</span>";
+
+                savingTexts.forEach(el => el.style.display = "none");
+                reassuranceTexts.forEach(el => el.textContent = "🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai");
+            }
+        }
+
+        switchBtn.addEventListener("click", () => {
+            isAnnual = !isAnnual;
+            updatePrices();
+        });
+
+        labelMonthly.addEventListener("click", () => {
+            isAnnual = false;
+            updatePrices();
+        });
+
+        labelAnnual.addEventListener("click", () => {
+            isAnnual = true;
+            updatePrices();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revioza - Roulette Avis Google | Gamification Locale</title>
+    <meta name="description"
+        content="Augmentez vos avis Google grâce à la gamification. Faites tourner la roulette en échange d'un avis sincère de vos clients.">
+    <!-- FontAwesome & Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=1.1">
+</head>
+
+<body>
+
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <div class="logo-text">RE<span class="v-accent">V</span>IOZA</div>
+                <span class="logo-tagline">L'avis qui vous rapporte</span>
+            </div>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+                <button id="btn-header-register" class="btn-secondary" style="font-size: 0.85rem; padding: 0.55rem 1.1rem; border-radius: 9999px; cursor: pointer; border: 1px solid var(--border-color); height: 38px;">
+                    Espace Gérant
+                </button>
+                <a href="pricing.html" class="cta-pitch" style="text-decoration: none;">
+                    Essayer Revioza
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Left B2B Pitch & Customizer Panel -->
+        <div class="pitch-and-controls">
+            <div class="hero-block">
+                <h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
+                <p>
+                    Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé sur
+                    leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un gain
+                    instantané configuré par vos soins.
+                </p>
+            </div>
+
+            <!-- Realtime Customization Admin Panel -->
+            <section class="panel-card" id="admin-panel">
+                <h2><i class="fa-solid fa-sliders"></i> Personnalisation en Temps Réel (Admin)</h2>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+                    Configurez le profil et les lots ci-dessous. Les modifications s'appliquent instantanément sur le
+                    simulateur mobile à droite !
+                </p>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="admin-rest-name">Nom du Restaurant</label>
+                        <input type="text" id="admin-rest-name" value="Bella Napoli">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-rest-sub">Spécialité / Type</label>
+                        <input type="text" id="admin-rest-sub" value="Pizzeria">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-theme-color">Couleur du Thème Principal</label>
+                        <input type="color" id="admin-theme-color" value="#e50914"
+                            style="height: 42px; padding: 4px; cursor: pointer;">
+                    </div>
+                </div>
+
+                <!-- Google Place ID input -->
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label for="admin-google-link">Place ID Google de votre Commerce</label>
+                    <input type="text" id="admin-google-link"
+                        value="ChIJN1t_tDeuEmsRUsoyG83VY24"
+                        placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83VY24" style="width: 100%;">
+                    
+                    <!-- Interactive Tutorial Toggle -->
+                    <div class="placeid-help-toggle" id="placeid-help-toggle" style="cursor: pointer; color: var(--primary); font-size: 0.8rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; font-weight: 600; user-select: none;">
+                        <i class="fa-solid fa-circle-question"></i> Comment trouver mon Place ID ?
+                    </div>
+                    <div class="placeid-help-content" id="placeid-help-content" style="display: none; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 0.5rem; font-size: 0.8rem; line-height: 1.5; color: var(--text-muted);">
+                        <ol style="margin-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <li>Allez sur l'outil officiel <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" style="color: var(--primary); text-decoration: underline;">Google Place ID Finder</a>.</li>
+                            <li>Recherchez le nom de votre commerce sur la carte.</li>
+                            <li>Copiez le code qui s'affiche dans la bulle d'info (ex : <code>ChIJN1t_tDeuEmsRUsoyG83VY24</code>).</li>
+                            <li>Collez ce code dans la case ci-dessus !</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Image Upload Field -->
+                <div class="form-group upload-group">
+                    <label for="admin-hero-image">Image d'Accueil (logo ou photo du commerce)</label>
+                    <div class="upload-drop-zone" id="upload-drop-zone">
+                        <div class="upload-preview-wrap" id="upload-preview-wrap" style="display:none;">
+                            <img id="upload-preview-img" alt="Aperçu"
+                                style="max-height:90px; border-radius:8px; object-fit:cover;">
+                            <button type="button" class="upload-remove-btn" id="upload-remove-btn"
+                                title="Supprimer l'image">
+                                <i class="fa-solid fa-xmark"></i>
+                            </button>
+                        </div>
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <i class="fa-solid fa-image"></i>
+                            <span>Cliquez ou déposez votre image ici</span>
+                            <small>.jpg, .jpeg, .png, .webp</small>
+                        </div>
+                        <input type="file" id="admin-hero-image" accept=".jpg,.jpeg,.png,.webp"
+                            style="position:absolute;inset:0;opacity:0;cursor:pointer;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: -0.5rem; margin-bottom: 1.5rem;">
+                    <label for="admin-image-url">Ou lien URL de l'image (pour QR Code mobile)</label>
+                    <input type="text" id="admin-image-url" placeholder="https://exemple.com/photo.jpg" style="width: 100%;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Configuration des Lots de la Roue</label>
+                </div>
+
+                <div class="prizes-editor">
+                    <div class="prize-row header-row">
+                        <span>Nom du Lot</span>
+                        <span>Probabilité</span>
+                        <span style="text-align: center;">Couleur</span>
+                    </div>
+                    <div id="admin-prizes-list">
+                        <!-- Dynamic list generated by JS -->
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="btn-secondary" id="btn-add-prize" style="flex: 1; margin-bottom: 0;">
+                        <i class="fa-solid fa-plus"></i> Ajouter un lot
+                    </button>
+                    <button class="btn-primary" id="btn-open-client"
+                        style="flex: 1; font-size: 0.85rem; padding: 10px 14px; margin-top: 0; box-shadow: none;">
+                        <i class="fa-solid fa-mobile-screen-button"></i> Tester la page Client
+                    </button>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="cta-pitch" id="btn-generate-qr"
+                        style="width: 100%; padding: 0.75rem 1.5rem; text-transform: uppercase; font-weight: 700; font-size: 0.9rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        <i class="fa-solid fa-qrcode"></i> Générer mon QR code Unique
+                    </button>
+                </div>
+            </section>
+
+            <!-- Features details for commercial demo -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <h3>Anti-Triche Avancé</h3>
+                    <p>Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour. Tickets
+                        de gain éphémères.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-qrcode"></i></div>
+                    <h3>Prêt à Imprimer</h3>
+                    <p>Téléchargez et imprimez votre kit de table de QR codes associés directement à votre compte
+                        d'établissement.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-chart-line"></i></div>
+                    <h3>Statistiques Avancées</h3>
+                    <p>Suivez le nombre de scans, de clics Google, les lots distribués et l'évolution globale de votre
+                        note moyenne.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fa-solid fa-unlock"></i></div>
+                    <h3>Résiliable à tout moment</h3>
+                    <p>Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un clic, en
+                        toute liberté.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Mobile Simulator Column (Reverted to two-column desktop side-by-side) -->
+        <div class="phone-simulator-wrapper">
+            <!-- Dynamic Phone Frame -->
+            <div class="phone-container">
+                <div class="phone-notch">
+                    <div class="phone-notch-camera"></div>
+                    <div class="phone-notch-speaker"></div>
+                </div>
+
+                <div class="phone-status-bar">
+                    <span>9:41</span>
+                    <div class="phone-status-icons">
+                        <i class="fa-solid fa-signal"></i>
+                        <i class="fa-solid fa-wifi"></i>
+                        <i class="fa-solid fa-battery-full"></i>
+                    </div>
+                </div>
+
+                <div class="phone-content">
+
+                    <!-- STEP 1: WELCOME SCREEN -->
+                    <div class="app-screen active" id="screen-1">
+
+                        <div class="app-screen-content">
+                            <div class="hero-pizza-image">
+                                <img id="hero-simulator-img"
+                                    src="https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80"
+                                    alt="Pizza">
+                                <div class="hero-pizza-overlay"></div>
+                            </div>
+
+                            <h2 class="app-title-large">DONNEZ VOTRE AVIS <span>ET TENTEZ DE GAGNER !</span></h2>
+
+                            <div class="step-checklist">
+                                <div class="checklist-item">
+                                    <div class="checklist-icon">1</div>
+                                    <div class="checklist-text">
+                                        <h4>Donnez votre avis</h4>
+                                        <p>Partagez votre expérience sur Google.</p>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon">2</div>
+                                    <div class="checklist-text">
+                                        <h4>Faites tourner la roulette</h4>
+                                        <p>Tournez la roue et tentez de gagner.</p>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="checklist-icon">3</div>
+                                    <div class="checklist-text">
+                                        <h4>Récupérez votre lot</h4>
+                                        <p>Montrez votre ticket en caisse pour en profiter.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn-google-signin" id="btn-google-signin">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                                    alt="Google">
+                                JE TENTE MA CHANCE
+                            </button>
+                            <span class="google-legal-notice">Connexion sécurisée via OAuth Google</span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: LEAVE REVIEW -->
+                    <div class="app-screen" id="screen-2">
+                        <div class="app-header">
+                            <button class="app-back-btn" onclick="goToStep(1)"><i
+                                    class="fa-solid fa-chevron-left"></i></button>
+                            <div class="app-brand-center">DONNEZ VOTRE AVIS</div>
+                            <div class="app-header-right"></div>
+                        </div>
+
+                        <div class="app-screen-content">
+                            <div class="google-logo-wrapper">
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
+                                    alt="Google">
+                            </div>
+
+                            <h3 class="review-headline">Votre avis compte !</h3>
+                            <p class="review-subtext">Partagez votre expérience sur Google et aidez-nous à nous
+                                améliorer.</p>
+
+                            <div class="stars-container">
+                                <span class="star-interactive" data-value="1">☆</span>
+                                <span class="star-interactive" data-value="2">☆</span>
+                                <span class="star-interactive" data-value="3">☆</span>
+                                <span class="star-interactive" data-value="4">☆</span>
+                                <span class="star-interactive" data-value="5">☆</span>
+                            </div>
+
+                            <!-- Positive Review Section (4-5 stars) -->
+                            <div id="positive-review-flow" style="width: 100%;">
+                                <button class="btn-google-action" id="btn-google-action">
+                                    LAISSER UN AVIS SUR GOOGLE <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </button>
+                                <span class="google-redirect-info">Laissez votre avis puis revenez ici pour lancer la
+                                    roue.</span>
+                            </div>
+
+                            <!-- Private Feedback Section (1-3 stars) -->
+                            <div id="private-feedback-flow"
+                                style="display: none; width: 100%; text-align: left; margin-top: 0.5rem; margin-bottom: 0.5rem;">
+                                <label
+                                    style="font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Avis
+                                    privé constructif</label>
+                                <textarea id="private-feedback-text"
+                                    placeholder="Dites-nous ce qui n'a pas été pour que nous puissions nous améliorer..."
+                                    style="width: 100%; min-height: 70px; margin-top: 0.4rem; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-main); padding: 0.5rem 0.75rem; font-family: var(--font-body); font-size: 0.8rem; resize: none; outline: none;"></textarea>
+                                <button class="btn-google-action" id="btn-submit-private"
+                                    style="margin-top: 0.6rem; background: var(--primary);">
+                                    ENVOYER MON RETOUR PRIVÉ <i class="fa-solid fa-paper-plane"
+                                        style="margin-left: 0.4rem;"></i>
+                                </button>
+                            </div>
+
+                            <div class="review-safety-lock" id="review-safety-lock">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Le serveur validera visuellement l'avis lors du retrait du lot.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3: ROULETTE SCREEN -->
+                    <div class="app-screen" id="screen-3">
+                        <div class="app-header">
+                            <button class="app-back-btn" onclick="goToStep(2)"><i
+                                    class="fa-solid fa-chevron-left"></i></button>
+                            <div class="app-brand-center">LA ROUE</div>
+                            <div class="app-header-right"></div>
+                        </div>
+
+                        <div class="app-screen-content">
+                            <p class="wheel-instructions">Faites tourner la roue et tentez votre chance !</p>
+
+                            <div class="wheel-outer-container">
+                                <div class="wheel-pointer" id="wheel-pointer"></div>
+                                <div class="wheel-bezel"></div>
+                                <canvas class="wheel-canvas" id="roulette-canvas"></canvas>
+                                <div class="wheel-center-pin"><img src="assets/logo_icon.jpg" alt="R"
+                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></div>
+                            </div>
+
+                            <button class="btn-spin-wheel" id="btn-spin-wheel">TOURNER LA ROUE</button>
+                            <span class="spin-limit-info">1 lancer par jour et par personne.</span>
+                            <span class="spin-limit-info"
+                                style="margin-top: 0.4rem; font-weight: 500; text-align: center; max-width: 90%; line-height: 1.3;">
+                                <i class="fa-solid fa-circle-exclamation"
+                                    style="color: var(--primary); margin-right: 3px;"></i>
+                                N'oubliez pas que vous devrez présenter la preuve de votre avis pour recevoir votre gain
+                                !
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4: CONGRATULATIONS -->
+                    <div class="app-screen" id="screen-4">
+                        <div class="app-header">
+                            <div class="app-brand-center">FÉLICITATIONS !</div>
+                        </div>
+
+                        <div class="app-screen-content">
+                            <h3 class="celeb-title">Vous avez gagné !</h3>
+                            <p class="celeb-subtitle">Bravo ! Voici votre récompense :</p>
+
+                            <div class="prize-showcase-box">
+                                <div class="prize-visual-icon" id="won-prize-icon">☕</div>
+                                <div class="prize-name-won" id="won-prize-name">Café offert</div>
+                            </div>
+
+                            <div class="timer-box">
+                                <span class="timer-title">Valable encore pendant</span>
+                                <div class="countdown-digits" id="timer-digits">01:59:43</div>
+                                <div class="countdown-labels">
+                                    <span>heures</span>
+                                    <span>minutes</span>
+                                    <span>secondes</span>
+                                </div>
+                            </div>
+
+                            <div class="coupon-merchant-info">
+                                <div class="merchant-avatar">
+                                    <i class="fa-solid fa-store" style="color: var(--primary);"></i>
+                                </div>
+                                <div>
+                                    <span class="restaurant-name-bind" style="font-weight: 700;">Bella Napoli</span> -
+                                    <span class="restaurant-sub-bind">Pizzeria</span>
+                                </div>
+                            </div>
+
+                            <a href="https://maps.google.com" target="_blank" class="btn-review-google-link">
+                                LIEN VERS LES AVIS <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+
+                            <p class="ticket-redeem-notice">
+                                Montrez cet <strong>écran actif</strong> (compte à rebours défilant) ainsi que votre
+                                <strong>avis publié</strong> au serveur pour recevoir votre gain !
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Nav Simulator inside Phone -->
+                    <div class="app-bottom-nav">
+                        <div class="nav-item active" onclick="goToStep(3)">
+                            <i class="fa-solid fa-house"></i>
+                            Accueil
+                        </div>
+                        <div class="nav-item"
+                            onclick="alert('Règles du jeu : 1 participation par jour maximum, réservée aux clients de l\'établissement.')">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Règles
+                        </div>
+                        <div class="nav-item" onclick="alert('Profil : Connecté avec Google.')">
+                            <i class="fa-solid fa-user"></i>
+                            Profil
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Alert Overlay simulating Google Redirect feedback -->
+                <div class="phone-alert-overlay" id="phone-alert-overlay">
+                    <div class="phone-alert-card">
+                        <div class="phone-alert-icon"><i class="fa-solid fa-up-right-from-square"></i></div>
+                        <h4 class="phone-alert-title">Redirection simulée</h4>
+                        <p class="phone-alert-desc">
+                            Le client est redirigé vers l'interface Google Review du restaurant.<br><br>
+                            <em>(Dans la démo, cliquez sur le bouton ci-dessous pour revenir après avoir validé votre
+                                avis)</em>
+                        </p>
+                        <button class="btn-alert-action" id="btn-alert-action">J'ai déposé mon avis</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unified Bottom Controls (Title + Arrows + Dots) -->
+            <div class="preview-step-footer">
+                <button class="btn-nav-prev" id="prev-step-btn" title="Étape précédente">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <div class="preview-footer-center">
+                    <span class="preview-step-title" id="preview-step-title">1. Connexion Client</span>
+                    <div class="simulator-step-dots">
+                        <span class="step-dot active" data-step="1" title="Étape 1"></span>
+                        <span class="step-dot" data-step="2" title="Étape 2"></span>
+                        <span class="step-dot" data-step="3" title="Étape 3"></span>
+                        <span class="step-dot" data-step="4" title="Étape 4"></span>
+                    </div>
+                </div>
+                <button class="btn-nav-next" id="next-step-btn" title="Étape suivante">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Contact CTA Section -->
+    <section class="cta-contact-section">
+        <div class="cta-contact-container">
+            <h2>Êtes-vous intéressé ?</h2>
+            <p>
+                Découvrez comment Revioza peut vous aider à multiplier vos avis clients et booster votre visibilité locale.
+            </p>
+            <a href="mailto:contact@revioza.com" class="btn-primary contact-btn">
+                Contactez-nous <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-branding">
+                <div class="logo">
+                    <div class="logo-text">RE<span class="v-accent">V</span>IOZA</div>
+                </div>
+                <p>
+                    Une solution innovante et ludique pour multiplier le bouche-à-oreille et grimper sur les premières
+                    places de Google Maps. Conçu spécifiquement pour les pizzerias, tacos, burgers et commerces de
+                    proximité.
+                </p>
+            </div>
+            <div class="footer-stats">
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-lock"></i></div>
+                    <div class="stat-label">100% Sécurisé</div>
+                    <div class="stat-desc">Connexion Google OAuth robuste</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="stat-label">1 Joueur/Jour</div>
+                    <div class="stat-desc">Garantie anti-triche stricte</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+                    <div class="stat-label">Ticket Limité</div>
+                    <div class="stat-desc">Compte à rebours dynamique de 2h</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon"><i class="fa-solid fa-certificate"></i></div>
+                    <div class="stat-label">Authentique</div>
+                    <div class="stat-desc">Avis sincères des clients physiques</div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- QR Code Generator Overlay Modal -->
+    <div class="phone-alert-overlay" id="overlay-qr"
+        style="z-index: 1000; position: fixed; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; inset: 0;">
+        <div class="phone-alert-card"
+            style="max-width: 400px; width: 90%; text-align: center; padding: 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+            <h3 style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--text-main);">
+                Votre QR Code Unique</h3>
+            <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">Scannez ce QR Code avec votre
+                téléphone portable pour tester la roue de loterie personnalisée en conditions réelles.</p>
+
+            <!-- QR Image wrapper -->
+            <div id="qr-code-image-container"
+                style="background: white; padding: 1rem; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 1rem 0; width: 200px; height: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.2);">
+                <img id="qr-code-img" src="" alt="QR Code" style="width: 100%; height: 100%; object-fit: contain;">
+            </div>
+
+            <div style="display: flex; gap: 0.75rem; width: 100%;">
+                <button class="btn-primary" id="btn-print-qr"
+                    style="flex: 1; font-size: 0.85rem; padding: 10px 14px; margin-top: 0; box-shadow: none;">
+                    <i class="fa-solid fa-print"></i> Imprimer
+                </button>
+                <button class="btn-secondary" id="btn-close-qr"
+                    style="flex: 1; font-size: 0.85rem; padding: 10px 14px; margin-bottom: 0;">
+                    Fermer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Registration / Login Modal for Gérants -->
+    <div class="phone-alert-overlay" id="overlay-register" style="z-index: 1000; position: fixed; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; inset: 0;">
+        <div class="phone-alert-card" id="register-card" style="max-width: 450px; width: 90%; padding: 2rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 1.25rem;">
+            
+            <!-- Tabs: Login / Register -->
+            <div style="display: flex; border-bottom: 1px solid var(--border-color); width: 100%; margin-bottom: 0.5rem;">
+                <button id="tab-login" style="flex: 1; padding: 0.75rem; background: transparent; border: none; border-bottom: 2px solid var(--primary); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 1rem; cursor: pointer; outline: none;">Connexion</button>
+                <button id="tab-register" style="flex: 1; padding: 0.75rem; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--text-muted); font-family: var(--font-display); font-weight: 700; font-size: 1rem; cursor: pointer; outline: none;">Inscription</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="form-login" style="display: flex; flex-direction: column; gap: 1rem; width: 100%; text-align: left;">
+                <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: #fff; text-align: left;">Accéder à votre Espace Gérant</h3>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Adresse Email</label>
+                    <input type="email" id="login-email" placeholder="contact@etablissement.com" required style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Mot de passe</label>
+                    <input type="password" id="login-password" placeholder="••••••••" required style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <button type="submit" class="cta-pitch" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem; border: none; cursor: pointer;">Se Connecter</button>
+            </form>
+
+            <!-- Register Form (hidden initially) -->
+            <form id="form-register" style="display: none; flex-direction: column; gap: 1rem; width: 100%; text-align: left;">
+                <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 800; color: #fff; text-align: left;">Créer votre Compte Gérant</h3>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Nom du commerce</label>
+                    <input type="text" id="register-rest-name" placeholder="Ex: Bella Napoli" required style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Spécialité / Type</label>
+                    <input type="text" id="register-rest-sub" placeholder="Ex: Pizzeria" required style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Adresse Email</label>
+                    <input type="email" id="register-email" placeholder="gerant@etablissement.com" required style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <div class="form-group" style="text-align: left;">
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; display: block;">Mot de passe</label>
+                    <input type="password" id="register-password" placeholder="Minimum 6 caractères" required minlength="6" style="width: 100%; padding: 0.75rem; border-radius: 10px; background: var(--bg-input); border: 1px solid var(--border-color); color: #fff; outline: none;">
+                </div>
+                <button type="submit" class="cta-pitch" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem; border: none; cursor: pointer;">Créer mon Compte</button>
+            </form>
+
+            <button class="btn-secondary" id="btn-close-register" style="width: 100%; font-size: 0.85rem; padding: 10px 14px; margin-bottom: 0; cursor: pointer;">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Confetti JS CDN, Cookie System & Main App Logic -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="cookies.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

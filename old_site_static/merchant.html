@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Revioza — Espace Gérant</title>
+    <meta name="description" content="Gérez votre roue de loterie, personnalisez vos gains, suivez vos statistiques et consultez les avis clients.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="merchant.css">
+</head>
+<body>
+
+
+
+<div class="app-header">
+    <div class="app-header-spacer"><i class="fa-solid fa-circle-user" style="color: var(--primary);"></i></div>
+    <div class="app-header-center">
+        <div class="header-title">Espace Gérant</div>
+        <div class="restaurant-name-bind header-rest-name">Bella Napoli</div>
+    </div>
+    <div class="app-header-right">
+        <a href="play.html" target="_blank" title="Aperçu Client" class="preview-btn">
+            <i class="fa-solid fa-eye"></i>
+        </a>
+    </div>
+</div>
+
+<!-- Main Screens Container -->
+<div class="screens-container">
+
+    <!-- SCREEN 1: DASHBOARD & STATS -->
+    <div class="app-screen active" id="screen-stats">
+        <div class="screen-scroll">
+            <div class="screen-body">
+                <div class="welcome-banner">
+                    <h3>Bonjour, Gérant 👋</h3>
+                    <p>Voici l'impact de Revioza sur votre commerce.</p>
+                </div>
+
+                <!-- Period selector -->
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="week">Semaine</button>
+                    <button class="period-btn" data-period="month">Mois</button>
+                    <button class="period-btn" data-period="year">Année</button>
+                </div>
+
+                <!-- Stats summary grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-star"></i></div>
+                        <div class="stat-num" id="stat-reviews-count">14</div>
+                        <div class="stat-label">Nouveaux Avis Google</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-user-plus"></i></div>
+                        <div class="stat-num" id="stat-clients-count">42</div>
+                        <div class="stat-label">Est. Clients Gagnés</div>
+                    </div>
+                </div>
+
+                <!-- Financial Gain Estimator -->
+                <div class="gain-card">
+                    <div class="gain-header">
+                        <i class="fa-solid fa-money-bill-trend-up"></i>
+                        <h4>Estimation du gain financier</h4>
+                    </div>
+                    <div class="gain-amount" id="stat-earnings">1 050 €</div>
+                    <p class="gain-desc">Revenus générés estimés grâce aux nouveaux clients ramenés par l'amélioration de votre référencement Google.</p>
+                    
+                    <div class="slider-group">
+                        <div class="slider-label">
+                            <span>Panier moyen par client :</span>
+                            <strong id="avg-basket-value">25 €</strong>
+                        </div>
+                        <input type="range" id="avg-basket-slider" min="10" max="150" value="25" step="5">
+                    </div>
+                </div>
+
+                <!-- Chart Card -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Évolution des avis générés</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="reviewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 2: CONFIGURATION & WHEEL -->
+    <div class="app-screen" id="screen-config">
+        <div class="screen-scroll">
+            <div class="screen-body">
+                
+                <!-- Profile Settings -->
+                <div class="card-section">
+                    <h3 class="section-title"><i class="fa-solid fa-store"></i> Profil de l'établissement</h3>
+                    
+                    <div class="form-group">
+                        <label for="merchant-rest-name">Nom de l'établissement</label>
+                        <input type="text" id="merchant-rest-name" value="Bella Napoli">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="merchant-rest-sub">Spécialité / Sous-titre</label>
+                        <input type="text" id="merchant-rest-sub" value="Pizzeria">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="merchant-google-link">Place ID Google de votre Commerce</label>
+                        <input type="text" id="merchant-google-link" value="ChIJN1t_tDeuEmsRUsoyG83VY24" placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83VY24">
+                        
+                        <!-- Interactive Tutorial Toggle -->
+                        <div class="placeid-help-toggle" id="merchant-placeid-help-toggle" style="cursor: pointer; color: var(--primary); font-size: 0.8rem; margin-top: 0.5rem; display: flex; align-items: center; gap: 0.25rem; font-weight: 600; user-select: none;">
+                            <i class="fa-solid fa-circle-question"></i> Comment trouver mon Place ID ?
+                        </div>
+                        <div class="placeid-help-content" id="merchant-placeid-help-content" style="display: none; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; margin-top: 0.5rem; font-size: 0.8rem; line-height: 1.5; color: var(--muted);">
+                            <ol style="margin-left: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                                <li>Allez sur l'outil officiel <a href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder" target="_blank" style="color: var(--primary); text-decoration: underline;">Google Place ID Finder</a>.</li>
+                                <li>Recherchez votre commerce sur la carte.</li>
+                                <li>Copiez le code (ex : <code>ChIJN1t_tDeuEmsRUsoyG83VY24</code>) et collez-le ici.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="merchant-theme-color">Couleur du thème principal</label>
+                        <div class="color-picker-wrapper">
+                            <input type="color" id="merchant-theme-color" value="#e50914">
+                            <span id="color-hex-label">#e50914</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label for="merchant-image-url">Lien URL de l'image (pour QR Code mobile)</label>
+                        <input type="text" id="merchant-image-url" placeholder="https://exemple.com/photo.jpg">
+                    </div>
+                </div>
+
+                <!-- Wheel Prizes Settings -->
+                <div class="card-section">
+                    <h3 class="section-title"><i class="fa-solid fa-circle-notch"></i> Configuration de la Roue</h3>
+                    <p class="section-subtitle">Ajustez les lots, les probabilités et les couleurs affichées sur la roue.</p>
+
+                    <div class="prizes-editor-mobile">
+                        <div id="merchant-prizes-list">
+                            <!-- Dynamically populated prize rows -->
+                        </div>
+                        <button class="btn-primary" id="btn-merchant-add-prize" style="margin-top: 1rem;">
+                            <i class="fa-solid fa-plus"></i> Ajouter un Lot
+                        </button>
+                    </div>
+                </div>
+
+                <!-- QR Code Access -->
+                <div class="card-section qr-section">
+                    <h3 class="section-title"><i class="fa-solid fa-qrcode"></i> QR Code de Table</h3>
+                    <p>Téléchargez et imprimez votre QR Code pour le disposer sur vos tables ou comptoirs.</p>
+                    <a href="QR_code.html" class="btn-secondary full-width" style="margin-top: 0.5rem; text-decoration: none;">
+                        <i class="fa-solid fa-qrcode"></i> Voir et Imprimer le QR Code
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREEN 3: PRIVATE FEEDBACK (< 3 stars) -->
+    <div class="app-screen" id="screen-reviews">
+        <div class="screen-scroll">
+            <div class="screen-body">
+                <div class="feedback-intro">
+                    <h3 class="section-title"><i class="fa-solid fa-comment-slash"></i> Retours Privés (< 3★)</h3>
+                    <p>Ces retours ont été saisis par des clients insatisfaits (1 à 3 étoiles). Ils restent <strong>100% privés</strong> pour vous permettre d'améliorer vos services sans impacter votre note Google publique.</p>
+                </div>
+
+                <div id="private-feedbacks-container" class="feedbacks-list">
+                    <!-- Dynamic private feedback list -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Bottom Navigation Menu -->
+<nav class="bottom-nav">
+    <div class="nav-item active" id="tab-stats">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>Stats</span>
+    </div>
+    <div class="nav-item" id="tab-config">
+        <i class="fa-solid fa-sliders"></i>
+        <span>Roue & Profil</span>
+    </div>
+    <div class="nav-item" id="tab-reviews">
+        <i class="fa-solid fa-comment-slash"></i>
+        <span>Retours Privés</span>
+        <span class="badge" id="negative-badge">3</span>
+    </div>
+</nav>
+
+<!-- ChartJS CDN, Cookie System & App Logic -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="cookies.js"></script>
+<script src="merchant.js"></script>
+</body>
+</html>
