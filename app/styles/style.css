@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-.page-landing {
-
-
 :root {
     --bg-main: #060608;
     --bg-card: #111115;
@@ -27,7 +24,7 @@
     padding: 0;
 }
 
-& {
+html, body {
     background-color: var(--bg-main);
     color: var(--text-main);
     font-family: var(--font-body);
@@ -1746,6 +1743,4 @@ footer {
 
 #btn-header-register:hover {
     background: var(--border-color);
-}
-
 }
