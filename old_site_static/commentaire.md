@@ -53,3 +53,54 @@ Voici l'état d'avancement des fonctionnalités listées dans le cahier des char
   - **Statut** :  Réalisé. Intègre l'OAuth Google (pop-up GSI sécurisé) et le simulateur de ticket de gain avec minuteur de validité de 2 heures.
 - `[x]` **Partie Gérant** (Configuration de la roue, statistiques d'utilisation en direct et QR Code à imprimer)
   - **Statut** :  Réalisé. Lié de manière bidirectionnelle avec la partie client.
+
+
+
+
+  A FAIRE : 
+
+
+  Actuellement, le site utilise un système de données purement local (localStorage). 
+Pour une solution professionnelle et sécurisée, il est nécessaire d'implémenter un backend fiable.
+
+    1. Backend : Supabase (Recommandé) ou Firebase
+    Objectif : Remplacer le localStorage par une base de données distante sécurisée.
+    Actions requises :
+
+    Créer un compte Supabase (ou Firebase).
+    Définir la structure de la base de données (tables merchants, reviews, prizes).
+    Intégrer le SDK Supabase dans app.js et merchant.js.
+    Remplacer les appels localStorage.getItem/setItem par des appels fetch/await vers l'API Supabase.
+    2. Authentification Sécurisée
+    Objectif : Gérer les sessions des gérants de manière sécurisée (actuellement géré par localStorage).
+    Actions requises :
+
+    Mettre en place une authentification OAuth via Supabase pour les gérants.
+    Ajouter des règles de sécurité (Row Level Security) pour garantir qu'un gérant ne puisse accéder qu'à ses propres données.
+    3. Dashboard Gérant Amélioré
+    Objectif : Offrir une vue d'ensemble professionnelle de la performance du commerce.
+    Actions requises :
+
+    Ajouter des métriques réelles (nombre d'avis collectés, taux de conversion, nombre de tickets distribués).
+    Créer un graphique de performance visuellement attractif (librairie Chart.js déjà présente, à reconnecter avec la base de données).
+    Permettre aux gérants de visualiser et de répondre directement aux avis clients depuis le dashboard.
+
+
+
+
+  Modifier aspect global du site pour donner un rendu plus professionnel. (s'inspirer des sites qonto, stripe, fintectra)
+  Avoir des pages dédiées:  
+  - Accueil
+  - Page d'inscription
+  - Page de connexion 
+  - Page d'information
+  - Page de contact
+  - Page de FAQ
+  - Page de mentions légales
+  - Page de politique de confidentialité
+  - Page de conditions générales d'utilisation
+  - Page de politique de retour
+  - Page de politique de remboursement
+  - Page de politique de livraison
+  - Page de politique de confidentialité
+  

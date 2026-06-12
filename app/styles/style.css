@@ -2,12 +2,12 @@
 
 :root {
     --bg-main: #060608;
-    --bg-card: #111115;
-    --bg-input: #1b1b22;
-    --border-color: #22222a;
+    --bg-card: rgba(17, 17, 21, 0.75);
+    --bg-input: #13131a;
+    --border-color: rgba(255, 255, 255, 0.08);
     --primary: #e50914;
     --primary-hover: #b80710;
-    --primary-glow: rgba(229, 9, 20, 0.4);
+    --primary-glow: rgba(229, 9, 20, 0.35);
     --text-main: #f5f5f7;
     --text-muted: #8e8e93;
     --text-google: #4285f4;
@@ -16,6 +16,13 @@
     --font-body: 'Plus Jakarta Sans', sans-serif;
     --phone-w: 375px;
     --phone-h: 780px;
+
+    /* Premium visual tokens */
+    --glass-bg: rgba(17, 17, 21, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --glass-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.5);
+    --glass-blur: blur(12px);
+    --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -30,10 +37,69 @@ body {
     font-family: var(--font-body);
     min-height: 100vh;
     overflow-x: hidden;
-    background-image: 
-        radial-gradient(circle at 10% 20%, rgba(229, 9, 20, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(229, 9, 20, 0.05) 0%, transparent 40%);
+    position: relative;
 }
+
+body::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    mask-image: radial-gradient(circle at 50% 30%, black 30%, transparent 80%);
+    pointer-events: none;
+}
+
+body::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(229, 9, 20, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(229, 9, 20, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(66, 133, 244, 0.03) 0%, transparent 35%);
+    pointer-events: none;
+}
+
+/* Scroll-Reveal System */
+.reveal {
+    opacity: 0;
+    transition: opacity 0.8s var(--ease-premium), transform 0.8s var(--ease-premium);
+    will-change: opacity, transform;
+}
+
+.reveal-fade-in {
+    transform: translateY(0);
+}
+
+.reveal-slide-up {
+    transform: translateY(40px);
+}
+
+.reveal-slide-left {
+    transform: translateX(40px);
+}
+
+.reveal-slide-right {
+    transform: translateX(-40px);
+}
+
+.reveal.in-view {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+}
+
+/* Stagger delays */
+.delay-100 { transition-delay: 100ms; }
+.delay-200 { transition-delay: 200ms; }
+.delay-300 { transition-delay: 300ms; }
+.delay-400 { transition-delay: 400ms; }
+.delay-500 { transition-delay: 500ms; }
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
@@ -217,12 +283,37 @@ main {
 }
 
 .panel-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    padding: 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    padding: 2.25rem 2rem;
     position: relative;
     overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    transition: border-color 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium), transform 0.4s var(--ease-premium);
+}
+
+.panel-card:hover {
+    border-color: rgba(229, 9, 20, 0.15);
+    box-shadow: 0 15px 40px 0 rgba(0, 0, 0, 0.6), 0 0 30px rgba(229, 9, 20, 0.03);
+}
+
+.panel-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), #ff2e3b, transparent);
+    background-size: 200% 100%;
+    animation: glowMove 4s linear infinite;
+}
+
+@keyframes glowMove {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 200% 50%; }
 }
 
 .panel-card::before {
@@ -282,16 +373,22 @@ main {
     border: 1px solid var(--border-color);
     color: var(--text-main);
     padding: 0.75rem 1rem;
-    border-radius: 10px;
+    border-radius: 12px;
     font-family: var(--font-body);
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.3s var(--ease-premium), box-shadow 0.3s var(--ease-premium), background-color 0.3s;
+}
+
+.form-group input:hover, .form-group select:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: #16161f;
 }
 
 .form-group input:focus, .form-group select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.25);
+    background: #181824;
+    box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 #private-feedback-text:focus {
@@ -537,16 +634,19 @@ main {
 }
 
 .feature-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.5rem;
-    transition: transform 0.2s, border-color 0.2s;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 1.75rem;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.4s var(--ease-premium), border-color 0.4s var(--ease-premium), box-shadow 0.4s var(--ease-premium);
 }
 
 .feature-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(229, 9, 20, 0.3);
+    transform: translateY(-6px);
+    border-color: rgba(229, 9, 20, 0.25);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 0 20px rgba(229, 9, 20, 0.08);
 }
 
 .feature-icon {
@@ -582,30 +682,49 @@ main {
 /* RIGHT COLUMN: iPhone Simulator Container */
 .phone-simulator-wrapper {
     position: sticky;
-    top: calc(50vh - 280px);
+    top: 2rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     z-index: 10;
-    transform: scale(0.65);
+    transform: scale(0.75);
     transform-origin: top center;
-    margin-bottom: -280px;
+    height: 920px;
+    margin-bottom: -230px;
+    transition: transform 0.3s var(--ease-premium), margin-bottom 0.3s var(--ease-premium);
 }
 
-@media (max-height: 850px) {
+@media (max-height: 900px) {
     .phone-simulator-wrapper {
-        transform: scale(0.58);
-        margin-bottom: -330px;
-        top: calc(50vh - 240px);
+        transform: scale(0.65);
+        margin-bottom: -320px;
+        top: 1rem;
     }
 }
 
-@media (max-height: 700px) {
+@media (max-height: 750px) {
     .phone-simulator-wrapper {
-        transform: scale(0.51);
-        margin-bottom: -380px;
-        top: calc(50vh - 210px);
+        transform: scale(0.52);
+        margin-bottom: -440px;
+        top: 0.5rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .phone-simulator-wrapper {
+        position: relative;
+        top: 0;
+        transform: scale(0.85);
+        transform-origin: center center;
+        height: auto;
+        margin: 2rem auto 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .phone-simulator-wrapper {
+        transform: scale(0.72);
     }
 }
 
@@ -615,20 +734,32 @@ main {
     height: var(--phone-h);
     background: #000000;
     border-radius: 55px;
-    border: 12px solid #222;
+    border: 12px solid #1a1a1f;
     box-shadow: 
-        0 25px 50px -12px rgba(0,0,0,0.8),
-        0 0 40px rgba(229, 9, 20, 0.15),
-        inset 0 0 10px rgba(255,255,255,0.1);
+        0 30px 60px -15px rgba(0,0,0,0.9),
+        0 0 50px var(--primary-glow),
+        inset 0 0 12px rgba(255,255,255,0.15);
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    transition: box-shadow 0.5s var(--ease-premium);
+}
+
+.phone-container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 50%);
+    pointer-events: none;
+    z-index: 99;
 }
 
 /* iPhone Island (Dynamic notch) */
 .phone-notch {
-    display: none !important;
     position: absolute;
     top: 12px;
     left: 50%;
@@ -661,12 +792,11 @@ main {
 
 /* Status Bar inside the simulator */
 .phone-status-bar {
-    display: none !important;
     height: 48px;
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    padding: 0 24px 8px;
+    padding: 0 32px 8px;
     font-size: 0.75rem;
     font-weight: 600;
     color: white;
@@ -756,7 +886,7 @@ main {
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    padding-top: 24px; /* Space to prevent clipping under rounded container corners when status bar is hidden */
+    padding-top: 0; /* Handled by status bar */
 }
 
 .app-screen {
@@ -764,7 +894,7 @@ main {
     inset: 0;
     display: flex;
     flex-direction: column;
-    padding: 1.25rem 1.25rem 4.5rem 1.25rem;
+    padding: 1.25rem 1.25rem 5.5rem 1.25rem;
     opacity: 0;
     pointer-events: none;
     transform: translateX(30px);
@@ -882,11 +1012,11 @@ main {
 /* STEP 1: WELCOME SCREEN */
 .hero-pizza-image {
     width: 100%;
-    height: 180px;
+    height: 120px;
     border-radius: 16px;
     overflow: hidden;
     position: relative;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     border: 1px solid var(--border-color);
 }
 
@@ -905,8 +1035,8 @@ main {
 
 .app-title-large {
     font-family: var(--font-display);
-    font-size: 1.45rem;
-    font-weight: 800;
+    font-size: 1.22rem;
+    font-weight: 850;
     line-height: 1.25;
     margin-bottom: 0.5rem;
 }
@@ -918,19 +1048,23 @@ main {
 
 .step-checklist {
     width: 100%;
-    margin: 1.25rem 0;
+    margin: 0.5rem 0;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 0.9rem;
+    border-radius: 14px;
 }
 
 .checklist-item {
     display: flex;
     align-items: flex-start;
-    gap: 0.75rem;
+    gap: 0.6rem;
     font-size: 0.75rem;
-    line-height: 1.4;
+    line-height: 1.35;
 }
 
 .checklist-icon {
@@ -949,10 +1083,13 @@ main {
 .checklist-text h4 {
     font-weight: 700;
     color: var(--text-main);
+    font-size: 0.82rem;
 }
 
 .checklist-text p {
     color: var(--text-muted);
+    font-size: 0.72rem;
+    margin-top: 1px;
 }
 
 .btn-google-signin {
@@ -960,8 +1097,8 @@ main {
     background: white;
     color: #1f2937;
     border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    border-radius: 12px;
     font-family: var(--font-body);
     font-weight: 600;
     font-size: 0.85rem;
@@ -992,7 +1129,7 @@ main {
 
 /* STEP 2: LEAVE REVIEW */
 .google-logo-wrapper {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
 }
 
 .google-logo-wrapper img {
@@ -1003,23 +1140,27 @@ main {
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.15rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .review-subtext {
     font-size: 0.75rem;
     color: var(--text-muted);
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.85rem;
 }
 
 .stars-container {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: 0.6rem;
+    margin: 0.75rem 0;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.6rem 1.25rem;
+    border-radius: 14px;
 }
 
 .star-interactive {
-    font-size: 1.75rem;
+    font-size: 1.6rem;
     color: var(--border-color);
     cursor: pointer;
     transition: color 0.1s, transform 0.1s;
@@ -1064,14 +1205,14 @@ main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 0.75rem;
+    padding: 0.5rem 0.75rem;
     background: var(--bg-input);
     border: 1px solid var(--border-color);
     border-radius: 8px;
     width: 100%;
-    margin-top: 1.25rem;
+    margin-top: 0.75rem;
     text-align: left;
-    font-size: 0.65rem;
+    font-size: 0.62rem;
     color: var(--text-muted);
 }
 
@@ -1083,15 +1224,15 @@ main {
 .wheel-instructions {
     font-size: 0.75rem;
     color: var(--text-muted);
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 /* Roulette Canvas/SVG Container */
 .wheel-outer-container {
-    width: 270px;
-    height: 270px;
+    width: 210px;
+    height: 210px;
     position: relative;
-    margin: 1.25rem 0;
+    margin: 0.75rem 0;
     user-select: none;
 }
 
@@ -1198,29 +1339,29 @@ main {
 .celeb-title {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.45rem;
+    font-size: 1.3rem;
     color: var(--text-main);
     letter-spacing: 0.05em;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.15rem;
 }
 
 .celeb-subtitle {
     font-size: 0.75rem;
     color: var(--text-muted);
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.75rem;
 }
 
 .prize-showcase-box {
     width: 100%;
     background: rgba(229, 9, 20, 0.05);
-    border: 1px dashed rgba(229, 9, 20, 0.25);
+    border: 1px dashed rgba(229, 9, 20, 0.2);
     border-radius: 16px;
-    padding: 1.5rem;
-    margin-bottom: 1.25rem;
+    padding: 0.85rem 1rem;
+    margin: 0.75rem 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.5rem;
     animation: pulseBox 2s infinite alternate;
 }
 
@@ -1230,22 +1371,22 @@ main {
 }
 
 .prize-visual-icon {
-    width: 80px;
-    height: 80px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: rgba(229, 9, 20, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.25rem;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    font-size: 1.5rem;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
     border: 1px solid rgba(229, 9, 20, 0.3);
 }
 
 .prize-name-won {
     font-family: var(--font-display);
     font-weight: 800;
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     color: var(--primary);
     text-transform: uppercase;
 }
@@ -1265,7 +1406,7 @@ main {
 
 .countdown-digits {
     font-family: var(--font-display);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-main);
     letter-spacing: 0.05em;
@@ -1332,13 +1473,13 @@ main {
 /* STEP 5: FINAL TICKET */
 .ticket-wrapper {
     width: 100%;
-    background: var(--bg-card);
-    border: 2px solid #3a1515;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    padding: 1.25rem;
+    padding: 1.25rem 1rem;
     position: relative;
-    margin-bottom: 1rem;
-    box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+    margin: 1rem 0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
 }
 
 /* Ticket dashed separator */
@@ -1390,9 +1531,9 @@ main {
 
 .ticket-barcode-box {
     background: white;
-    padding: 0.6rem;
-    border-radius: 8px;
-    margin-top: 1.75rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1416,6 +1557,15 @@ main {
     color: var(--text-muted);
     line-height: 1.4;
     margin-top: 0.75rem;
+}
+
+.ticket-redeem-notice {
+    font-size: 0.62rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+    margin-top: 0.6rem;
+    text-align: center;
+    max-width: 95%;
 }
 
 .btn-how-it-works {
@@ -1599,12 +1749,12 @@ footer {
 /* Coupon Ticket Prize Image Styles */
 .ticket-image-box {
     width: 100%;
-    height: 140px;
+    height: 110px;
     border-radius: 12px;
     overflow: hidden;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
     border: 1px solid var(--border-color);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
 }
 
 #ticket-prize-img {
@@ -1656,7 +1806,7 @@ footer {
     gap: 0.5rem;
     text-decoration: none;
     transition: transform 0.2s, background-color 0.2s;
-    margin-top: 1.25rem;
+    margin-top: 0.75rem;
     box-shadow: 0 4px 12px var(--primary-glow);
 }
 
@@ -1743,4 +1893,186 @@ footer {
 
 #btn-header-register:hover {
     background: var(--border-color);
+}
+
+/* ════════════════════════════════════
+   HERO ILLUSTRATION & SHOWCASE
+   ════════════════════════════════════ */
+.hero-illustration-wrap {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    margin-top: 2rem;
+    transition: transform 0.4s var(--ease-premium), border-color 0.4s var(--ease-premium);
+}
+
+.hero-illustration-wrap:hover {
+    transform: translateY(-4px) scale(1.01);
+    border-color: rgba(229, 9, 20, 0.25);
+}
+
+.hero-illustration-img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.95) contrast(1.05);
+    transition: filter 0.3s;
+}
+
+.hero-illustration-wrap:hover .hero-illustration-img {
+    filter: brightness(1) contrast(1.05);
+}
+
+.illustration-glow-badge {
+    position: absolute;
+    bottom: 1.25rem;
+    left: 1.25rem;
+    background: rgba(6, 6, 8, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ════════════════════════════════════
+   INTERACTIVE STORYTELLING TIMELINE
+   ════════════════════════════════════ */
+.timeline-section {
+    margin: 4.5rem 0 2rem;
+}
+
+.timeline-heading {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-weight: 850;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(180deg, #ffffff 0%, #a3a3a3 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.timeline-heading span {
+    background: linear-gradient(135deg, #ff3333 0%, #e50914 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.timeline-subheading {
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 3rem;
+}
+
+.timeline-container {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+@media (max-width: 900px) {
+    .timeline-container {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+    }
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    z-index: 2;
+}
+
+@media (max-width: 900px) {
+    .timeline-item {
+        flex-direction: row;
+        gap: 1.5rem;
+        align-items: center;
+    }
+}
+
+.timeline-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    transition: all 0.4s var(--ease-premium);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+}
+
+@media (max-width: 900px) {
+    .timeline-badge {
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+}
+
+.timeline-item:hover .timeline-badge {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    transform: scale(1.15);
+    box-shadow: 0 0 15px rgba(229, 9, 20, 0.45);
+}
+
+.timeline-content {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 1.5rem 1.25rem;
+    width: 100%;
+    box-shadow: var(--glass-shadow);
+    transition: border-color 0.4s var(--ease-premium), transform 0.4s var(--ease-premium);
+}
+
+.timeline-item:hover .timeline-content {
+    border-color: rgba(229, 9, 20, 0.2);
+    transform: translateY(-2px);
+}
+
+.step-tag {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-content h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+}
+
+.timeline-content p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    line-height: 1.45;
 }

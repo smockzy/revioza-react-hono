@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Route } from "./+types/pricing";
 import "../styles/style.css";
 import "../styles/pricing.css";
@@ -28,6 +28,31 @@ const prices: Record<string, PlanConfig> = {
 
 export default function Pricing() {
 	const [isAnnual, setIsAnnual] = useState(false);
+	const [openFaq, setOpenFaq] = useState<Record<number, boolean>>({});
+
+	const toggleFaq = (index: number) => {
+		setOpenFaq((prev) => ({
+			...prev,
+			[index]: !prev[index],
+		}));
+	};
+
+	// Scroll reveal IntersectionObserver
+	useEffect(() => {
+		const revealEls = document.querySelectorAll(".reveal");
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add("in-view");
+					}
+				});
+			},
+			{ threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+		);
+		revealEls.forEach((el) => observer.observe(el));
+		return () => observer.disconnect();
+	}, []);
 
 	const getPrice = (plan: string) => (isAnnual ? prices[plan].annual : prices[plan].monthly);
 	const getReassurance = () =>
@@ -61,7 +86,7 @@ export default function Pricing() {
 
 			<main className="pricing-container">
 				{/* Hero Title */}
-				<section className="pricing-hero">
+				<section className="pricing-hero reveal reveal-slide-up">
 					<h1>
 						Des tarifs simples, <span>sans engagement</span>
 					</h1>
@@ -101,7 +126,7 @@ export default function Pricing() {
 				{/* Pricing Grid */}
 				<section className="pricing-grid-plans">
 					{/* Plan 1: Starter */}
-					<div className="pricing-card">
+					<div className="pricing-card reveal reveal-slide-up delay-100">
 						<div className="plan-header">
 							<span className="plan-tier">Solo / Starter</span>
 							<h2 className="plan-price" id="price-starter">
@@ -168,7 +193,7 @@ export default function Pricing() {
 					</div>
 
 					{/* Plan 2: Business (Featured) */}
-					<div className="pricing-card featured">
+					<div className="pricing-card featured reveal reveal-slide-up delay-200">
 						<div className="featured-ribbon">Recommandé</div>
 						<div className="plan-header">
 							<span className="plan-tier">Business / Growth</span>
@@ -263,7 +288,7 @@ export default function Pricing() {
 					</div>
 
 					{/* Plan 3: Franchise */}
-					<div className="pricing-card">
+					<div className="pricing-card reveal reveal-slide-up delay-300">
 						<div className="plan-header">
 							<span className="plan-tier">Franchise & Réseau</span>
 							<h2 className="plan-price" id="price-franchise">
@@ -357,64 +382,57 @@ export default function Pricing() {
 				</section>
 
 				{/* FAQ Section */}
-				<section className="pricing-faq">
+				<section className="pricing-faq reveal reveal-slide-up">
 					<h2>Questions Fréquentes</h2>
-					<div className="faq-grid">
-						<div className="faq-item">
-							<h3>Y a-t-il un engagement de durée ?</h3>
-							<p>
-								Non, toutes nos offres mensuelles sont 100% sans engagement. Vous pouvez suspendre,
-								résilier ou modifier votre abonnement à tout moment en un clic depuis votre espace gérant.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Comment fonctionne l&apos;offre d&apos;essai de 14 jours ?</h3>
-							<p>
-								L&apos;essai gratuit de 14 jours est universel et disponible sur toutes nos formules.
-								Aucune carte bancaire n&apos;est requise. Vous pouvez configurer votre compte, imprimer
-								des QR codes temporaires et tester le système immédiatement.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Qu&apos;est-ce que le filtrage intelligent des avis ?</h3>
-							<p>
-								Si un client sélectionne une note basse (1 à 3 étoiles), le système lui propose de rédiger
-								une critique constructive privée destinée uniquement à la direction, évitant ainsi un avis
-								négatif public sur votre fiche Google Maps.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Comment sont générés et imprimés les QR codes ?</h3>
-							<p>
-								Depuis votre espace d&apos;administration, vous pouvez télécharger un fichier PDF prêt à
-								l&apos;emploi contenant vos chevalets de table avec votre code QR unique. Il vous suffit de
-								les imprimer et de les placer sur vos tables ou comptoirs.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Est-ce que c&apos;est légal ?</h3>
-							<p>
-								Oui, totalement. Revioza incite vos clients à partager leur expérience sincère — nous ne
-								demandons jamais explicitement une note de 5 étoiles. La récompense est offerte en échange
-								d&apos;un avis honnête, ce qui est conforme aux conditions d&apos;utilisation de Google.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Combien d&apos;avis vais-je vraiment obtenir ?</h3>
-							<p>
-								Nos clients obtiennent en moyenne 40 à 80 nouveaux avis dès le premier mois
-								d&apos;utilisation, selon la fréquentation de leur établissement. Certains restaurants ont
-								doublé leur nombre total d&apos;avis en moins de 6 semaines.
-							</p>
-						</div>
-						<div className="faq-item">
-							<h3>Puis-je résilier mon abonnement annuel ?</h3>
-							<p>
-								Oui, vous pouvez résilier à tout moment depuis votre espace gérant. L&apos;abonnement
-								annuel est facturé en une fois et n&apos;est pas remboursable, mais vous conservez un accès
-								complet à Revioza jusqu&apos;au dernier jour de votre période de 12 mois.
-							</p>
-						</div>
+					<div className="faq-accordion-container">
+						{[
+							{
+								q: "Y a-t-il un engagement de durée ?",
+								a: "Non, toutes nos offres mensuelles sont 100% sans engagement. Vous pouvez suspendre, résilier ou modifier votre abonnement à tout moment en un clic depuis votre espace gérant.",
+							},
+							{
+								q: "Comment fonctionne l'offre d'essai de 14 jours ?",
+								a: "L'essai gratuit de 14 jours est universel et disponible sur toutes nos formules. Aucune carte bancaire n'est requise. Vous pouvez configurer votre compte, imprimer des QR codes temporaires et tester le système immédiatement.",
+							},
+							{
+								q: "Qu'est-ce que le filtrage intelligent des avis ?",
+								a: "Si un client sélectionne une note basse (1 à 3 étoiles), le système lui propose de rédiger une critique constructive privée destinée uniquement à la direction, évitant ainsi un avis négatif public sur votre fiche Google Maps.",
+							},
+							{
+								q: "Comment sont générés et imprimés les QR codes ?",
+								a: "Depuis votre espace d'administration, vous pouvez télécharger un fichier PDF prêt à l'emploi contenant vos chevalets de table avec votre code QR unique. Il vous suffit de les imprimer et de les placer sur vos tables ou comptoirs.",
+							},
+							{
+								q: "Est-ce que c'est légal ?",
+								a: "Oui, totalement. Revioza incite vos clients à partager leur expérience sincère — nous ne demandons jamais explicitement une note de 5 étoiles. La récompense est offerte en échange d'un avis honnête, ce qui est conforme aux conditions d'utilisation de Google.",
+							},
+							{
+								q: "Combien d'avis vais-je vraiment obtenir ?",
+								a: "Nos clients obtiennent en moyenne 40 à 80 nouveaux avis dès le premier mois d'utilisation, selon la fréquentation de leur établissement. Certains restaurants ont doublé leur nombre total d'avis en moins de 6 semaines.",
+							},
+							{
+								q: "Puis-je résilier mon abonnement annuel ?",
+								a: "Oui, vous pouvez résilier à tout moment depuis votre espace gérant. L'abonnement annuel est facturé en une fois et n'est pas remboursable, mais vous conservez un accès complet à Revioza jusqu'au dernier jour de votre période de 12 mois.",
+							},
+						].map((item, idx) => (
+							<div 
+								className={`faq-accordion-item ${openFaq[idx] ? "open" : ""}`} 
+								key={idx}
+								onClick={() => toggleFaq(idx)}
+							>
+								<div className="faq-question-bar">
+									<h3>{item.q}</h3>
+									<span className="faq-icon-toggle">
+										<i className="fa-solid fa-chevron-down"></i>
+									</span>
+								</div>
+								<div className="faq-answer-wrapper">
+									<div className="faq-answer-content">
+										<p>{item.a}</p>
+									</div>
+								</div>
+							</div>
+						))}
 					</div>
 				</section>
 			</main>

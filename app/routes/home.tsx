@@ -113,6 +113,23 @@ export default function Home() {
 		}
 	}, []);
 
+	// Scroll Reveal Observer
+	useEffect(() => {
+		const revealEls = document.querySelectorAll(".reveal");
+		const observer = new IntersectionObserver(
+			(entries) => {
+				entries.forEach((entry) => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add("in-view");
+					}
+				});
+			},
+			{ threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+		);
+		revealEls.forEach((el) => observer.observe(el));
+		return () => observer.disconnect();
+	}, []);
+
 	// Render wheel whenever prizes change
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -444,15 +461,27 @@ export default function Home() {
 			<main>
 				{/* Left B2B Pitch & Customizer Panel */}
 				<div className="pitch-and-controls">
-					<div className="hero-block">
+					<div className="hero-block reveal reveal-slide-up">
 						<h1>
 							Démultipliez vos <span>Avis Google</span> par le Jeu
 						</h1>
-						<p>
+						<p style={{ marginBottom: "2rem" }}>
 							Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
 							sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
 							gain instantané configuré par vos soins.
 						</p>
+						
+						{/* Showcase generated B2B Product Photograph */}
+						<div className="hero-illustration-wrap reveal reveal-slide-up delay-100">
+							<img 
+								src="/assets/dining_table_qr_scan.png" 
+								alt="Client scannant le QR code sur une table de restaurant" 
+								className="hero-illustration-img"
+							/>
+							<div className="illustration-glow-badge">
+								<i className="fa-solid fa-bolt"></i> Expérience instantanée
+							</div>
+						</div>
 					</div>
 
 					{/* Admin Panel */}
@@ -737,9 +766,59 @@ export default function Home() {
 						</div>
 					</section>
 
+					{/* Interactive Storytelling Timeline */}
+					<section className="timeline-section reveal reveal-slide-up">
+						<h2 className="timeline-heading">
+							Comment fonctionne <span>Revioza</span> ?
+						</h2>
+						<p className="timeline-subheading">
+							Un parcours fluide en 4 étapes simples pour multiplier par 10 vos avis clients.
+						</p>
+
+						<div className="timeline-container">
+							{[
+								{
+									stepNum: "1",
+									icon: "fa-qrcode",
+									title: "Scan du QR Code",
+									desc: "Le client scanne le QR code unique présent sur sa table pour lancer l'expérience sur son mobile.",
+								},
+								{
+									stepNum: "2",
+									icon: "fa-shield-halved",
+									title: "Connexion Google",
+									desc: "Une authentification simple et sécurisée valide l'identité du client et évite les participations multiples.",
+								},
+								{
+									stepNum: "3",
+									icon: "fa-star",
+									title: "Avis Honnête",
+									desc: "Le client laisse sa note. Si elle est positive (4-5★), il est redirigé vers Google. Si elle est basse (1-3★), il laisse un retour privé.",
+								},
+								{
+									stepNum: "4",
+									icon: "fa-trophy",
+									title: "Tirage & Gain",
+									desc: "La roue tourne ! Le client gagne un lot (configuré par vos soins) à consommer sur place dans les 2 heures.",
+								},
+							].map((item, idx) => (
+								<div className="timeline-item" key={idx}>
+									<div className="timeline-badge">
+										<i className={`fa-solid ${item.icon}`}></i>
+									</div>
+									<div className="timeline-content">
+										<span className="step-tag">Étape {item.stepNum}</span>
+										<h3>{item.title}</h3>
+										<p>{item.desc}</p>
+									</div>
+								</div>
+							))}
+						</div>
+					</section>
+
 					{/* Features Grid */}
-					<div className="features-grid">
-						<div className="feature-card">
+					<div className="features-grid reveal reveal-slide-up">
+						<div className="feature-card delay-100">
 							<div className="feature-icon">
 								<i className="fa-solid fa-shield-halved"></i>
 							</div>
@@ -749,7 +828,7 @@ export default function Home() {
 								Tickets de gain éphémères.
 							</p>
 						</div>
-						<div className="feature-card">
+						<div className="feature-card delay-200">
 							<div className="feature-icon">
 								<i className="fa-solid fa-qrcode"></i>
 							</div>
@@ -759,7 +838,7 @@ export default function Home() {
 								compte d&apos;établissement.
 							</p>
 						</div>
-						<div className="feature-card">
+						<div className="feature-card delay-300">
 							<div className="feature-icon">
 								<i className="fa-solid fa-chart-line"></i>
 							</div>
@@ -769,7 +848,7 @@ export default function Home() {
 								globale de votre note moyenne.
 							</p>
 						</div>
-						<div className="feature-card">
+						<div className="feature-card delay-400">
 							<div className="feature-icon">
 								<i className="fa-solid fa-unlock"></i>
 							</div>
@@ -783,7 +862,7 @@ export default function Home() {
 				</div>
 
 				{/* Right Mobile Simulator Column */}
-				<div className="phone-simulator-wrapper">
+				<div className="phone-simulator-wrapper reveal reveal-fade-in delay-200">
 					<div className="phone-container">
 						<div className="phone-notch">
 							<div className="phone-notch-camera"></div>
