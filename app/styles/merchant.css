@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-
-
 :root {
     --bg: #060608;
     --bg-card: #111115;
@@ -30,7 +28,7 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-html, & {
+html, body {
     height: 100%;
     overflow: hidden;
     background: var(--bg);
@@ -161,7 +159,7 @@ html, & {
     display: none;
 }
 
-.screen-& {
+.screen-body {
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -716,4 +714,3 @@ input[type="range"] {
 .full-width {
     width: 100%;
 }
-
