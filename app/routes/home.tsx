@@ -109,12 +109,15 @@ export default function Home() {
 	const [cookieBanner, setCookieBanner] = useState(false);
 	const [isAnnualPricing, setIsAnnualPricing] = useState(false);
 	const [placeIdHelp, setPlaceIdHelp] = useState(false);
+	const [overlayRules, setOverlayRules] = useState(false);
+	const [overlayProfile, setOverlayProfile] = useState(false);
 	// SSR guard for Framer Motion
 	const [isMounted, setIsMounted] = useState(false);
 	const prefersReducedMotion = useReducedMotion();
 
 	// Demo simulator canvas ref (connected to admin panel)
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Ref to the interactive demo section for smooth scroll
 	const demoSectionRef = useRef<HTMLElement>(null);
@@ -169,6 +172,14 @@ export default function Home() {
 				document.documentElement.style.setProperty("--primary", cookieColor);
 			}
 		}
+
+		// URL parameter check for registration popup
+		const urlParams = new URLSearchParams(window.location.search);
+		if (urlParams.get("register") === "true") {
+			setActiveTab("register");
+			setOverlayRegister(true);
+			window.history.replaceState({}, document.title, window.location.pathname);
+		}
 	}, []);
 
 	// Scroll Reveal Observer
@@ -188,14 +199,14 @@ export default function Home() {
 		return () => observer.disconnect();
 	}, [isMounted]);
 
-	// Render wheel whenever prizes change (demo simulator canvas)
+	// Render wheel whenever prizes change, or when step changes (demo simulator canvas)
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
-		renderWheelCanvas(canvas, ctx, appState.prizes, 300);
-	}, [appState.prizes]);
+		renderWheelCanvas(canvas, ctx, appState.prizes, 270);
+	}, [appState.prizes, appState.currentStep]);
 
 	// Timer management
 	useEffect(() => {
@@ -250,6 +261,16 @@ export default function Home() {
 		[appState.googleLink]
 	);
 
+	const openRegisterModal = useCallback(() => {
+		setActiveTab("register");
+		setOverlayRegister(true);
+	}, []);
+
+	const openLoginModal = useCallback(() => {
+		setActiveTab("login");
+		setOverlayRegister(true);
+	}, []);
+
 	const handleGoogleSignin = useCallback(() => {
 		goToStep(2);
 	}, [goToStep]);
@@ -269,7 +290,8 @@ export default function Home() {
 		if (canvas) {
 			const currentRotation = parseFloat(canvas.style.transform?.replace(/[^0-9.-]/g, "") || "0");
 			const spinRotations = 5 * 360;
-			const finalRotation = currentRotation + spinRotations + targetAngle;
+			const currentBase = Math.floor(currentRotation / 360) * 360;
+			const finalRotation = currentBase + spinRotations + targetAngle;
 
 			canvas.style.transition = "transform 4.5s cubic-bezier(0.15, 0.95, 0.35, 1)";
 			canvas.style.transform = `rotate(${finalRotation}deg)`;
@@ -285,15 +307,18 @@ export default function Home() {
 			if (!won.name.toLowerCase().includes("perdu")) {
 				import("canvas-confetti").then((mod) => {
 					const confetti = mod.default;
-					const canvas = canvasRef.current;
-					let x = 0.5;
-					let y = 0.6;
-					if (canvas) {
-						const rect = canvas.getBoundingClientRect();
-						x = (rect.left + rect.width / 2) / window.innerWidth;
-						y = (rect.top + rect.height / 2) / window.innerHeight;
+					const confCanvas = confettiCanvasRef.current;
+					if (confCanvas) {
+						const myConfetti = confetti.create(confCanvas, {
+							resize: true,
+							useWorker: true,
+						});
+						myConfetti({
+							particleCount: 80,
+							spread: 60,
+							origin: { x: 0.5, y: 0.5 },
+						});
 					}
-					confetti({ particleCount: 100, spread: 70, origin: { x, y } });
 				});
 			}
 
@@ -310,7 +335,7 @@ export default function Home() {
 			const canvas = canvasRef.current;
 			if (canvas) {
 				const ctx = canvas.getContext("2d");
-				if (ctx) renderWheelCanvas(canvas, ctx, appState.prizes, 300);
+				if (ctx) renderWheelCanvas(canvas, ctx, appState.prizes, 270);
 			}
 		},
 		[appState.prizes, updateAndSave]
@@ -481,6 +506,11 @@ export default function Home() {
 		[updateAndSave]
 	);
 
+	const handleGoogleLogin = useCallback(() => {
+		localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
+		window.location.href = "/merchant";
+	}, []);
+
 	// Smooth scroll to interactive demo section
 	const handleScrollToDemo = useCallback(() => {
 		demoSectionRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -529,6 +559,19 @@ export default function Home() {
 					</div>
 
 					<div className="phone-content">
+						{!isHero && (
+							<canvas
+								ref={confettiCanvasRef}
+								style={{
+									position: "absolute",
+									inset: 0,
+									pointerEvents: "none",
+									zIndex: 98,
+									width: "100%",
+									height: "100%",
+								}}
+							/>
+						)}
 						{/* STEP 1: WELCOME — always active in hero, conditional in demo */}
 						<div
 							className={`app-screen ${isHero || appState.currentStep === 1 ? "active" : ""}`}
@@ -814,22 +857,34 @@ export default function Home() {
 
 								{/* Bottom Nav */}
 								<div className="app-bottom-nav">
-									<div className="nav-item active" onClick={() => goToStep(3)}>
+									<div
+										className={`nav-item ${appState.currentStep === 3 && !overlayRules && !overlayProfile ? "active" : ""}`}
+										onClick={() => {
+											setOverlayRules(false);
+											setOverlayProfile(false);
+											goToStep(3);
+										}}
+									>
 										<i className="fa-solid fa-house"></i>
 										Accueil
 									</div>
 									<div
-										className="nav-item"
-										onClick={() =>
-											alert(
-												"Règles du jeu : 1 participation par jour maximum, réservée aux clients de l'établissement."
-											)
-										}
+										className={`nav-item ${overlayRules ? "active" : ""}`}
+										onClick={() => {
+											setOverlayRules(true);
+											setOverlayProfile(false);
+										}}
 									>
 										<i className="fa-solid fa-circle-info"></i>
 										Règles
 									</div>
-									<div className="nav-item" onClick={() => alert("Profil : Connecté avec Google.")}>
+									<div
+										className={`nav-item ${overlayProfile ? "active" : ""}`}
+										onClick={() => {
+											setOverlayProfile(true);
+											setOverlayRules(false);
+										}}
+									>
 										<i className="fa-solid fa-user"></i>
 										Profil
 									</div>
@@ -862,6 +917,74 @@ export default function Home() {
 											}}
 										>
 											J&apos;ai déposé mon avis
+										</button>
+									</div>
+								</div>
+
+								{/* Rules Overlay */}
+								<div className={`phone-alert-overlay ${overlayRules ? "active" : ""}`}>
+									<div className="phone-alert-card">
+										<div className="phone-alert-icon" style={{ backgroundColor: "rgba(52, 199, 89, 0.1)", color: "var(--accent-green)" }}>
+											<i className="fa-solid fa-circle-info"></i>
+										</div>
+										<h4 className="phone-alert-title">Règles du Jeu</h4>
+										<div className="phone-alert-desc" style={{ textAlign: "left", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+											<p>• <strong>1 participation</strong> par jour et par personne maximum.</p>
+											<p>• Réservé exclusivement aux clients de l&apos;établissement.</p>
+											<p>• Présentation de l&apos;avis publié obligatoire pour retirer le lot.</p>
+											<p>• Aucun lot ne peut être converti en espèces.</p>
+										</div>
+										<button
+											className="btn-alert-action"
+											style={{ backgroundColor: "var(--primary)" }}
+											onClick={() => setOverlayRules(false)}
+										>
+											Fermer
+										</button>
+									</div>
+								</div>
+
+								{/* Profile Overlay */}
+								<div className={`phone-alert-overlay ${overlayProfile ? "active" : ""}`}>
+									<div className="phone-alert-card">
+										<div className="phone-alert-icon">
+											<i className="fa-solid fa-user"></i>
+										</div>
+										<h4 className="phone-alert-title">Mon Profil</h4>
+										<div className="phone-alert-desc" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.5rem", width: "100%" }}>
+											<div style={{
+												width: "50px",
+												height: "50px",
+												borderRadius: "50%",
+												background: "rgba(255, 255, 255, 0.1)",
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+												fontSize: "1.5rem",
+												marginBottom: "0.25rem"
+											}}>
+												👤
+											</div>
+											<p style={{ fontWeight: 600, color: "var(--text-main)" }}>Client Démo</p>
+											<p style={{ fontSize: "0.7rem", color: "var(--text-muted)", wordBreak: "break-all" }}>client.demo@gmail.com</p>
+											<div style={{
+												marginTop: "0.5rem",
+												padding: "4px 8px",
+												borderRadius: "9999px",
+												backgroundColor: "rgba(52, 199, 89, 0.1)",
+												color: "var(--accent-green)",
+												fontSize: "0.65rem",
+												fontWeight: 600
+											}}>
+												<i className="fa-solid fa-circle-check" style={{ marginRight: "3px" }}></i> Connecté via Google
+											</div>
+										</div>
+										<button
+											className="btn-alert-action"
+											style={{ backgroundColor: "var(--primary)" }}
+											onClick={() => setOverlayProfile(false)}
+										>
+											Fermer
 										</button>
 									</div>
 								</div>
@@ -949,7 +1072,7 @@ export default function Home() {
 					</div>
 					<div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
 						<button
-							id="btn-header-register"
+							id="btn-header-login"
 							className="btn-secondary"
 							style={{
 								fontSize: "0.85rem",
@@ -959,9 +1082,27 @@ export default function Home() {
 								border: "1px solid var(--border-color)",
 								height: "38px",
 							}}
-							onClick={() => setOverlayRegister(true)}
+							onClick={openLoginModal}
 						>
 							Je suis déjà client
+						</button>
+						<button
+							id="btn-header-register"
+							className="btn-primary"
+							style={{
+								fontSize: "0.85rem",
+								padding: "0.55rem 1.2rem",
+								borderRadius: "9999px",
+								cursor: "pointer",
+								border: "none",
+								height: "38px",
+								fontWeight: 600,
+								boxShadow: "0 4px 12px var(--primary-glow)",
+								transition: "transform 0.2s"
+							}}
+							onClick={openRegisterModal}
+						>
+							S&apos;inscrire
 						</button>
 						<a href="/pricing" className="cta-pitch" style={{ textDecoration: "none" }}>
 							Essayer Revioza
@@ -1077,6 +1218,8 @@ export default function Home() {
 				</div>
 			</section>
 
+			<div className="section-divider" />
+
 			{/* ═══════════════════════════════════════
 			    SECTION: COMMENT ÇA MARCHE
 			    ═══════════════════════════════════════ */}
@@ -1121,6 +1264,8 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+
+			<div className="section-divider" />
 
 			{/* ═══════════════════════════════════════
 			    SECTION: DÉMO INTERACTIVE
@@ -1429,6 +1574,8 @@ export default function Home() {
 				</div>
 			</section>
 
+			<div className="section-divider" />
+
 			{/* ═══════════════════════════════════════
 			    SECTION: FEATURES
 			    ═══════════════════════════════════════ */}
@@ -1492,6 +1639,9 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+
+			<div className="section-divider" />
+
 			{/* ═══════════════════════════════════════
 			    SECTION: SOCIAL PROOF
 			    ═══════════════════════════════════════ */}
@@ -1531,6 +1681,9 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+
+			<div className="section-divider" />
+
 			{/* ═══════════════════════════════════════
 			    SECTION: PRICING (inline)
 			    ═══════════════════════════════════════ */}
@@ -1590,14 +1743,14 @@ export default function Home() {
 							<div className="plan-divider"></div>
 							<ul className="plan-features-list">
 								<li><i className="fa-solid fa-check"></i> 1 établissement physique</li>
-								<li><i className="fa-solid fa-check"></i> Jusqu&apos;à 250 avis / mois</li>
+								<li><i className="fa-solid fa-check"></i> Jusqu&apos;à 50 avis / mois</li>
 								<li><i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)</li>
 								<li><i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer</li>
 								<li><i className="fa-solid fa-check"></i> Statistiques de base (scans)</li>
 								<li className="disabled"><i className="fa-solid fa-xmark"></i> Logo personnalisé au centre de la roue</li>
 								<li className="disabled"><i className="fa-solid fa-xmark"></i> Filtrage intelligent des avis négatifs</li>
 							</ul>
-							<button className="btn-plan-select" onClick={() => alert("Merci pour votre intérêt ! Cette page est une démonstration interactive.")}>
+							<button className="btn-plan-select" onClick={openRegisterModal}>
 								Essayer gratuitement
 							</button>
 							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
@@ -1633,7 +1786,7 @@ export default function Home() {
 								<li><i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)</li>
 								<li><i className="fa-solid fa-check"></i> Support client prioritaire 7j/7</li>
 							</ul>
-							<button className="btn-plan-select featured" onClick={() => alert("Merci pour votre intérêt ! Cette page est une démonstration interactive.")}>
+							<button className="btn-plan-select featured" onClick={openRegisterModal}>
 								Essayer gratuitement
 							</button>
 							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
@@ -1666,7 +1819,7 @@ export default function Home() {
 								<li><i className="fa-solid fa-check"></i> Intégrations caisse &amp; API</li>
 								<li><i className="fa-solid fa-check"></i> Accompagnement et conseiller dédié</li>
 							</ul>
-							<button className="btn-plan-select" onClick={() => alert("Merci pour votre intérêt ! Cette page est une démonstration interactive.")}>
+							<button className="btn-plan-select" onClick={openRegisterModal}>
 								Contacter le service commercial
 							</button>
 							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
@@ -1682,6 +1835,8 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
+
+			<div className="section-divider" />
 
 			{/* ═══════════════════════════════════════
 			    FOOTER
@@ -1743,7 +1898,7 @@ export default function Home() {
 			{/* QR Code Modal */}
 			{overlayQr && (
 				<div
-					className="phone-alert-overlay"
+					className="phone-alert-overlay active"
 					style={{
 						zIndex: 1000,
 						position: "fixed",
@@ -1808,7 +1963,7 @@ export default function Home() {
 			{/* Registration/Login Modal */}
 			{overlayRegister && (
 				<div
-					className="phone-alert-overlay"
+					className="phone-alert-overlay active"
 					style={{
 						zIndex: 1000,
 						position: "fixed",
@@ -1892,9 +2047,9 @@ export default function Home() {
 								</h3>
 								<div className="form-group" style={{ textAlign: "left" }}>
 									<label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px", display: "block" }}>
-										Adresse Email
+										Identifiant ou Adresse Email
 									</label>
-									<input type="email" id="login-email" placeholder="contact@etablissement.com" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
+									<input type="text" id="login-email" placeholder="Identifiant ou email" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
 								</div>
 								<div className="form-group" style={{ textAlign: "left" }}>
 									<label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px", display: "block" }}>
@@ -1904,6 +2059,39 @@ export default function Home() {
 								</div>
 								<button type="submit" className="cta-pitch" style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem", border: "none", cursor: "pointer" }}>
 									Se Connecter
+								</button>
+								<div style={{ display: "flex", alignItems: "center", margin: "0.25rem 0", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+									<div style={{ flex: 1, height: "1px", background: "var(--border-color)" }}></div>
+									<span style={{ padding: "0 0.75rem", textTransform: "uppercase", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.05em" }}>ou</span>
+									<div style={{ flex: 1, height: "1px", background: "var(--border-color)" }}></div>
+								</div>
+								<button
+									type="button"
+									className="btn-secondary"
+									style={{
+										width: "100%",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										gap: "0.6rem",
+										fontSize: "0.9rem",
+										padding: "0.75rem",
+										borderRadius: "12px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										background: "var(--bg-input)",
+										color: "#fff",
+										fontWeight: 600,
+										transition: "background 0.2s"
+									}}
+									onClick={handleGoogleLogin}
+								>
+									<img
+										src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+										alt="Google"
+										style={{ width: "18px", height: "18px" }}
+									/>
+									Se connecter avec Google
 								</button>
 							</form>
 						)}
@@ -1935,6 +2123,39 @@ export default function Home() {
 								</div>
 								<button type="submit" className="cta-pitch" style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem", border: "none", cursor: "pointer" }}>
 									Créer mon Compte
+								</button>
+								<div style={{ display: "flex", alignItems: "center", margin: "0.25rem 0", color: "var(--text-muted)", fontSize: "0.8rem" }}>
+									<div style={{ flex: 1, height: "1px", background: "var(--border-color)" }}></div>
+									<span style={{ padding: "0 0.75rem", textTransform: "uppercase", fontSize: "0.7rem", fontWeight: 600, letterSpacing: "0.05em" }}>ou</span>
+									<div style={{ flex: 1, height: "1px", background: "var(--border-color)" }}></div>
+								</div>
+								<button
+									type="button"
+									className="btn-secondary"
+									style={{
+										width: "100%",
+										display: "flex",
+										alignItems: "center",
+										justifyContent: "center",
+										gap: "0.6rem",
+										fontSize: "0.9rem",
+										padding: "0.75rem",
+										borderRadius: "12px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										background: "var(--bg-input)",
+										color: "#fff",
+										fontWeight: 600,
+										transition: "background 0.2s"
+									}}
+									onClick={handleGoogleLogin}
+								>
+									<img
+										src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+										alt="Google"
+										style={{ width: "18px", height: "18px" }}
+									/>
+									S&apos;inscrire avec Google
 								</button>
 							</form>
 						)}

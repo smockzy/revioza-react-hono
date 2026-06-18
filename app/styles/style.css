@@ -41,6 +41,19 @@ body {
 }
 
 body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+.page-landing {
+    position: relative;
+}
+
+.page-landing::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -1226,15 +1239,15 @@ main {
 }
 
 /* Roulette Canvas/SVG Container */
-.wheel-outer-container {
-    width: 210px;
-    height: 210px;
+.phone-simulator-wrapper .wheel-outer-container {
+    width: 270px;
+    height: 270px;
     position: relative;
-    margin: 0.75rem 0;
+    margin: 1rem 0;
     user-select: none;
 }
 
-.wheel-bezel {
+.phone-simulator-wrapper .wheel-bezel {
     position: absolute;
     inset: 0;
     border-radius: 50%;
@@ -1248,16 +1261,16 @@ main {
     pointer-events: none;
 }
 
-.wheel-canvas {
-    width: 100%;
-    height: 100%;
+.phone-simulator-wrapper .wheel-canvas {
+    width: 100% !important;
+    height: 100% !important;
     border-radius: 50%;
     transition: transform 5s cubic-bezier(0.15, 0.95, 0.35, 1);
     transform: rotate(0deg);
 }
 
 /* Pointer pin on top */
-.wheel-pointer {
+.phone-simulator-wrapper .wheel-pointer {
     position: absolute;
     top: -15px;
     left: 50%;
@@ -1272,7 +1285,7 @@ main {
     transform-origin: 50% 0%;
 }
 
-.wheel-pointer.wiggle {
+.phone-simulator-wrapper .wheel-pointer.wiggle {
     animation: pointerWiggle 0.15s ease-in-out infinite alternate;
 }
 
@@ -1281,7 +1294,7 @@ main {
     100% { transform: translateX(-50%) rotate(12deg); }
 }
 
-.wheel-center-pin {
+.phone-simulator-wrapper .wheel-center-pin {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -2147,6 +2160,20 @@ footer {
     padding: 7rem 2rem 4rem;
     position: relative;
     overflow: hidden;
+    background:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px),
+        radial-gradient(
+            ellipse 80% 60% at 50% 0%,
+            rgba(198, 18, 31, 0.08) 0%,
+            transparent 70%
+        ),
+        #0d0d0d;
+    background-size:
+        40px 40px,
+        40px 40px,
+        100% 100%,
+        100% 100%;
 }
 
 .section-hero::before {
@@ -2839,5 +2866,57 @@ footer {
         text-align: center;
         padding: 1.25rem 1.5rem;
     }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LANDING PAGE BACKGROUND ENHANCEMENTS (CSS-only)
+   ───────────────────────────────────────────────────────────── */
+
+/* Alternating background colors for sections */
+.section-how {
+    background: #111111;
+}
+
+.section-demo {
+    background: linear-gradient(180deg, transparent 0%, rgba(229, 9, 20, 0.025) 50%, transparent 100%), #0d0d0d;
+}
+
+.section-features {
+    background: #111111;
+}
+
+.section-social {
+    background: #0d0d0d;
+}
+
+.section-pricing {
+    background: linear-gradient(180deg, transparent 0%, rgba(229, 9, 20, 0.02) 50%, transparent 100%), #111111;
+}
+
+footer {
+    background: #0d0d0d !important;
+}
+
+/* Ensure page contents render above the global noise layer */
+.section-inner,
+.reviews-carousel-wrap,
+.header-container,
+.footer-new-container,
+.footer-bottom-bar {
+    position: relative;
+    z-index: 1;
+}
+
+/* Reusable section divider */
+.section-divider {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(198, 18, 31, 0.5) 50%,
+        transparent 100%
+    );
+    border: none;
+    margin: 0;
 }
 

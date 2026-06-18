@@ -43,5 +43,12 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings
 	 */
 	// "services": [{ "binding": "MY_SERVICE", "service": "my-service" }]
-	"upload_source_maps": true
+	"upload_source_maps": true,
+	/**
+	 * Custom Domains — bind revioza.com to this Worker
+	 * https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
+	 */
+	"routes": [
+		{ "pattern": "revioza.com", "custom_domain": true }
+	]
 }

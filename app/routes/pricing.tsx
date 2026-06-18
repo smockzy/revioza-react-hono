@@ -3,7 +3,7 @@ import type { Route } from "./+types/pricing";
 import "../styles/style.css";
 import "../styles/pricing.css";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
 	return [
 		{ title: "Revioza - Tarifs & Abonnements | Gamification Locale" },
 		{
@@ -61,7 +61,7 @@ export default function Pricing() {
 			: "🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai";
 
 	const handlePlanClick = () => {
-		alert("Merci pour votre intérêt ! Cette page est une démonstration interactive.");
+		window.location.href = "/?register=true";
 	};
 
 	return (
@@ -156,7 +156,7 @@ export default function Pricing() {
 								<i className="fa-solid fa-check"></i> 1 établissement physique
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Jusqu&apos;à 250 avis / mois
+								<i className="fa-solid fa-check"></i> Jusqu&apos;à 50 avis / mois
 							</li>
 							<li>
 								<i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)
@@ -415,8 +415,8 @@ export default function Pricing() {
 								a: "Oui, vous pouvez résilier à tout moment depuis votre espace gérant. L'abonnement annuel est facturé en une fois et n'est pas remboursable, mais vous conservez un accès complet à Revioza jusqu'au dernier jour de votre période de 12 mois.",
 							},
 						].map((item, idx) => (
-							<div 
-								className={`faq-accordion-item ${openFaq[idx] ? "open" : ""}`} 
+							<div
+								className={`faq-accordion-item ${openFaq[idx] ? "open" : ""}`}
 								key={idx}
 								onClick={() => toggleFaq(idx)}
 							>

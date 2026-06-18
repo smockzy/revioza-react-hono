@@ -142,7 +142,7 @@ export default function Play() {
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 		renderWheelCanvas(canvas, ctx, state.prizes, 260);
-	}, [state.prizes]);
+	}, [state.prizes, state.step]);
 
 	// Timer
 	useEffect(() => {
@@ -224,7 +224,8 @@ export default function Play() {
 		const canvas = canvasRef.current;
 		if (canvas) {
 			const prevRot = parseFloat(canvas.style.transform?.replace(/[^0-9.-]/g, "") || "0");
-			const nextRot = prevRot + 5 * 360 + target;
+			const currentBase = Math.floor(prevRot / 360) * 360;
+			const nextRot = currentBase + 5 * 360 + target;
 			canvas.style.transition = "transform 4.5s cubic-bezier(0.12, 0.95, 0.35, 1)";
 			canvas.style.transform = `rotate(${nextRot}deg)`;
 		}
