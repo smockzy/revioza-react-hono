@@ -5,7 +5,10 @@ import {
 	Outlet,
 	Scripts,
 	ScrollRestoration,
+	useLocation,
 } from "react-router";
+import { useState, useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -49,8 +52,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
 	);
 }
 
+// Inner wrapper with AnimatePresence — needs useLocation which only works client-side
+function AnimatedOutlet() {
+	const [isMounted, setIsMounted] = useState(false);
+	const location = useLocation();
+
+	useEffect(() => setIsMounted(true), []);
+
+	// SSR: render Outlet without AnimatePresence to avoid hydration mismatch
+	if (!isMounted) return <Outlet />;
+
+	return (
+		<AnimatePresence mode="wait">
+			<Outlet key={location.pathname} />
+		</AnimatePresence>
+	);
+}
+
 export default function App() {
-	return <Outlet />;
+	return <AnimatedOutlet />;
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

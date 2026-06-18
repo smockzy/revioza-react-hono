@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { FadeInSection } from "../utils/FadeInSection";
 import type { Route } from "./+types/home";
 import "../styles/style.css";
 import "../styles/pricing.css";
@@ -24,7 +26,7 @@ import {
 	clearAllReviozaCookies,
 } from "../utils/cookies";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ }: Route.MetaArgs) {
 	return [
 		{ title: "Revioza - Roulette Avis Google | Gamification Locale" },
 		{
@@ -50,7 +52,18 @@ const DEFAULT_APP_STATE: AppState = {
 	timerSeconds: 7183,
 };
 
-// Fake reviews for the social proof carousel
+// Inline pricing plans data
+interface PlanConfig {
+	monthly: string;
+	annual: string;
+	saving: string;
+}
+const PRICES: Record<string, PlanConfig> = {
+	starter: { monthly: "49€", annual: "39€", saving: "soit 120€ économisés par an" },
+	business: { monthly: "99€", annual: "79€", saving: "soit 240€ économisés par an" },
+	franchise: { monthly: "199€", annual: "159€", saving: "soit 480€ économisés par an" },
+};
+
 const FAKE_REVIEWS = [
 	{
 		name: "Lucas M.",
@@ -82,37 +95,7 @@ const FAKE_REVIEWS = [
 		text: "Facile à configurer, les lots sont personnalisables. Exactement ce qu'il me fallait pour ma pizzeria.",
 		avatar: "🧑‍🦱",
 	},
-	{
-		name: "Emma V.",
-		city: "Nantes",
-		text: "J'étais sceptique mais ça marche vraiment. 60 avis en 3 semaines, notre score est passé de 3.9 à 4.6.",
-		avatar: "👩‍🦰",
-	},
-	{
-		name: "Romain D.",
-		city: "Lille",
-		text: "Interface très intuitive, mes clients trouvent ça ludique. Le système anti-triche est rassurant.",
-		avatar: "👨‍🦲",
-	},
-	{
-		name: "Julie T.",
-		city: "Strasbourg",
-		text: "Super ROI ! Pour un café offert, j'obtiens un avis authentique. C'est du win-win pour tout le monde.",
-		avatar: "👩‍🦱",
-	},
 ];
-
-// Inline pricing plans data
-interface PlanConfig {
-	monthly: string;
-	annual: string;
-	saving: string;
-}
-const PRICES: Record<string, PlanConfig> = {
-	starter: { monthly: "49€", annual: "39€", saving: "soit 120€ économisés par an" },
-	business: { monthly: "99€", annual: "79€", saving: "soit 240€ économisés par an" },
-	franchise: { monthly: "199€", annual: "159€", saving: "soit 480€ économisés par an" },
-};
 
 export default function Home() {
 	const [appState, setAppState] = useState<AppState>(DEFAULT_APP_STATE);
@@ -126,12 +109,17 @@ export default function Home() {
 	const [cookieBanner, setCookieBanner] = useState(false);
 	const [isAnnualPricing, setIsAnnualPricing] = useState(false);
 	const [placeIdHelp, setPlaceIdHelp] = useState(false);
+	// SSR guard for Framer Motion
+	const [isMounted, setIsMounted] = useState(false);
+	const prefersReducedMotion = useReducedMotion();
 
 	// Demo simulator canvas ref (connected to admin panel)
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Ref to the interactive demo section for smooth scroll
 	const demoSectionRef = useRef<HTMLElement>(null);
+
+	useEffect(() => setIsMounted(true), []);
 
 	// Load config from localStorage on mount
 	useEffect(() => {
@@ -198,7 +186,7 @@ export default function Home() {
 		);
 		revealEls.forEach((el) => observer.observe(el));
 		return () => observer.disconnect();
-	}, []);
+	}, [isMounted]);
 
 	// Render wheel whenever prizes change (demo simulator canvas)
 	useEffect(() => {
@@ -297,7 +285,15 @@ export default function Home() {
 			if (!won.name.toLowerCase().includes("perdu")) {
 				import("canvas-confetti").then((mod) => {
 					const confetti = mod.default;
-					confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+					const canvas = canvasRef.current;
+					let x = 0.5;
+					let y = 0.6;
+					if (canvas) {
+						const rect = canvas.getBoundingClientRect();
+						x = (rect.left + rect.width / 2) / window.innerWidth;
+						y = (rect.top + rect.height / 2) / window.innerHeight;
+					}
+					confetti({ particleCount: 100, spread: 70, origin: { x, y } });
 				});
 			}
 
@@ -516,7 +512,7 @@ export default function Home() {
 		const displaySub = isHero ? "Pizzeria" : appState.restaurantSub;
 
 		return (
-			<div className={`phone-simulator-wrapper${isHero ? " hero-phone" : ""} reveal reveal-fade-in delay-200`}>
+			<div className={`phone-simulator-wrapper${isHero ? " hero-phone" : ""}`}>
 				<div className="phone-container">
 					<div className="phone-notch">
 						<div className="phone-notch-camera"></div>
@@ -912,10 +908,36 @@ export default function Home() {
 	};
 
 	// ─────────────────────────────────────────────────────────────
+	// HERO MOTION VARIANTS
+	// ─────────────────────────────────────────────────────────────
+	const heroContainerVariants = {
+		hidden: {},
+		visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
+	};
+	const heroItemVariants = {
+		hidden: { opacity: 0, y: 30 },
+		visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+	};
+	const heroBadgeVariants = {
+		hidden: { opacity: 0, y: -16 },
+		visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+	};
+	const heroPhoneVariants = {
+		hidden: { opacity: 0, x: 60 },
+		visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut", delay: 0.2 } },
+	};
+
+	// ─────────────────────────────────────────────────────────────
 	// RENDER
 	// ─────────────────────────────────────────────────────────────
 	return (
-		<div className="page-landing">
+		<motion.div
+			className="page-landing"
+			initial={{ opacity: 0, y: 20 }}
+			animate={{ opacity: 1, y: 0 }}
+			exit={{ opacity: 0, y: -20 }}
+			transition={{ duration: 0.4, ease: "easeInOut" }}
+		>
 			{/* NAV */}
 			<header>
 				<div className="header-container">
@@ -939,7 +961,7 @@ export default function Home() {
 							}}
 							onClick={() => setOverlayRegister(true)}
 						>
-							Espace Gérant
+							Je suis déjà client
 						</button>
 						<a href="/pricing" className="cta-pitch" style={{ textDecoration: "none" }}>
 							Essayer Revioza
@@ -953,43 +975,105 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-hero" id="section-hero">
 				<div className="hero-content-wrap">
-					{/* Left: Headline + CTAs */}
-					<div className="hero-left reveal reveal-slide-up">
-						<div className="hero-eyebrow">
-							<i className="fa-solid fa-star"></i>
-							<span>Gamification d&apos;avis Google pour restaurateurs</span>
+					{/* Left: Headline + CTAs — stagger animation when mounted */}
+					{isMounted && !prefersReducedMotion ? (
+						<motion.div
+							className="hero-left"
+							variants={heroContainerVariants}
+							initial="hidden"
+							animate="visible"
+						>
+							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
+								<i className="fa-solid fa-star"></i>
+								<span>Gamification d&apos;avis Google pour commerces</span>
+							</motion.div>
+							<motion.h1 variants={heroItemVariants}>
+								Démultipliez vos <span>Avis Google</span> par le Jeu
+							</motion.h1>
+							<motion.p variants={heroItemVariants}>
+								Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
+								sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
+								gain instantané configuré par vos soins.
+							</motion.p>
+							<motion.div className="hero-cta-group" variants={heroItemVariants}>
+								<motion.button
+									className="btn-primary hero-cta-main"
+									id="hero-cta-demo"
+									onClick={handleScrollToDemo}
+									whileHover={{ scale: 1.03 }}
+									whileTap={{ scale: 0.97 }}
+								>
+									<i className="fa-solid fa-play"></i> Voir la démo
+								</motion.button>
+								<motion.a
+									href="/pricing"
+									className="btn-secondary hero-cta-secondary"
+									id="hero-cta-pricing"
+									style={{ textDecoration: "none" }}
+									whileHover={{ scale: 1.03 }}
+									whileTap={{ scale: 0.97 }}
+								>
+									Voir les tarifs
+								</motion.a>
+							</motion.div>
+							<motion.div className="hero-social-proof-mini" variants={heroItemVariants}>
+								<div className="hero-mini-stars">★★★★★</div>
+								<div className="hero-social-proof-text-col">
+									<span>+50 établissements nous suivent déjà !</span>
+									<div className="hero-social-proof-invite">Pourquoi pas vous ?</div>
+								</div>
+							</motion.div>
+						</motion.div>
+					) : (
+						<div className="hero-left">
+							<div className="hero-eyebrow">
+								<i className="fa-solid fa-star"></i>
+								<span>Gamification d&apos;avis Google pour restaurateurs</span>
+							</div>
+							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
+							<p>
+								Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
+								sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
+								gain instantané configuré par vos soins.
+							</p>
+							<div className="hero-cta-group">
+								<button className="btn-primary hero-cta-main" id="hero-cta-demo" onClick={handleScrollToDemo}>
+									<i className="fa-solid fa-play"></i> Voir la démo
+								</button>
+								<a href="/pricing" className="btn-secondary hero-cta-secondary" id="hero-cta-pricing" style={{ textDecoration: "none" }}>
+									Voir les tarifs
+								</a>
+							</div>
+							<div className="hero-social-proof-mini">
+								<div className="hero-mini-stars">★★★★★</div>
+								<div className="hero-social-proof-text-col">
+									<span>+50 établissements nous suivent déjà !</span>
+									<div className="hero-social-proof-invite">Pourquoi pas vous ?</div>
+								</div>
+							</div>
 						</div>
-						<h1>
-							Démultipliez vos <span>Avis Google</span> par le Jeu
-						</h1>
-						<p>
-							Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
-							sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
-							gain instantané configuré par vos soins.
-						</p>
-						<div className="hero-cta-group">
-							<button className="btn-primary hero-cta-main" id="hero-cta-demo" onClick={handleScrollToDemo}>
-								<i className="fa-solid fa-play"></i> Voir la démo
-							</button>
-							<a
-								href="/pricing"
-								className="btn-secondary hero-cta-secondary"
-								id="hero-cta-pricing"
-								style={{ textDecoration: "none" }}
-							>
-								Voir les tarifs
-							</a>
-						</div>
-						<div className="hero-social-proof-mini">
-							<div className="hero-mini-stars">★★★★★</div>
-							<span>+200 établissements nous font confiance</span>
-						</div>
-					</div>
+					)}
 
-					{/* Right: Static phone simulator (read-only, step 1 fixed) */}
-					<div className="hero-right">
-						{renderPhoneSimulator(true)}
-					</div>
+					{/* Right: Static phone simulator — floating animation */}
+					{isMounted && !prefersReducedMotion ? (
+						<motion.div
+							className="hero-right"
+							variants={heroPhoneVariants}
+							initial="hidden"
+							animate={["visible", "float"]}
+						>
+							<motion.div
+								animate={{ y: [0, -10, 0] }}
+								transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+							>
+								{renderPhoneSimulator(true)}
+							</motion.div>
+						</motion.div>
+					) : (
+						<div className="hero-right">
+							{renderPhoneSimulator(true)}
+						</div>
+					)}
 				</div>
 			</section>
 
@@ -998,53 +1082,42 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-how" id="section-how">
 				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Comment ça marche</div>
-					<h2 className="section-heading reveal reveal-slide-up">
-						3 étapes pour <span>multiplier vos avis</span>
-					</h2>
-					<p className="section-subheading reveal reveal-slide-up">
-						Un parcours fluide en 3 étapes simples pour transformer chaque repas en avis Google authentique.
-					</p>
-					<div className="how-steps reveal reveal-slide-up">
-						<div className="how-step-card">
-							<div className="how-step-num">01</div>
-							<div className="how-step-icon">
-								<i className="fa-solid fa-sliders"></i>
+					<FadeInSection delay={0}>
+						<div className="section-label">Comment ça marche</div>
+						<h2 className="section-heading">
+							3 étapes pour <span>multiplier vos avis</span>
+						</h2>
+						<p className="section-subheading">
+							Un parcours fluide en 3 étapes simples pour transformer chaque repas en avis Google authentique.
+						</p>
+					</FadeInSection>
+					<div className="how-steps">
+						<FadeInSection delay={0}>
+							<div className="how-step-card">
+								<div className="how-step-num">01</div>
+								<div className="how-step-icon"><i className="fa-solid fa-sliders"></i></div>
+								<h3>Configurez votre roue</h3>
+								<p>En 2 minutes, personnalisez vos lots, votre identité visuelle et votre lien Google. Votre QR code unique est prêt à imprimer.</p>
 							</div>
-							<h3>Configurez votre roue</h3>
-							<p>
-								En 2 minutes, personnalisez vos lots, votre identité visuelle et votre lien Google.
-								Votre QR code unique est prêt à imprimer.
-							</p>
-						</div>
-						<div className="how-step-connector">
-							<i className="fa-solid fa-arrow-right"></i>
-						</div>
-						<div className="how-step-card">
-							<div className="how-step-num">02</div>
-							<div className="how-step-icon">
-								<i className="fa-solid fa-qrcode"></i>
+						</FadeInSection>
+						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
+						<FadeInSection delay={0.15}>
+							<div className="how-step-card">
+								<div className="how-step-num">02</div>
+								<div className="how-step-icon"><i className="fa-solid fa-qrcode"></i></div>
+								<h3>Le client scanne et joue</h3>
+								<p>Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
 							</div>
-							<h3>Le client scanne et joue</h3>
-							<p>
-								Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner
-								la roue depuis son smartphone — sans friction.
-							</p>
-						</div>
-						<div className="how-step-connector">
-							<i className="fa-solid fa-arrow-right"></i>
-						</div>
-						<div className="how-step-card">
-							<div className="how-step-num">03</div>
-							<div className="how-step-icon">
-								<i className="fa-solid fa-star"></i>
+						</FadeInSection>
+						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
+						<FadeInSection delay={0.3}>
+							<div className="how-step-card">
+								<div className="how-step-num">03</div>
+								<div className="how-step-icon"><i className="fa-solid fa-star"></i></div>
+								<h3>Un avis sincère, un lot gagné</h3>
+								<p>Le client laisse son avis Google honnête et récupère son lot en caisse en montrant son ticket. Win-win pour tous.</p>
 							</div>
-							<h3>Un avis sincère, un lot gagné</h3>
-							<p>
-								Le client laisse son avis Google honnête et récupère son lot en caisse en montrant son
-								ticket. Win-win pour tous.
-							</p>
-						</div>
+						</FadeInSection>
 					</div>
 				</div>
 			</section>
@@ -1349,7 +1422,7 @@ export default function Home() {
 						</div>
 
 						{/* Right: Interactive phone simulator */}
-						<div className="demo-right">
+						<div className="demo-right reveal reveal-slide-up">
 							{renderPhoneSimulator(false)}
 						</div>
 					</div>
@@ -1361,55 +1434,64 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-features" id="section-features">
 				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Fonctionnalités</div>
-					<h2 className="section-heading reveal reveal-slide-up">
-						Tout ce dont vous avez <span>besoin</span>
-					</h2>
-					<div className="features-grid reveal reveal-slide-up">
-						<div className="feature-card delay-100">
-							<div className="feature-icon">
-								<i className="fa-solid fa-shield-halved"></i>
+					<FadeInSection delay={0}>
+						<div className="section-label">Fonctionnalités</div>
+						<h2 className="section-heading">
+							Tout ce dont vous avez <span>besoin</span>
+						</h2>
+					</FadeInSection>
+					<div className="features-grid">
+						<FadeInSection delay={0}>
+							<div className="feature-card delay-100">
+								<div className="feature-icon">
+									<i className="fa-solid fa-shield-halved"></i>
+								</div>
+								<h3>Anti-Triche Avancé</h3>
+								<p>
+									Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour.
+									Tickets de gain éphémères.
+								</p>
 							</div>
-							<h3>Anti-Triche Avancé</h3>
-							<p>
-								Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour.
-								Tickets de gain éphémères.
-							</p>
-						</div>
-						<div className="feature-card delay-200">
-							<div className="feature-icon">
-								<i className="fa-solid fa-qrcode"></i>
+						</FadeInSection>
+						<FadeInSection delay={0.1}>
+							<div className="feature-card delay-200">
+								<div className="feature-icon">
+									<i className="fa-solid fa-qrcode"></i>
+								</div>
+								<h3>Prêt à Imprimer</h3>
+								<p>
+									Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
+									compte d&apos;établissement.
+								</p>
 							</div>
-							<h3>Prêt à Imprimer</h3>
-							<p>
-								Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
-								compte d&apos;établissement.
-							</p>
-						</div>
-						<div className="feature-card delay-300">
-							<div className="feature-icon">
-								<i className="fa-solid fa-chart-line"></i>
+						</FadeInSection>
+						<FadeInSection delay={0.2}>
+							<div className="feature-card delay-300">
+								<div className="feature-icon">
+									<i className="fa-solid fa-chart-line"></i>
+								</div>
+								<h3>Statistiques Avancées</h3>
+								<p>
+									Suivez le nombre de scans, de clics Google, les lots distribués et l&apos;évolution
+									globale de votre note moyenne.
+								</p>
 							</div>
-							<h3>Statistiques Avancées</h3>
-							<p>
-								Suivez le nombre de scans, de clics Google, les lots distribués et l&apos;évolution
-								globale de votre note moyenne.
-							</p>
-						</div>
-						<div className="feature-card delay-400">
-							<div className="feature-icon">
-								<i className="fa-solid fa-unlock"></i>
+						</FadeInSection>
+						<FadeInSection delay={0.3}>
+							<div className="feature-card delay-400">
+								<div className="feature-icon">
+									<i className="fa-solid fa-unlock"></i>
+								</div>
+								<h3>Résiliable à tout moment</h3>
+								<p>
+									Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un
+									clic, en toute liberté.
+								</p>
 							</div>
-							<h3>Résiliable à tout moment</h3>
-							<p>
-								Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un
-								clic, en toute liberté.
-							</p>
-						</div>
+						</FadeInSection>
 					</div>
 				</div>
 			</section>
-
 			{/* ═══════════════════════════════════════
 			    SECTION: SOCIAL PROOF
 			    ═══════════════════════════════════════ */}
@@ -1449,7 +1531,6 @@ export default function Home() {
 					</div>
 				</div>
 			</section>
-
 			{/* ═══════════════════════════════════════
 			    SECTION: PRICING (inline)
 			    ═══════════════════════════════════════ */}
@@ -1915,6 +1996,6 @@ export default function Home() {
 					</button>
 				</div>
 			)}
-		</div>
+		</motion.div>
 	);
 }

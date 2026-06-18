@@ -2288,17 +2288,43 @@ footer {
 
 .hero-social-proof-mini {
     display: flex;
-    align-items: center;
+    flex-direction: row;
+    align-items: flex-start;
     gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.hero-social-proof-text-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
     font-size: 0.85rem;
     color: var(--text-muted);
-    margin-top: 0.25rem;
 }
 
 .hero-mini-stars {
     color: #ffb800;
     font-size: 1rem;
     letter-spacing: 2px;
+}
+
+.hero-social-proof-invite {
+    font-size: 0.85rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary) 0%, #ff6b6b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: inline-block;
+    padding-left: 2px;
+    animation: invitePulse 3s infinite ease-in-out;
+}
+
+@keyframes invitePulse {
+    0%, 100% { opacity: 0.85; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-1px); }
 }
 
 .hero-right {

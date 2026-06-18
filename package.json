@@ -17,6 +17,8 @@
 	"dependencies": {
 		"canvas-confetti": "^1.9.4",
 		"chart.js": "^4.5.1",
+		"framer-motion": "^12.40.0",
+		"gsap": "^3.15.0",
 		"hono": "4.11.1",
 		"isbot": "5.1.32",
 		"react": "19.2.1",
