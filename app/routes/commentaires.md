@@ -1,4 +1,15 @@
 
+--------------------------------------------------------------------------------------------------
+commande à taper dans le terminal de antigravity (en bas) pour mettre à jour le site (2min~) :
+
+git add -A
+git commit -m "ta description"
+git push origin main
+
+-------------------------------------------------------------------------------------------------
+
+
+
 
 bug d'affichage de la roue dans le nouveau site, et l'animation des confettis s'affiche en plein milieu de l'ecran -> à modifier
 
@@ -20,3 +31,9 @@ ajouter un tableau des probabilités de la roue.
 modifier resultat quand on perd à la roue -> "dommage, vous avez perdu" -> "reesayez une prochaine fois !"
 
 tache blanche à l'acceuil dans "avis google"
+ 
+creer **base de données** pour les utilisateurs, les avis, les roues, les lots, les clients, les abonnements, etc.
+
+Connecter un SDK Serverless comme **Supabase** ou **Firebase** pour gérer la persistance partagée de manière centralisée
+
+configurer **google OAUTH** (dans supabase?)
