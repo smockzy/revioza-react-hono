@@ -40,7 +40,7 @@ export const DEFAULT_PRIZES: Prize[] = [
     { id: 2, name: "-15% SUR LA NOTE", weight: 20, color: "#e50914", textStyle: "#ffffff", icon: "🏷️" },
     { id: 3, name: "TIRAMISU OFFERT", weight: 15, color: "#111115", textStyle: "#f5f5f7", icon: "🍰" },
     { id: 4, name: "BOISSON OFFERTE", weight: 15, color: "#e50914", textStyle: "#ffffff", icon: "🥤" },
-    { id: 5, name: "PERDU DOMMAGE !", weight: 5, color: "#22222a", textStyle: "#8e8e93", icon: "😢" },
+    { id: 5, name: "REESSAYEZ UNE PROCHAINE FOIS !", weight: 5, color: "#22222a", textStyle: "#8e8e93", icon: "😢" },
 ];
 
 export const DEFAULT_PLAY_PRIZES: Prize[] = [
@@ -48,7 +48,7 @@ export const DEFAULT_PLAY_PRIZES: Prize[] = [
     { id: 2, name: "-15% SUR LA NOTE", weight: 20, color: "#e50914", textStyle: "#ffffff", icon: "🏷️" },
     { id: 3, name: "TIRAMISU OFFERT", weight: 15, color: "#111115", textStyle: "#f5f5f7", icon: "🍰" },
     { id: 4, name: "BOISSON OFFERTE", weight: 15, color: "#e50914", textStyle: "#ffffff", icon: "🥤" },
-    { id: 5, name: "PERDU !", weight: 10, color: "#22222a", textStyle: "#8e8e93", icon: "😢" },
+    { id: 5, name: "REESSAYEZ UNE PROCHAINE FOIS !", weight: 10, color: "#22222a", textStyle: "#8e8e93", icon: "😢" },
 ];
 
 export const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=400&q=80";
@@ -169,7 +169,7 @@ export function guessIcon(name: string): string {
     if (/PIZZA/.test(n)) return "🍕";
     if (/BURGER/.test(n)) return "🍔";
     if (/%|REDUC|SUR LA/.test(n)) return "🏷️";
-    if (/PERDU|RIEN/.test(n)) return "😢";
+    if (/PERDU|RIEN|REESSAYEZ/.test(n)) return "😢";
     return "🎁";
 }
 
@@ -195,7 +195,7 @@ export function renderWheelCanvas(
     ctx.clearRect(0, 0, size, size);
 
     prizes.forEach((prize, index) => {
-        const startAngle = index * anglePerSector - Math.PI / 2;
+        const startAngle = index * anglePerSector - Math.PI / 2 - anglePerSector / 2;
         const endAngle = startAngle + anglePerSector;
 
         ctx.beginPath();
@@ -219,8 +219,8 @@ export function renderWheelCanvas(
         ctx.fillStyle = prize.textStyle || "#ffffff";
         ctx.font = "800 10px 'Outfit', sans-serif";
 
-        let displayName = prize.name;
-        if (displayName.length > 16) displayName = displayName.slice(0, 14) + "..";
+        let displayName = (prize.icon ? prize.icon + "  " : "") + prize.name;
+        if (displayName.length > 20) displayName = displayName.slice(0, 18) + "..";
 
         ctx.fillText(displayName, radius - 20, 0);
         ctx.restore();

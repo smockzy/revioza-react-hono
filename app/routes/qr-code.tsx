@@ -250,48 +250,64 @@ export default function QRCode() {
 				}
 
 				@media print {
-					.page-qrcode {
-						background: white;
-						color: black;
+					html, body {
+						background: white !important;
+						color: black !important;
+						height: auto !important;
+						min-height: 0 !important;
+						overflow: visible !important;
 					}
-
-					.page-qrcode .header-container,
-					.page-qrcode header,
-					.page-qrcode .action-buttons,
-					.page-qrcode .qr-desc,
-					.page-qrcode footer,
-					.page-qrcode .merchant-badge {
+					/* Hide unnecessary page wrapper elements */
+					#root, header, footer, .action-buttons, .qr-desc, .merchant-badge, .header-container {
 						display: none !important;
 					}
-
-					.page-qrcode .qr-container {
-						border: none;
-						box-shadow: none;
-						margin: 0;
-						padding: 2cm;
-						background: white;
-						width: 100%;
-						max-width: 100%;
-						height: 100vh;
-						justify-content: center;
+					.page-qrcode {
+						background: white !important;
+						color: black !important;
+						min-height: 0 !important;
+						height: auto !important;
+						display: block !important;
+						padding: 0 !important;
+						margin: 0 !important;
 					}
-
+					.page-qrcode .qr-container {
+						background: white !important;
+						border: none !important;
+						box-shadow: none !important;
+						margin: 0 !important;
+						padding: 2cm !important;
+						width: 100% !important;
+						max-width: 100% !important;
+						height: auto !important;
+						display: flex !important;
+						flex-direction: column !important;
+						align-items: center !important;
+						justify-content: center !important;
+					}
 					.page-qrcode .qr-title {
 						color: black !important;
-						font-size: 2.5rem;
-						margin-bottom: 1cm;
+						font-size: 3rem !important;
+						margin-bottom: 1.5cm !important;
+						display: block !important;
 					}
-
 					.page-qrcode .qr-title span {
 						color: black !important;
 					}
-
 					.page-qrcode .qr-box {
-						box-shadow: none;
-						border: 2px solid #000;
-						width: 12cm;
-						height: 12cm;
-						padding: 0.5cm;
+						box-shadow: none !important;
+						border: 2px solid #000 !important;
+						width: 12cm !important;
+						height: 12cm !important;
+						padding: 0.5cm !important;
+						background: white !important;
+						display: flex !important;
+						align-items: center !important;
+						justify-content: center !important;
+					}
+					.page-qrcode .qr-box img {
+						width: 11cm !important;
+						height: 11cm !important;
+						display: block !important;
 					}
 				}
 			`}</style>

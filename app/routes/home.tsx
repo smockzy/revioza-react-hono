@@ -102,6 +102,22 @@ const FAKE_REVIEWS = [
 	},
 ];
 
+const getGlowColor = (hexColor: string) => {
+	const hex = hexColor.replace("#", "");
+	if (hex.length === 3) {
+		const r = parseInt(hex[0] + hex[0], 16);
+		const g = parseInt(hex[1] + hex[1], 16);
+		const b = parseInt(hex[2] + hex[2], 16);
+		return `rgba(${r},${g},${b},0.35)`;
+	} else if (hex.length === 6) {
+		const r = parseInt(hex.slice(0, 2), 16);
+		const g = parseInt(hex.slice(2, 4), 16);
+		const b = parseInt(hex.slice(4, 6), 16);
+		return `rgba(${r},${g},${b},0.35)`;
+	}
+	return "rgba(229,9,20,0.35)";
+};
+
 export default function Home() {
 	const [appState, setAppState] = useState<AppState>(DEFAULT_APP_STATE);
 	const [heroSrc, setHeroSrc] = useState(DEFAULT_HERO_IMAGE);
@@ -546,7 +562,10 @@ export default function Home() {
 		return (
 			<div
 				className={`phone-simulator-wrapper${isHero ? " hero-phone" : " demo-phone-scope"}`}
-				style={!isHero ? ({ "--preview-primary": appState.primaryColor } as React.CSSProperties) : undefined}
+				style={{
+					"--primary": isHero ? "#e50914" : appState.primaryColor,
+					"--primary-glow": isHero ? "rgba(229, 9, 20, 0.35)" : getGlowColor(appState.primaryColor),
+				} as React.CSSProperties}
 			>
 				<div className="phone-container">
 					<div className="phone-notch">
@@ -1041,19 +1060,19 @@ export default function Home() {
 	const heroContainerVariants = {
 		hidden: {},
 		visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
-	};
+	} as const;
 	const heroItemVariants = {
 		hidden: { opacity: 0, y: 30 },
 		visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-	};
+	} as const;
 	const heroBadgeVariants = {
 		hidden: { opacity: 0, y: -16 },
 		visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-	};
+	} as const;
 	const heroPhoneVariants = {
 		hidden: { opacity: 0, x: 60 },
 		visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut", delay: 0.2 } },
-	};
+	} as const;
 
 	// ─────────────────────────────────────────────────────────────
 	// RENDER
@@ -1475,32 +1494,90 @@ export default function Home() {
 											const file = e.target.files?.[0];
 											if (file) handleFileUpload(file);
 										}}
-													/>
-													<button className="btn-icon-delete" onClick={() => handleDeletePrize(prize.id)}>
-														<i className="fas fa-trash"></i>
-													</button>
-												</div>
-												<div className="prize-probability-wrapper">
-													<input
-														type="number"
-														value={prize.weight}
-														min={1}
-														max={100}
-														onChange={(e) => handlePrizeFieldChange(prize.id, "weight", e.target.value)}
-													/>
-													<span className="percent-symbol">%</span>
-												</div>
-												<div className="prize-color-dot" style={{ backgroundColor: prize.color }}>
-													<input
-														type="color"
-														value={prize.color}
-														onChange={(e) => handlePrizeFieldChange(prize.id, "color", e.target.value)}
-													/>
-												</div>
-											</div>
-										))}
-									</div>
+									/>
 								</div>
+								{uploadStatus && (
+									<div
+										style={{
+											fontSize: "0.78rem",
+											marginTop: "0.4rem",
+											padding: "6px 10px",
+											borderRadius: "8px",
+											textAlign: "center",
+											background: uploadStatus.isError ? "rgba(229,9,20,0.12)" : "rgba(52,199,89,0.12)",
+											color: uploadStatus.isError ? "#e50914" : "#34c759",
+											border: uploadStatus.isError ? "1px solid rgba(229,9,20,0.3)" : "1px solid rgba(52,199,89,0.3)",
+										}}
+									>
+										{uploadStatus.msg}
+									</div>
+								)}
+							</div>
+
+							<div className="form-group" style={{ marginTop: "-0.5rem", marginBottom: "1.5rem" }}>
+								<label htmlFor="admin-image-url">Ou lien URL de l&apos;image (pour QR Code mobile)</label>
+								<input
+									type="text"
+									id="admin-image-url"
+									value={appState.imageUrl}
+									onChange={(e) => {
+										updateAndSave({ imageUrl: e.target.value });
+										setCookie("admin_image_url", e.target.value);
+										if (!uploadPreview) {
+											setHeroSrc(e.target.value || DEFAULT_HERO_IMAGE);
+										}
+									}}
+									placeholder="https://exemple.com/photo.jpg"
+									style={{ width: "100%" }}
+								/>
+							</div>
+						</div>
+
+						<div className="form-group" style={{ marginBottom: "1rem" }}>
+							<label>Configuration des Lots de la Roue</label>
+						</div>
+
+						{/* Prizes Editor */}
+						<div className="prizes-editor">
+							<div className="prize-row header-row">
+								<span>Nom du Lot</span>
+								<span>Probabilité</span>
+								<span style={{ textAlign: "center" }}>Couleur</span>
+							</div>
+							<div id="admin-prizes-list">
+								{appState.prizes.map((prize) => (
+									<div key={prize.id} className="prize-row">
+										<div className="prize-name-wrapper">
+											<input
+												type="text"
+												value={prize.name}
+												onChange={(e) => handlePrizeFieldChange(prize.id, "name", e.target.value)}
+											/>
+											<button className="btn-icon-delete" onClick={() => handleDeletePrize(prize.id)}>
+												<i className="fas fa-trash"></i>
+											</button>
+										</div>
+										<div className="prize-probability-wrapper">
+											<input
+												type="number"
+												value={prize.weight}
+												min={1}
+												max={100}
+												onChange={(e) => handlePrizeFieldChange(prize.id, "weight", e.target.value)}
+											/>
+											<span className="percent-symbol">%</span>
+										</div>
+										<div className="prize-color-dot" style={{ backgroundColor: prize.color }}>
+											<input
+												type="color"
+												value={prize.color}
+												onChange={(e) => handlePrizeFieldChange(prize.id, "color", e.target.value)}
+											/>
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
 
 								<div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
 									<button className="btn-secondary" onClick={handleAddPrize} style={{ flex: 1, marginBottom: 0 }}>

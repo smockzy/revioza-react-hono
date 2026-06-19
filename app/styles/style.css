@@ -669,7 +669,6 @@ main {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1.25rem;
 }
 
 .feature-icon i {
@@ -698,11 +697,12 @@ main {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    z-index: 10;
-    transform: scale(0.75);
+    z-index: 15;
+    pointer-events: none;
+    transform: scale(0.85);
     transform-origin: top center;
     height: 920px;
-    margin-bottom: -230px;
+    margin-bottom: -130px;
     transition: transform 0.3s var(--ease-premium), margin-bottom 0.3s var(--ease-premium);
 }
 
@@ -755,6 +755,7 @@ main {
     display: flex;
     flex-direction: column;
     transition: box-shadow 0.5s var(--ease-premium);
+    pointer-events: auto;
 }
 
 .phone-container::after {
@@ -2258,6 +2259,7 @@ footer {
     font-weight: 900;
     line-height: 1.05;
     letter-spacing: -0.04em;
+    color: #ffffff;
     background: linear-gradient(180deg, #ffffff 0%, #c0c0c0 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -2265,6 +2267,7 @@ footer {
 }
 
 .hero-left h1 span {
+    color: #e50914;
     background: linear-gradient(135deg, #ff4444 0%, #e50914 60%, #ff2e3b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -2920,5 +2923,82 @@ footer {
     );
     border: none;
     margin: 0;
+}
+
+/* Features grid visual additions */
+.feature-card-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+    width: 100%;
+}
+
+.feature-metric {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: 99px;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.feature-metric.featured {
+    color: var(--primary);
+    background: rgba(229, 9, 20, 0.1);
+    border-color: rgba(229, 9, 20, 0.2);
+}
+
+.feature-card.featured {
+    border-color: rgba(229, 9, 20, 0.35) !important;
+    background: linear-gradient(180deg, rgba(229, 9, 20, 0.02) 0%, transparent 100%), var(--glass-bg);
+    box-shadow: 0 10px 30px rgba(229, 9, 20, 0.06);
+    position: relative;
+}
+
+.feature-card.featured::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 20px;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(229, 9, 20, 0.4), transparent 50%, rgba(229, 9, 20, 0.2));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+}
+
+/* Premium Background Glow Blobs */
+.glow-blob {
+    position: absolute;
+    width: 450px;
+    height: 450px;
+    border-radius: 50%;
+    filter: blur(150px);
+    opacity: 0.1;
+    z-index: -1;
+    pointer-events: none;
+    animation: floatBlob 25s infinite alternate ease-in-out;
+}
+
+.glow-blob-1 {
+    background: var(--primary);
+    top: 15%;
+    left: -10%;
+}
+
+.glow-blob-2 {
+    background: #ff525d;
+    top: 60%;
+    right: -10%;
+    animation-delay: -12s;
+}
+
+@keyframes floatBlob {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(60px, 80px) scale(1.15); }
 }
 

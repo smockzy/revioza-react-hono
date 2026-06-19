@@ -219,7 +219,7 @@ export default function Play() {
 		const n = state.prizes.length;
 		const idx = state.prizes.findIndex((p) => p.id === won.id);
 		const deg = 360 / n;
-		const target = 360 - (idx * deg + deg / 2);
+		const target = 360 - idx * deg;
 
 		const canvas = canvasRef.current;
 		if (canvas) {
@@ -327,6 +327,8 @@ export default function Play() {
 
 	return (
 		<div className="page-play">
+			<div className="glow-blob glow-blob-1"></div>
+			<div className="glow-blob glow-blob-2"></div>
 			{/* SCREEN 1 — WELCOME */}
 			<div className={`app-screen ${state.step === 1 ? "active" : ""}`} id="screen-1">
 				<div className="screen-scroll">
@@ -612,6 +614,25 @@ export default function Play() {
 								<p>{text}</p>
 							</div>
 						))}
+					</div>
+					<h5 style={{ fontSize: "0.8rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--primary)", marginTop: "0.5rem", width: "100%", textAlign: "left" }}>
+						Probabilités des gains
+					</h5>
+					<div style={{ width: "100%", maxHeight: "120px", overflowY: "auto", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "10px", padding: "0.5rem 0.75rem", marginBottom: "0.5rem" }}>
+						<table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.75rem" }}>
+							<tbody>
+								{state.prizes.map((p) => (
+									<tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+										<td style={{ padding: "4px 0", color: "var(--text)", textAlign: "left" }}>
+											{p.icon} {p.name}
+										</td>
+										<td style={{ padding: "4px 0", color: "var(--primary)", fontWeight: 700, textAlign: "right" }}>
+											{p.weight}%
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
 					</div>
 					<button className="btn-primary full-width" onClick={() => setOverlayRules(false)}>Compris !</button>
 				</div>

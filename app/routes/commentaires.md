@@ -34,3 +34,33 @@ creer **base de données** pour les utilisateurs, les avis, les roues, les lots,
 Connecter un SDK Serverless comme **Supabase** ou **Firebase** pour gérer la persistance partagée de manière centralisée
 
 configurer **google OAUTH** (dans supabase?)
+
+
+
+COMMENTAIRE AMINE : 
+
+Sur PC :
+
+- Le même badge fait "AI Slop" -> il faut le retirer/le remplacer par autre chose
+- Le texte "Transformez vos clients..." est trop long + certains termes font AI, comme "ambasaddeurs locaux"
+- Retirer les mouvements du smartphone
+- Agrandir le smartphone pour qu'on puisse mieux interagir avec (quand on est sur PC)
+- "+50 établissements nous suivent déjà !" -> "+50 établissements ont améliorés leur visibilité" ou qlqch comme ça
+- "pour transformer chaque repas" ; on ne vises pas que les restaurants, donc fais plus général
+
+Dans la démo interactive :
+- La palette de couleur fait changer le style de tout le site -> il faut que ça change seulement le contenu dans le smartphone
+- J'ai essayé de mettre une image, ça m'a mis "⚠️ Hébergement échoué. L'image sera visible localement uniquement."²²
+- "Générer mon QRCode" -> "Imprimer le QR Code" ne fonctionne pas, la page est blanche
+- Il faut également agrandir le téléphone, il est beaucoup trop petit
+- Le panneau "Personnalisation en Temps Réel (Admin)" est trop brut, trop chargé, trop compact -> il faut une interface plus "douce" voir une page externe dédiée à la démo
+
+
+- Les rubriques de la section "Tout ce dont vous avez besoin" font trop AI, on les voit sur tous les sites générés par ia -> trouve un nouveau design, et ajoute des images (c'est ce qui retire l'aspect ia)
+
+- Les avis ont tous la même photo de profil
+- Les avis sont des noms de particuliers -> tu vises les entreprises, donc il faut mettre des noms d'établissements (fictifs)
+- Essaie de rendre les textes des avis moins parfaits, avec des potentielles fautes pour rendre ça plus crédible
+
+
+- J'ai cliqué sur "Essayer gratuitement" dans les offres, puis "Connexion" -> "Connexion avec Google", et je suis arrivé sur https://revioza.com/merchant ? c'est pas censé arriver
