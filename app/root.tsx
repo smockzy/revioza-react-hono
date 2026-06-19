@@ -61,6 +61,16 @@ function AnimatedOutlet() {
 
 	useEffect(() => setIsMounted(true), []);
 
+	useEffect(() => {
+		if (typeof document !== "undefined") {
+			const path = location.pathname.toLowerCase();
+			if (!path.includes("/play") && !path.includes("/merchant")) {
+				document.documentElement.style.removeProperty("--primary");
+				document.documentElement.style.removeProperty("--primary-glow");
+			}
+		}
+	}, [location.pathname]);
+
 	// SSR: render Outlet without AnimatePresence to avoid hydration mismatch
 	if (!isMounted) return <Outlet />;
 

@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { FadeInSection } from "../utils/FadeInSection";
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/demo";
 import "../styles/style.css";
 import "../styles/pricing.css";
 import {
@@ -22,17 +21,15 @@ import {
 import {
 	setCookie,
 	getCookie,
-	getAllReviozaCookies,
-	clearAllReviozaCookies,
 } from "../utils/cookies";
 
 export function meta({ }: Route.MetaArgs) {
 	return [
-		{ title: "Revioza - Augmentez vos avis Google ! | Gamification Locale" },
+		{ title: "Revioza - Personnalisez votre Roue | Démo Interactive" },
 		{
 			name: "description",
 			content:
-				"Augmentez vos avis Google grâce à la gamification. Faites tourner la roulette en échange d'un avis sincère de vos clients.",
+				"Personnalisez l'apparence, les lots et le fonctionnement de votre roulette interactive en direct.",
 		},
 	];
 }
@@ -52,54 +49,6 @@ const DEFAULT_APP_STATE: AppState = {
 	timerSeconds: 7183,
 };
 
-// Inline pricing plans data
-interface PlanConfig {
-	monthly: string;
-	annual: string;
-	saving: string;
-}
-const PRICES: Record<string, PlanConfig> = {
-	unique: { monthly: "29€", annual: "23€", saving: "soit 72€ économisés par an" },
-};
-
-const FAKE_REVIEWS = [
-	{
-		name: "Brasserie Le Central",
-		city: "Lyon",
-		text: "On a mis le QR code sur les tables il y a 3 semaines. 89 avis au départ, 141 aujourd'hui. Mes serveurs adorent voir les clients tourner la roue.",
-		avatar: "LC",
-		avatarBg: "#c0392b",
-	},
-	{
-		name: "Pizzeria Napoli Nostra",
-		city: "Marseille",
-		text: "Franchement simple à configurer. En 20 minutes c'était en place. Les clients jouent, l'ambiance est bonne, et les avis s'accumulent. Que du positif.",
-		avatar: "NN",
-		avatarBg: "#e74c3c",
-	},
-	{
-		name: "Burger Station",
-		city: "Paris",
-		text: "J'étais sceptique mais les chiffres parlent d'eux-mêmes. Plus de 60 avis en un mois. La roue amuse vraiment les gens, ils restent plus longtemps.",
-		avatar: "BS",
-		avatarBg: "#922b21",
-	},
-	{
-		name: "O'Maki Sushi",
-		city: "Bordeaux",
-		text: "Notre note est passée de 3.9 à 4.5 étoiles en 6 semaines. Les retours négatifs restent en privé, les bons vont sur Google. Vraiment bien pensé.",
-		avatar: "OM",
-		avatarBg: "#cd6155",
-	},
-	{
-		name: "Café des Halles",
-		city: "Toulouse",
-		text: "Ça fait 2 mois qu'on utilise Revioza. On reçoit entre 5 et 8 avis par jour maintenant. Pour le prix, c'est très rentable.",
-		avatar: "CH",
-		avatarBg: "#a93226",
-	},
-];
-
 const getGlowColor = (hexColor: string) => {
 	const hex = hexColor.replace("#", "");
 	if (hex.length === 3) {
@@ -116,48 +65,38 @@ const getGlowColor = (hexColor: string) => {
 	return "rgba(229,9,20,0.35)";
 };
 
-export default function Home() {
+export default function Demo() {
 	const [appState, setAppState] = useState<AppState>(DEFAULT_APP_STATE);
 	const [heroSrc, setHeroSrc] = useState(DEFAULT_HERO_IMAGE);
 	const [uploadPreview, setUploadPreview] = useState<string | null>(null);
 	const [uploadStatus, setUploadStatus] = useState<{ msg: string; isError: boolean } | null>(null);
-	const [overlayQr, setOverlayQr] = useState(false);
 	const [overlayRegister, setOverlayRegister] = useState(false);
 	const [activeTab, setActiveTab] = useState<"login" | "register">("login");
 	const [alertOverlay, setAlertOverlay] = useState(false);
-	const [cookieBanner, setCookieBanner] = useState(false);
-	const [isAnnualPricing, setIsAnnualPricing] = useState(false);
 	const [placeIdHelp, setPlaceIdHelp] = useState(false);
 	const [overlayRules, setOverlayRules] = useState(false);
 	const [overlayProfile, setOverlayProfile] = useState(false);
-	// SSR guard for Framer Motion
 	const [isMounted, setIsMounted] = useState(false);
 	const prefersReducedMotion = useReducedMotion();
 
-	// Demo simulator canvas ref (connected to admin panel)
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const confettiCanvasRef = useRef<HTMLCanvasElement>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-	// Ref to the interactive demo section for smooth scroll
-	const demoSectionRef = useRef<HTMLElement>(null);
 
 	useEffect(() => setIsMounted(true), []);
 
-	// Load config from localStorage on mount
 	useEffect(() => {
 		if (typeof document !== "undefined") {
 			document.documentElement.style.removeProperty("--primary");
 			document.documentElement.style.removeProperty("--primary-glow");
 		}
+
 		const saved = loadConfigFromStorage(DEFAULT_APP_STATE);
-		// Preserve non-serializable fields
 		saved.timerInterval = null;
 		saved.selectedPrize = null;
 		saved.isSpinning = false;
 		setAppState(saved);
-		// Note: primaryColor is applied as a scoped CSS var on the demo phone preview only.
 
-		// Restore hero image
 		const savedHero = localStorage.getItem("revioza_custom_hero_image");
 		if (savedHero) {
 			setHeroSrc(savedHero);
@@ -166,14 +105,6 @@ export default function Home() {
 			setHeroSrc(saved.imageUrl);
 		}
 
-		// Cookie restoration banner
-		const cookies = getAllReviozaCookies();
-		if (Object.keys(cookies).length > 0) {
-			setCookieBanner(true);
-			setTimeout(() => setCookieBanner(false), 5000);
-		}
-
-		// Cookie bindings
 		const cookieName = getCookie("admin_rest_name");
 		const cookieSub = getCookie("admin_rest_sub");
 		const cookieGoogle = getCookie("admin_google_link");
@@ -189,19 +120,9 @@ export default function Home() {
 				primaryColor: cookieColor || prev.primaryColor,
 				imageUrl: cookieImage || prev.imageUrl,
 			}));
-			// primaryColor from cookie is applied via scoped CSS var on the demo phone preview only
-		}
-
-		// URL parameter check for registration popup
-		const urlParams = new URLSearchParams(window.location.search);
-		if (urlParams.get("register") === "true") {
-			setActiveTab("register");
-			setOverlayRegister(true);
-			window.history.replaceState({}, document.title, window.location.pathname);
 		}
 	}, []);
 
-	// Scroll Reveal Observer
 	useEffect(() => {
 		const revealEls = document.querySelectorAll(".reveal");
 		const observer = new IntersectionObserver(
@@ -218,7 +139,6 @@ export default function Home() {
 		return () => observer.disconnect();
 	}, [isMounted]);
 
-	// Render wheel whenever prizes change, or when step changes (demo simulator canvas)
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -227,7 +147,6 @@ export default function Home() {
 		renderWheelCanvas(canvas, ctx, appState.prizes, 270);
 	}, [appState.prizes, appState.currentStep]);
 
-	// Timer management
 	useEffect(() => {
 		if (appState.currentStep === 4) {
 			const interval = setInterval(() => {
@@ -347,11 +266,8 @@ export default function Home() {
 
 	const handleColorChange = useCallback(
 		(color: string) => {
-			// Color is scoped to the demo phone preview via .demo-phone-scope CSS class.
-			// document.documentElement is NOT mutated, preventing global theme leakage.
 			updateAndSave({ primaryColor: color });
 			setCookie("admin_theme_color", color);
-			// Re-render wheel canvas (uses prize.color directly, not --primary)
 			const canvas = canvasRef.current;
 			if (canvas) {
 				const ctx = canvas.getContext("2d");
@@ -531,19 +447,6 @@ export default function Home() {
 		window.location.href = "/merchant";
 	}, []);
 
-	// Smooth scroll to interactive demo section
-	const handleScrollToDemo = useCallback(() => {
-		demoSectionRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, []);
-
-	// Pricing helper
-	const getPricingPrice = (plan: string) =>
-		isAnnualPricing ? PRICES[plan].annual : PRICES[plan].monthly;
-	const getPricingReassurance = () =>
-		isAnnualPricing
-			? "🔒 Facturé en une fois · Non remboursable · Accès garanti 12 mois complets"
-			: "🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai";
-
 	const stepTitles = [
 		"1. Connexion Client",
 		"2. Avis sur Google",
@@ -551,11 +454,6 @@ export default function Home() {
 		"4. Félicitations !",
 	];
 
-	// ─────────────────────────────────────────────────────────────
-	// PHONE SIMULATOR RENDERER
-	// isHero = true  → step 1 fixé, lecture seule, données mockées
-	// isHero = false → connecté à appState, panels interactifs
-	// ─────────────────────────────────────────────────────────────
 	const renderPhoneSimulator = (isHero: boolean) => {
 		const displayHeroSrc = isHero ? DEFAULT_HERO_IMAGE : heroSrc;
 		const displayName = isHero ? "Bella Napoli" : appState.restaurantName;
@@ -598,7 +496,7 @@ export default function Home() {
 								}}
 							/>
 						)}
-						{/* STEP 1: WELCOME — always active in hero, conditional in demo */}
+						{/* STEP 1: WELCOME */}
 						<div
 							className={`app-screen ${isHero || appState.currentStep === 1 ? "active" : ""}`}
 							id={isHero ? "hero-screen-1" : "screen-1"}
@@ -638,28 +536,17 @@ export default function Home() {
 										</div>
 									</div>
 								</div>
-								{isHero ? (
-									<button className="btn-google-signin" onClick={handleScrollToDemo}>
-										<img
-											src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-											alt="Google"
-										/>
-										ESSAYER LA DÉMO ↓
-									</button>
-								) : (
-									<button className="btn-google-signin" onClick={handleGoogleSignin}>
-										<img
-											src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-											alt="Google"
-										/>
-										JE TENTE MA CHANCE
-									</button>
-								)}
-
+								<button className="btn-google-signin" onClick={handleGoogleSignin}>
+									<img
+										src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+										alt="Google"
+									/>
+									JE TENTE MA CHANCE
+								</button>
 							</div>
 						</div>
 
-						{/* Interactive screens only in demo mode */}
+						{/* Interactive screens */}
 						{!isHero && (
 							<>
 								{/* STEP 2: LEAVE REVIEW */}
@@ -1038,7 +925,7 @@ export default function Home() {
 					</div>
 				</div>
 
-				{/* Step navigation footer — demo mode only */}
+				{/* Step navigation footer */}
 				{!isHero && (
 					<div className="preview-step-footer">
 						<button
@@ -1075,46 +962,16 @@ export default function Home() {
 		);
 	};
 
-	// ─────────────────────────────────────────────────────────────
-	// HERO MOTION VARIANTS
-	// ─────────────────────────────────────────────────────────────
-	const heroContainerVariants = {
-		hidden: {},
-		visible: { transition: { staggerChildren: 0.15, delayChildren: 0.1 } },
-	} as const;
-	const heroItemVariants = {
-		hidden: { opacity: 0, y: 30 },
-		visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
-	} as const;
-	const heroBadgeVariants = {
-		hidden: { opacity: 0, y: -16 },
-		visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
-	} as const;
-	const heroPhoneVariants = {
-		hidden: { opacity: 0, x: 60 },
-		visible: { opacity: 1, x: 0, transition: { duration: 0.7, ease: "easeOut", delay: 0.2 } },
-	} as const;
-
-	// ─────────────────────────────────────────────────────────────
-	// RENDER
-	// ─────────────────────────────────────────────────────────────
 	return (
-		<motion.div
-			className="page-landing"
-			initial={{ opacity: 0, y: 20 }}
-			animate={{ opacity: 1, y: 0 }}
-			exit={{ opacity: 0, y: -20 }}
-			transition={{ duration: 0.4, ease: "easeInOut" }}
-		>
-			{/* NAV */}
+		<div className="page-landing" style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
 			<header>
 				<div className="header-container">
-					<div className="logo">
+					<a href="/" className="logo" style={{ textDecoration: "none" }}>
 						<div className="logo-text">
 							RE<span className="v-accent">V</span>IOZA
 						</div>
 						<span className="logo-tagline">L&apos;avis qui vous rapporte</span>
-					</div>
+					</a>
 					<div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
 						<button
 							id="btn-header-login"
@@ -1149,593 +1006,309 @@ export default function Home() {
 						>
 							S&apos;inscrire
 						</button>
-						<a href="/pricing" className="cta-pitch" style={{ textDecoration: "none" }}>
-							Essayer Revioza
-						</a>
 					</div>
 				</div>
 			</header>
 
-			{/* ═══════════════════════════════════════
-			    SECTION: HERO
-			    ═══════════════════════════════════════ */}
-			<section className="section-hero" id="section-hero">
-				<div className="hero-content-wrap">
-					{/* Left: Headline + CTAs — stagger animation when mounted */}
-					{isMounted && !prefersReducedMotion ? (
-						<motion.div
-							className="hero-left"
-							variants={heroContainerVariants}
-							initial="hidden"
-							animate="visible"
-						>
-							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
-								<i className="fa-solid fa-star"></i>
-								<span>+50 commerces boostent leurs avis Google</span>
-							</motion.div>
-							<motion.h1 variants={heroItemVariants}>
-								Démultipliez vos <span>Avis Google</span> par le Jeu
-							</motion.h1>
-							<motion.p variants={heroItemVariants}>
-								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
-							</motion.p>
-							<motion.div className="hero-cta-group" variants={heroItemVariants}>
-								<motion.button
-									className="btn-primary hero-cta-main"
-									id="hero-cta-demo"
-									onClick={handleScrollToDemo}
-									whileHover={{ scale: 1.03 }}
-									whileTap={{ scale: 0.97 }}
-								>
-									<i className="fa-solid fa-play"></i> Voir la démo
-								</motion.button>
-								<motion.a
-									href="/pricing"
-									className="btn-secondary hero-cta-secondary"
-									id="hero-cta-pricing"
-									style={{ textDecoration: "none" }}
-									whileHover={{ scale: 1.03 }}
-									whileTap={{ scale: 0.97 }}
-								>
-									Voir les tarifs
-								</motion.a>
-							</motion.div>
-							<motion.div className="hero-social-proof-mini" variants={heroItemVariants}>
-								<div className="hero-mini-stars">★★★★★</div>
-								<div className="hero-social-proof-text-col">
-									<span>+50 établissements ont boosté leur réputation Google</span>
-									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
-								</div>
-							</motion.div>
-						</motion.div>
-					) : (
-						<div className="hero-left">
-							<div className="hero-eyebrow">
-								<i className="fa-solid fa-star"></i>
-								<span>+50 commerces boostent leurs avis Google</span>
-							</div>
-							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
-							<p>
-								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
-							</p>
-							<div className="hero-cta-group">
-								<button className="btn-primary hero-cta-main" id="hero-cta-demo" onClick={handleScrollToDemo}>
-									<i className="fa-solid fa-play"></i> Voir la démo
-								</button>
-								<a href="/pricing" className="btn-secondary hero-cta-secondary" id="hero-cta-pricing" style={{ textDecoration: "none" }}>
-									Voir les tarifs
-								</a>
-							</div>
-							<div className="hero-social-proof-mini">
-								<div className="hero-mini-stars">★★★★★</div>
-								<div className="hero-social-proof-text-col">
-									<span>+50 établissements ont boosté leur réputation Google</span>
-									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
-								</div>
-							</div>
-						</div>
-					)}
-
-					{/* Right: Static phone simulator — entry animation only, no floating */}
-					{isMounted && !prefersReducedMotion ? (
-						<motion.div
-							className="hero-right"
-							variants={heroPhoneVariants}
-							initial="hidden"
-							animate="visible"
-						>
-							{renderPhoneSimulator(true)}
-						</motion.div>
-					) : (
-						<div className="hero-right">
-							{renderPhoneSimulator(true)}
-						</div>
-					)}
-				</div>
-			</section>
-
-			<div className="section-divider" />
-
-			{/* ═══════════════════════════════════════
-			    SECTION: COMMENT ÇA MARCHE
-			    ═══════════════════════════════════════ */}
-			<section className="section-how" id="section-how">
+			<main style={{ flex: 1, padding: "5rem 2rem" }}>
 				<div className="section-inner">
-					<FadeInSection delay={0}>
-						<div className="section-label">Comment ça marche</div>
-						<h2 className="section-heading">
-							3 étapes pour <span>multiplier vos avis</span>
-						</h2>
-						<p className="section-subheading">
-							Un parcours fluide en 3 étapes simples pour transformer chaque visite client en avis Google authentique.
+					<div style={{ textAlign: "center", marginBottom: "3rem" }}>
+						<h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.5rem", fontWeight: 800, color: "var(--text-main)", textTransform: "uppercase" }}>
+							Personnalisez votre Roue
+						</h1>
+						<p style={{ color: "var(--text-muted)", fontSize: "1rem", marginTop: "0.5rem" }}>
+							Prévisualisez le rendu avant de vous lancer
 						</p>
-					</FadeInSection>
-					<div className="how-steps">
-						<FadeInSection delay={0}>
-							<div className="how-step-card">
-								<div className="how-step-num">01</div>
-								<div className="how-step-icon"><i className="fa-solid fa-sliders"></i></div>
-								<h3>Configurez votre roue</h3>
-								<p>En 2 minutes, personnalisez vos lots, votre identité visuelle et votre lien Google. Votre QR code unique est prêt à imprimer.</p>
-							</div>
-						</FadeInSection>
-						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
-						<FadeInSection delay={0.15}>
-							<div className="how-step-card">
-								<div className="how-step-num">02</div>
-								<div className="how-step-icon"><i className="fa-solid fa-qrcode"></i></div>
-								<h3>Le client scanne et joue</h3>
-								<p>Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
-							</div>
-						</FadeInSection>
-						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
-						<FadeInSection delay={0.3}>
-							<div className="how-step-card">
-								<div className="how-step-num">03</div>
-								<div className="how-step-icon"><i className="fa-solid fa-star"></i></div>
-								<h3>Un avis sincère, un lot gagné</h3>
-								<p>Le client laisse son avis Google honnête et récupère son lot en caisse en montrant son ticket. Win-win pour tous.</p>
-							</div>
-						</FadeInSection>
 					</div>
-				</div>
-			</section>
 
-			<div className="section-divider" />
-
-			{/* ═══════════════════════════════════════
-			    SECTION: DÉMO INTERACTIVE
-			    ═══════════════════════════════════════ */}
-			<section className="section-demo" id="section-demo" ref={demoSectionRef}>
-				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Démo interactive</div>
-					<h2 className="section-heading reveal reveal-slide-up">
-						Testez <span>l&apos;expérience client</span> en direct
-					</h2>
-					<p className="section-subheading reveal reveal-slide-up">
-						Configurez le profil et les lots ci-dessous. Les modifications s&apos;appliquent instantanément
-						sur le simulateur mobile à droite !
-					</p>
-
-					<div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: "100%" }}>
-						{/* Interactive phone simulator */}
-						<div className="reveal reveal-slide-up" style={{ display: "flex", justifyContent: "center", width: "100%" }}>
+					<div className="demo-layout">
+						{/* Colonne gauche : Le smartphone simulator */}
+						<div className="demo-right">
 							{renderPhoneSimulator(false)}
 						</div>
-						<div style={{ display: "flex", justifyContent: "center", marginTop: "32px", width: "100%" }}>
-							<a
-								href="/demo"
-								className="btn-secondary"
-								style={{
-									padding: "0.75rem 2rem",
-									borderRadius: "50px",
-									textDecoration: "none",
-									fontWeight: 600,
-									fontSize: "0.95rem",
-									border: "1px solid var(--border-color)",
-									background: "var(--bg-card)",
-									color: "var(--text-main)",
-									display: "inline-flex",
-									alignItems: "center",
-									gap: "0.5rem",
-									transition: "all 0.2s ease-in-out",
-								}}
-							>
-								Personnaliser ma Roue →
-							</a>
-						</div>
-					</div>
-				</div>
-			</section>
 
-			<div className="section-divider" />
+						{/* Colonne droite : Le panneau de personnalisation */}
+						<div className="demo-left">
+							<section className="panel-card" id="admin-panel" style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "1.75rem" }}>
+								<h2 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-main)", marginBottom: "0.5rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
+									<i className="fa-solid fa-sliders" style={{ color: "var(--primary)" }}></i> Configuration
+								</h2>
+								<p style={{ fontSize: "0.82rem", color: "var(--text-muted)", marginBottom: "1.5rem", lineHeight: 1.4 }}>
+									Modifiez les options ci-dessous pour personnaliser le simulateur de smartphone à gauche en temps réel.
+								</p>
 
-			{/* ═══════════════════════════════════════
-			    SECTION: FEATURES
-			    ═══════════════════════════════════════ */}
-			<section className="section-features" id="section-features">
-				<div className="section-inner">
-					<FadeInSection delay={0}>
-						<div className="section-label">Fonctionnalités</div>
-						<h2 className="section-heading">
-							Tout ce dont vous avez <span>besoin</span>
-						</h2>
-					</FadeInSection>
-					<div className="features-grid">
-						<FadeInSection delay={0}>
-							<div className="feature-card featured delay-100">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-shield-halved"></i>
+								{/* Section Apparence */}
+								<div className="admin-group" style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1.25rem", marginBottom: "1.25rem" }}>
+									<div className="admin-group-label" style={{ fontSize: "0.85rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-main)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+										<i className="fa-solid fa-palette" style={{ color: "var(--primary)" }}></i> Apparence
 									</div>
-									<span className="feature-metric featured">1 participation / jour</span>
-								</div>
-								<h3>Anti-Triche Avancé</h3>
-								<p>
-									Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour.
-									Tickets de gain éphémères.
-								</p>
-							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.1}>
-							<div className="feature-card delay-200">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-qrcode"></i>
-									</div>
-									<span className="feature-metric">PDF en 2 min</span>
-								</div>
-								<h3>Prêt à Imprimer</h3>
-								<p>
-									Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
-									compte d&apos;établissement.
-								</p>
-							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.2}>
-							<div className="feature-card featured delay-300">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-chart-line"></i>
-									</div>
-									<span className="feature-metric featured">Temps réel</span>
-								</div>
-								<h3>Statistiques Avancées</h3>
-								<p>
-									Suivez le nombre de scans, de clics Google, les lots distribués et l&apos;évolution
-									globale de votre note moyenne.
-								</p>
-							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.3}>
-							<div className="feature-card delay-400">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-unlock"></i>
-									</div>
-									<span className="feature-metric">Sans engagement</span>
-								</div>
-								<h3>Résiliable à tout moment</h3>
-								<p>
-									Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un
-									clic, en toute liberté.
-								</p>
-							</div>
-						</FadeInSection>
-					</div>
-				</div>
-			</section>
+									
+									<div className="form-grid" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+										<div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+											<label htmlFor="admin-rest-name" style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Nom du commerce</label>
+											<input
+												type="text"
+												id="admin-rest-name"
+												value={appState.restaurantName}
+												onChange={(e) => {
+													updateAndSave({ restaurantName: e.target.value });
+													setCookie("admin_rest_name", e.target.value);
+												}}
+												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }}
+											/>
+										</div>
 
-			<div className="section-divider" />
+										<div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+											<label htmlFor="admin-rest-sub" style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Type d&apos;établissement</label>
+											<input
+												type="text"
+												id="admin-rest-sub"
+												value={appState.restaurantSub}
+												onChange={(e) => {
+													updateAndSave({ restaurantSub: e.target.value });
+													setCookie("admin_rest_sub", e.target.value);
+												}}
+												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }}
+											/>
+										</div>
 
-			{/* ═══════════════════════════════════════
-			    SECTION: SOCIAL PROOF
-			    ═══════════════════════════════════════ */}
-			<section className="section-social" id="section-social">
-				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Témoignages</div>
-					<h2 className="section-heading reveal reveal-slide-up">
-						Ils nous font <span>confiance</span>
-					</h2>
-				</div>
-				{/* Infinite auto-scroll carousel — pure CSS, no external lib */}
-				<div className="reviews-carousel-wrap">
-					<div className="reviews-track">
-						{/* Duplicate for seamless infinite loop */}
-						{[...FAKE_REVIEWS, ...FAKE_REVIEWS].map((review, i) => (
-							<div className="review-card" key={i}>
-								<div className="review-card-header">
-								<div
-									className="review-avatar-circle"
-									style={{
-										background: (review as any).avatarBg ? `${(review as any).avatarBg}22` : "rgba(229,9,20,0.12)",
-										borderColor: (review as any).avatarBg ? `${(review as any).avatarBg}44` : "rgba(229,9,20,0.25)",
-										color: (review as any).avatarBg || "var(--primary)",
-										fontFamily: "var(--font-display)",
-										fontWeight: 700,
-										fontSize: "0.8rem",
-										letterSpacing: "0.02em",
-									}}
-								>{review.avatar}</div>
-									<div className="review-identity">
-										<div className="review-name">{review.name}</div>
-										<div className="review-city">
-											<i className="fa-solid fa-location-dot"></i> {review.city}
+										<div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+											<label style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Couleur principale</label>
+											<div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+												<input
+													type="color"
+													id="admin-theme-color"
+													value={appState.primaryColor}
+													onChange={(e) => handleColorChange(e.target.value)}
+													style={{ width: "42px", height: "42px", padding: "3px", cursor: "pointer", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "var(--bg-input)" }}
+												/>
+												<div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+													<span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text-main)", fontFamily: "monospace" }}>
+														{appState.primaryColor.toUpperCase()}
+													</span>
+													<span style={{ fontSize: "0.68rem", color: "var(--text-muted)" }}>
+														Boutons · Roue · Accents
+													</span>
+												</div>
+												<div style={{
+													flex: 1,
+													height: "28px",
+													borderRadius: "6px",
+													background: `linear-gradient(90deg, ${appState.primaryColor}, ${appState.primaryColor}99)`,
+													border: "1px solid rgba(255,255,255,0.06)",
+												}} />
+											</div>
+										</div>
+
+										<div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+											<label style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Image d&apos;accueil</label>
+											<div
+												className="upload-drop-zone"
+												style={{ position: "relative", border: "2px dashed var(--border-color)", borderRadius: "10px", padding: "1rem", textAlign: "center", cursor: "pointer", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "100px" }}
+												onDragOver={(e) => {
+													e.preventDefault();
+													e.currentTarget.classList.add("drag-over");
+												}}
+												onDragLeave={(e) => e.currentTarget.classList.remove("drag-over")}
+												onDrop={(e) => {
+													e.preventDefault();
+													e.currentTarget.classList.remove("drag-over");
+													const file = e.dataTransfer.files[0];
+													if (file) handleFileUpload(file);
+												}}
+											>
+												{uploadPreview ? (
+													<div className="upload-preview-wrap" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+														<img src={uploadPreview} alt="Aperçu" style={{ maxHeight: "70px", borderRadius: "6px", objectFit: "cover" }} />
+														<button
+															type="button"
+															className="upload-remove-btn"
+															title="Supprimer l'image"
+															onClick={(e) => {
+																e.stopPropagation();
+																handleRemoveImage();
+															}}
+															style={{ background: "rgba(229,9,20,0.15)", border: "none", color: "#e50914", width: "26px", height: "26px", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+														>
+															<i className="fa-solid fa-xmark"></i>
+														</button>
+													</div>
+												) : (
+													<div className="upload-placeholder" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "4px" }}>
+														<i className="fa-solid fa-image" style={{ fontSize: "1.25rem", color: "var(--text-muted)", marginBottom: "4px" }}></i>
+														<span style={{ fontSize: "0.75rem", color: "var(--text-main)" }}>Cliquez ou déposez votre image ici</span>
+														<small style={{ fontSize: "0.65rem", color: "var(--text-muted)" }}>.jpg, .jpeg, .png, .webp</small>
+													</div>
+												)}
+												<input
+													type="file"
+													id="admin-hero-image"
+													ref={fileInputRef}
+													accept=".jpg,.jpeg,.png,.webp"
+													style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
+													onChange={(e) => {
+														const file = e.target.files?.[0];
+														if (file) handleFileUpload(file);
+													}}
+												/>
+											</div>
+											{uploadStatus && (
+												<div
+													style={{
+														fontSize: "0.75rem",
+														marginTop: "0.4rem",
+														padding: "5px 8px",
+														borderRadius: "6px",
+														textAlign: "center",
+														background: uploadStatus.isError ? "rgba(229,9,20,0.1)" : "rgba(52,199,89,0.1)",
+														color: uploadStatus.isError ? "#e50914" : "#34c759",
+														border: uploadStatus.isError ? "1px solid rgba(229,9,20,0.2)" : "1px solid rgba(52,199,89,0.2)",
+													}}
+												>
+													{uploadStatus.msg}
+												</div>
+											)}
+										</div>
+
+										<div className="form-group" style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+											<label htmlFor="admin-image-url" style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Ou lien URL de l&apos;image</label>
+											<input
+												type="text"
+												id="admin-image-url"
+												value={appState.imageUrl}
+												onChange={(e) => {
+													updateAndSave({ imageUrl: e.target.value });
+													setCookie("admin_image_url", e.target.value);
+													if (!uploadPreview) {
+														setHeroSrc(e.target.value || DEFAULT_HERO_IMAGE);
+													}
+												}}
+												placeholder="https://exemple.com/photo.jpg"
+												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none", fontSize: "0.78rem" }}
+											/>
 										</div>
 									</div>
-									<div className="review-google-badge">
-										<img
-											src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
-											alt="Google"
-											style={{ height: "14px", display: "block" }}
+								</div>
+
+								{/* Section Lots & Récompenses */}
+								<div className="admin-group" style={{ borderBottom: "1px solid var(--border-color)", paddingBottom: "1.25rem", marginBottom: "1.25rem" }}>
+									<div className="admin-group-label" style={{ fontSize: "0.85rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-main)", marginBottom: "1rem", display: "flex", alignItems: "center", gap: "0.4rem" }}>
+										<i className="fa-solid fa-gift" style={{ color: "var(--primary)" }}></i> Lots &amp; Récompenses
+									</div>
+
+									<div className="prizes-editor">
+										<div className="prize-row header-row" style={{ display: "grid", gridTemplateColumns: "1fr 90px 50px", gap: "8px", marginBottom: "8px", fontSize: "0.72rem", color: "var(--text-muted)", textTransform: "uppercase", fontWeight: 700 }}>
+											<span>Nom du Lot</span>
+											<span>Probabilité</span>
+											<span style={{ textAlign: "center" }}>Color</span>
+										</div>
+										<div id="admin-prizes-list" style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+											{appState.prizes.map((prize) => (
+												<div key={prize.id} className="prize-row" style={{ display: "grid", gridTemplateColumns: "1fr 90px 50px", gap: "8px", alignItems: "center" }}>
+													<div className="prize-name-wrapper" style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--bg-input)", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "2px 6px" }}>
+														<input
+															type="text"
+															value={prize.name}
+															onChange={(e) => handlePrizeFieldChange(prize.id, "name", e.target.value)}
+															style={{ flex: 1, background: "transparent", border: "none", color: "#fff", outline: "none", fontSize: "0.78rem", padding: "4px 0" }}
+														/>
+														<button className="btn-icon-delete" onClick={() => handleDeletePrize(prize.id)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: "0.78rem" }}>
+															<i className="fas fa-trash"></i>
+														</button>
+													</div>
+													<div className="prize-probability-wrapper" style={{ display: "flex", alignItems: "center", gap: "4px", background: "var(--bg-input)", border: "1px solid var(--border-color)", borderRadius: "8px", padding: "2px 6px" }}>
+														<input
+															type="number"
+															value={prize.weight}
+															min={1}
+															max={100}
+															onChange={(e) => handlePrizeFieldChange(prize.id, "weight", e.target.value)}
+															style={{ width: "100%", background: "transparent", border: "none", color: "#fff", outline: "none", fontSize: "0.78rem", padding: "4px 0", textAlign: "right" }}
+														/>
+														<span className="percent-symbol" style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>%</span>
+													</div>
+													<div className="prize-color-dot" style={{ position: "relative", width: "28px", height: "28px", borderRadius: "50%", margin: "0 auto", border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer", backgroundColor: prize.color }}>
+														<input
+															type="color"
+															value={prize.color}
+															onChange={(e) => handlePrizeFieldChange(prize.id, "color", e.target.value)}
+															style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer", width: "100%", height: "100%" }}
+														/>
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+
+									<div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+										<button className="btn-secondary" onClick={handleAddPrize} style={{ flex: 1, padding: "8px 12px", fontSize: "0.78rem", borderRadius: "8px", cursor: "pointer" }}>
+											<i className="fa-solid fa-plus"></i> Ajouter un lot
+										</button>
+										<button
+											className="btn-primary"
+											onClick={handleOpenClient}
+											style={{ flex: 1, padding: "8px 12px", fontSize: "0.78rem", borderRadius: "8px", cursor: "pointer", border: "none", fontWeight: 600 }}
+										>
+											<i className="fa-solid fa-mobile-screen-button"></i> Tester la page
+										</button>
+									</div>
+
+									<div style={{ marginTop: "0.75rem" }}>
+										<button
+											className="cta-pitch"
+											onClick={handleGenerateQr}
+											style={{
+												width: "100%",
+												padding: "0.65rem",
+												textTransform: "uppercase",
+												fontWeight: 700,
+												fontSize: "0.8rem",
+												borderRadius: "8px",
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+												gap: "0.4rem",
+												border: "none",
+												cursor: "pointer"
+											}}
+										>
+											<i className="fa-solid fa-qrcode"></i> Imprimer le QR code
+										</button>
+									</div>
+								</div>
+
+								{/* Section Intégrations (Google Place ID commenté) */}
+								<div className="admin-group">
+									<div className="admin-group-label" style={{ fontSize: "0.85rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--text-muted)", display: "flex", alignItems: "center", gap: "0.4rem", opacity: 0.6 }}>
+										<i className="fa-brands fa-google"></i> Intégrations
+									</div>
+									
+									{/* TODO: Place ID — à afficher uniquement pour les utilisateurs connectés avec un abonnement actif
+									<div className="form-group" style={{ marginTop: "1rem" }}>
+										<label htmlFor="admin-google-link" style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase" }}>Place ID Google</label>
+										<input
+											type="text"
+											id="admin-google-link"
+											value={appState.googleLink}
+											onChange={(e) => {
+												updateAndSave({ googleLink: e.target.value });
+												setCookie("admin_google_link", e.target.value);
+											}}
+											placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83VY24"
+											style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none", fontSize: "0.78rem", marginTop: "4px" }}
 										/>
 									</div>
-								</div>
-								<div className="review-stars-row">★★★★★</div>
-								<p className="review-text-body">&ldquo;{review.text}&rdquo;</p>
-							</div>
-						))}
-					</div>
-				</div>
-			</section>
-
-			<div className="section-divider" />
-
-			{/* ═══════════════════════════════════════
-			    SECTION: PRICING (inline)
-			    ═══════════════════════════════════════ */}
-			<section className="section-pricing" id="section-pricing">
-				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Tarifs</div>
-					<h2 className="section-heading reveal reveal-slide-up">
-						Des tarifs simples, <span>sans engagement</span>
-					</h2>
-					<p className="section-subheading reveal reveal-slide-up">
-						Boostez votre e-réputation locale avec la solution de loterie interactive la plus performante du marché.
-					</p>
-
-					{/* Billing toggle */}
-					<div className="billing-toggle-wrap reveal reveal-slide-up">
-						<span
-							className={`toggle-label ${!isAnnualPricing ? "active" : ""}`}
-							onClick={() => setIsAnnualPricing(false)}
-						>
-							Facturation mensuelle
-						</span>
-						<button
-							className={`billing-switch ${isAnnualPricing ? "active" : ""}`}
-							id="billing-switch-home"
-							aria-label="Toggle billing cycle"
-							onClick={() => setIsAnnualPricing(!isAnnualPricing)}
-						>
-							<span className="switch-dot"></span>
-						</button>
-						<span
-							className={`toggle-label ${isAnnualPricing ? "active" : ""}`}
-							onClick={() => setIsAnnualPricing(true)}
-						>
-							Facturation annuelle
-							<span className="discount-badge">-20%</span>
-						</span>
-					</div>
-
-					{/* Pricing cards */}
-					<div className="pricing-grid-plans" style={{ display: "flex", justifyContent: "center", width: "100%", gap: 0 }}>
-						{/* Plan Unique - Featured */}
-						<div className="pricing-card featured reveal reveal-slide-up delay-200" style={{ maxWidth: "500px", width: "100%" }}>
-							<div className="featured-ribbon">Offre Unique</div>
-							<div className="plan-header">
-								<span className="plan-tier">Plan Pro Tout-Inclus</span>
-								<h2 className="plan-price" id="price-unique" style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
-									{getPricingPrice("unique")}<span>/mois</span>
-									<span style={{ fontSize: "1.3rem", textDecoration: "line-through", color: "var(--text-muted)", fontWeight: 500, marginLeft: "0.5rem" }}>
-										{isAnnualPricing ? "46€" : "59€"}
-									</span>
-									<span className="discount-badge" style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}>
-										-50% À VIE
-									</span>
-								</h2>
-								{isAnnualPricing && (
-									<div
-										className="annual-saving-text"
-										style={{
-											fontSize: "0.72rem",
-											color: "var(--accent-green)",
-											fontWeight: 700,
-											marginTop: "0.2rem",
-										}}
-									>
-										{PRICES.unique.saving}
+									*/}
+									
+									<div style={{ fontSize: "0.7rem", color: "var(--text-muted)", marginTop: "0.5rem", fontStyle: "italic", opacity: 0.7 }}>
+										Les options avancées de synchronisation Google Maps seront disponibles dans votre espace client.
 									</div>
-								)}
-								<div style={{ display: "inline-block", background: "rgba(229, 9, 20, 0.05)", border: "1px solid rgba(229, 9, 20, 0.15)", borderRadius: "6px", padding: "4px 10px", fontSize: "0.75rem", fontWeight: 700, color: "var(--primary)", width: "fit-content", marginTop: "0.4rem" }}>
-									🚀 + 1 MOIS GRATUIT
 								</div>
-								<p className="plan-desc" style={{ marginTop: "0.8rem" }}>
-									Toutes nos fonctionnalités pro pour démultiplier vos avis sans limite de scans ni d&apos;avis.
-								</p>
-							</div>
-							<div className="plan-divider"></div>
-							<ul className="plan-features-list">
-								<li>
-									<i className="fa-solid fa-check"></i> 1 établissement physique
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Avis &amp; Scans illimités
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> QR Code de table personnalisé prêt à imprimer
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Filtrage intelligent (retours négatifs en privé)
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Logo personnalisé et charte graphique
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)
-								</li>
-								<li>
-									<i className="fa-solid fa-check"></i> Support client prioritaire 7j/7
-								</li>
-							</ul>
-							<button className="btn-plan-select featured" onClick={openRegisterModal}>
-								Essayer gratuitement
-							</button>
-							<p
-								className="plan-reassurance"
-								style={{
-									fontSize: "0.7rem",
-									color: "var(--text-muted)",
-									textAlign: "center",
-									marginTop: "0.6rem",
-									opacity: 0.8,
-									lineHeight: 1.3,
-								}}
-							>
-								{getPricingReassurance()}
-							</p>
-						</div>
-					</div>
-
-					<div className="pricing-cta-block reveal reveal-slide-up">
-						<a href="/pricing" className="btn-secondary" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.5rem" }}>
-							Voir la page tarifs complète <i className="fa-solid fa-arrow-right"></i>
-						</a>
-					</div>
-				</div>
-			</section>
-
-			<div className="section-divider" />
-
-			{/* ═══════════════════════════════════════
-			    FOOTER
-			    ═══════════════════════════════════════ */}
-			<footer>
-				<div className="footer-new-container">
-					<div className="footer-brand-col">
-						<div className="logo">
-							<div className="logo-text">
-								RE<span className="v-accent">V</span>IOZA
-							</div>
-						</div>
-						<p>
-							Une solution innovante et ludique pour multiplier le bouche-à-oreille et grimper sur les
-							premières places de Google Maps. Conçu spécifiquement pour les pizzerias, tacos, burgers et
-							commerces de proximité.
-						</p>
-						<a href="mailto:contact@revioza.com" className="footer-email-link">
-							<i className="fa-solid fa-envelope"></i> contact@revioza.com
-						</a>
-					</div>
-					<div className="footer-links-col">
-						<h4>Navigation</h4>
-						<nav className="footer-nav">
-							<a href="#section-how">Comment ça marche</a>
-							<a href="#section-demo">Démo interactive</a>
-							<a href="#section-features">Fonctionnalités</a>
-							<a href="#section-pricing">Tarifs</a>
-							<a href="/pricing">Page tarifs complète</a>
-						</nav>
-					</div>
-					<div className="footer-legal-col">
-						<h4>Légal</h4>
-						<nav className="footer-nav">
-							<a href="/legal/mentions-legales">Mentions légales</a>
-							<a href="/legal/politique-confidentialite">Politique de confidentialité</a>
-							<a href="/legal/conditions-utilisation">Conditions d&apos;utilisation</a>
-						</nav>
-						<div className="footer-badges">
-							<div className="footer-badge">
-								<i className="fa-solid fa-lock"></i> 100% Sécurisé
-							</div>
-							<div className="footer-badge">
-								<i className="fa-solid fa-certificate"></i> Avis Authentiques
-							</div>
+							</section>
 						</div>
 					</div>
 				</div>
-				<div className="footer-bottom-bar">
-					<span>© 2026 Revioza. Tous droits réservés.</span>
-					<span className="footer-bottom-made">Fait avec ❤️ pour les commerçants français</span>
-				</div>
-				{/* TODO: Remplacer par le nom légal de la société et le numéro SIREN */}
-				<div style={{ fontSize: "0.75rem", color: "var(--text-muted)", opacity: 0.6, textAlign: "center", paddingTop: "0.5rem", paddingBottom: "0.5rem" }}>
-					Société : [NOM À COMPLÉTER] — SIREN : [À COMPLÉTER]
-				</div>
-			</footer>
-
-			{/* ═══════════════════════════════════════
-			    MODALS (hors flux)
-			    ═══════════════════════════════════════ */}
-
-			{/* QR Code Modal */}
-			{overlayQr && (
-				<div
-					className="phone-alert-overlay active"
-					style={{
-						zIndex: 1000,
-						position: "fixed",
-						background: "rgba(0,0,0,0.85)",
-						display: "flex",
-						alignItems: "center",
-						justifyContent: "center",
-						inset: 0,
-					}}
-				>
-					<div
-						className="phone-alert-card"
-						style={{
-							maxWidth: "400px",
-							width: "90%",
-							textAlign: "center",
-							padding: "2rem",
-							background: "var(--bg-card)",
-							border: "1px solid var(--border-color)",
-							borderRadius: "20px",
-							boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
-							display: "flex",
-							flexDirection: "column",
-							alignItems: "center",
-							gap: "1rem",
-						}}
-					>
-						<h3
-							style={{
-								fontFamily: "var(--font-display)",
-								fontSize: "1.4rem",
-								fontWeight: 800,
-								color: "var(--text-main)",
-							}}
-						>
-							Votre QR Code Unique
-						</h3>
-						<p style={{ fontSize: "0.8rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
-							Scannez ce QR Code avec votre téléphone portable pour tester la roue de loterie personnalisée
-							en conditions réelles.
-						</p>
-						<div style={{ display: "flex", gap: "0.75rem", width: "100%" }}>
-							<button
-								className="btn-primary"
-								onClick={() => window.print()}
-								style={{ flex: 1, fontSize: "0.85rem", padding: "10px 14px", marginTop: 0, boxShadow: "none" }}
-							>
-								<i className="fa-solid fa-print"></i> Imprimer
-							</button>
-							<button
-								className="btn-secondary"
-								onClick={() => setOverlayQr(false)}
-								style={{ flex: 1, fontSize: "0.85rem", padding: "10px 14px", marginBottom: 0 }}
-							>
-								Fermer
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
+			</main>
 
 			{/* Registration/Login Modal */}
 			{overlayRegister && (
@@ -1948,52 +1521,40 @@ export default function Home() {
 				</div>
 			)}
 
-			{/* Cookie Banner */}
-			{cookieBanner && (
-				<div
-					style={{
-						position: "fixed",
-						bottom: "1.25rem",
-						left: "50%",
-						transform: "translateX(-50%)",
-						background: "linear-gradient(135deg, #1a1a22 0%, #23232f 100%)",
-						color: "#f5f5f7",
-						border: "1px solid rgba(229,9,20,0.35)",
-						borderRadius: "50px",
-						padding: "0.6rem 1.1rem",
-						display: "flex",
-						alignItems: "center",
-						gap: "0.6rem",
-						fontSize: "0.78rem",
-						fontFamily: "var(--font-body, 'Outfit', sans-serif)",
-						boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
-						zIndex: 9999,
-						whiteSpace: "nowrap",
-						maxWidth: "90vw",
-					}}
-				>
-					<i className="fa-solid fa-floppy-disk" style={{ color: "#e50914" }}></i>
-					<span>Vos informations ont été restaurées depuis votre dernière session.</span>
-					<button
-						onClick={() => {
-							clearAllReviozaCookies();
-							setCookieBanner(false);
-						}}
-						title="Effacer les données sauvegardées"
-						style={{
-							background: "none",
-							border: "none",
-							color: "#8e8e93",
-							cursor: "pointer",
-							padding: 0,
-							fontSize: "0.85rem",
-							lineHeight: 1,
-						}}
-					>
-						<i className="fa-solid fa-xmark"></i>
-					</button>
+			<footer>
+				<div className="footer-new-container">
+					<div className="footer-brand-col">
+						<div className="logo">
+							<div className="logo-text">
+								RE<span className="v-accent">V</span>IOZA
+							</div>
+						</div>
+						<p>
+							Une solution innovante et ludique pour multiplier le bouche-à-oreille et grimper sur les
+							premières places de Google Maps.
+						</p>
+					</div>
+					<div className="footer-links-col">
+						<h4>Navigation</h4>
+						<nav className="footer-nav">
+							<a href="/">Accueil</a>
+							<a href="/pricing">Tarifs</a>
+							<a href="/demo">Démo</a>
+						</nav>
+					</div>
+					<div className="footer-legal-col">
+						<h4>Légal</h4>
+						<nav className="footer-nav">
+							<a href="/legal/mentions-legales">Mentions légales</a>
+							<a href="/legal/politique-confidentialite">Politique de confidentialité</a>
+							<a href="/legal/conditions-utilisation">Conditions d&apos;utilisation</a>
+						</nav>
+					</div>
 				</div>
-			)}
-		</motion.div>
+				<div className="footer-bottom-bar">
+					<span>© 2026 Revioza. Tous droits réservés.</span>
+				</div>
+			</footer>
+		</div>
 	);
 }
