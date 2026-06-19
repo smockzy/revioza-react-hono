@@ -772,7 +772,7 @@ export default function Home() {
 											<canvas className="wheel-canvas" id="roulette-canvas" ref={canvasRef}></canvas>
 											<div className="wheel-center-pin">
 												<img
-													src="/assets/logo_icon.jpg"
+													src="/assets/logo_icon.png"
 													alt="R"
 													style={{
 														width: "100%",

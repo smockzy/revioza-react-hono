@@ -447,7 +447,7 @@ export default function Play() {
 							<div className="wheel-bezel"></div>
 							<canvas id="roulette-canvas" className="wheel-canvas" ref={canvasRef}></canvas>
 							<div className="wheel-center-pin">
-								<img src="/assets/logo_icon.jpg" alt="R" id="wheel-pin-img" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+								<img src="/assets/logo_icon.png" alt="R" id="wheel-pin-img" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
 							</div>
 						</div>
 						<div className="wheel-cta-block">

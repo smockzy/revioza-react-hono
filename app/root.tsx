@@ -14,8 +14,8 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
-	{ rel: "icon", type: "image/jpeg", href: "/assets/logo_icon.jpg" },
-	{ rel: "apple-touch-icon", href: "/assets/logo_icon.jpg" },
+	{ rel: "icon", type: "image/png", href: "/assets/logo_icon.png" },
+	{ rel: "apple-touch-icon", href: "/assets/logo_icon.png" },
 	{ rel: "preconnect", href: "https://fonts.googleapis.com" },
 	{
 		rel: "preconnect",
