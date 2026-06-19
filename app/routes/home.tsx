@@ -59,9 +59,7 @@ interface PlanConfig {
 	saving: string;
 }
 const PRICES: Record<string, PlanConfig> = {
-	starter: { monthly: "49€", annual: "39€", saving: "soit 120€ économisés par an" },
-	business: { monthly: "99€", annual: "79€", saving: "soit 240€ économisés par an" },
-	franchise: { monthly: "199€", annual: "159€", saving: "soit 480€ économisés par an" },
+	unique: { monthly: "29€", annual: "23€", saving: "soit 72€ économisés par an" },
 };
 
 const FAKE_REVIEWS = [
@@ -301,7 +299,7 @@ export default function Home() {
 		const numSectors = appState.prizes.length;
 		const selectedIndex = appState.prizes.findIndex((p) => p.id === won.id);
 		const anglePerSector = 360 / numSectors;
-		const targetAngle = 360 - (selectedIndex * anglePerSector + anglePerSector / 2);
+		const targetAngle = 360 - selectedIndex * anglePerSector;
 
 		const canvas = canvasRef.current;
 		if (canvas) {
@@ -957,6 +955,25 @@ export default function Home() {
 											<p>• Réservé exclusivement aux clients de l&apos;établissement.</p>
 											<p>• Présentation de l&apos;avis publié obligatoire pour retirer le lot.</p>
 											<p>• Aucun lot ne peut être converti en espèces.</p>
+											<h5 style={{ fontSize: "0.75rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em", color: "var(--primary)", marginTop: "0.5rem", width: "100%" }}>
+												Probabilités des gains
+											</h5>
+											<div style={{ width: "100%", maxHeight: "100px", overflowY: "auto", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: "8px", padding: "0.4rem 0.6rem" }}>
+												<table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.7rem" }}>
+													<tbody>
+														{appState.prizes.map((p) => (
+															<tr key={p.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.02)" }}>
+																<td style={{ padding: "3px 0", color: "var(--text-main)", textAlign: "left" }}>
+																	{p.icon} {p.name}
+																</td>
+																<td style={{ padding: "3px 0", color: "var(--primary)", fontWeight: 700, textAlign: "right" }}>
+																	{p.weight}%
+																</td>
+															</tr>
+														))}
+													</tbody>
+												</table>
+											</div>
 										</div>
 										<button
 											className="btn-alert-action"
@@ -1638,9 +1655,12 @@ export default function Home() {
 					</FadeInSection>
 					<div className="features-grid">
 						<FadeInSection delay={0}>
-							<div className="feature-card delay-100">
-								<div className="feature-icon">
-									<i className="fa-solid fa-shield-halved"></i>
+							<div className="feature-card featured delay-100">
+								<div className="feature-card-header-row">
+									<div className="feature-icon">
+										<i className="fa-solid fa-shield-halved"></i>
+									</div>
+									<span className="feature-metric featured">1 participation / jour</span>
 								</div>
 								<h3>Anti-Triche Avancé</h3>
 								<p>
@@ -1651,8 +1671,11 @@ export default function Home() {
 						</FadeInSection>
 						<FadeInSection delay={0.1}>
 							<div className="feature-card delay-200">
-								<div className="feature-icon">
-									<i className="fa-solid fa-qrcode"></i>
+								<div className="feature-card-header-row">
+									<div className="feature-icon">
+										<i className="fa-solid fa-qrcode"></i>
+									</div>
+									<span className="feature-metric">PDF en 2 min</span>
 								</div>
 								<h3>Prêt à Imprimer</h3>
 								<p>
@@ -1662,9 +1685,12 @@ export default function Home() {
 							</div>
 						</FadeInSection>
 						<FadeInSection delay={0.2}>
-							<div className="feature-card delay-300">
-								<div className="feature-icon">
-									<i className="fa-solid fa-chart-line"></i>
+							<div className="feature-card featured delay-300">
+								<div className="feature-card-header-row">
+									<div className="feature-icon">
+										<i className="fa-solid fa-chart-line"></i>
+									</div>
+									<span className="feature-metric featured">Temps réel</span>
 								</div>
 								<h3>Statistiques Avancées</h3>
 								<p>
@@ -1675,8 +1701,11 @@ export default function Home() {
 						</FadeInSection>
 						<FadeInSection delay={0.3}>
 							<div className="feature-card delay-400">
-								<div className="feature-icon">
-									<i className="fa-solid fa-unlock"></i>
+								<div className="feature-card-header-row">
+									<div className="feature-icon">
+										<i className="fa-solid fa-unlock"></i>
+									</div>
+									<span className="feature-metric">Sans engagement</span>
 								</div>
 								<h3>Résiliable à tout moment</h3>
 								<p>
@@ -1783,106 +1812,82 @@ export default function Home() {
 					</div>
 
 					{/* Pricing cards */}
-					<div className="pricing-grid-plans">
-						{/* Plan Starter */}
-						<div className="pricing-card reveal reveal-slide-up delay-100">
+					<div className="pricing-grid-plans" style={{ display: "flex", justifyContent: "center", width: "100%", gap: 0 }}>
+						{/* Plan Unique - Featured */}
+						<div className="pricing-card featured reveal reveal-slide-up delay-200" style={{ maxWidth: "500px", width: "100%" }}>
+							<div className="featured-ribbon">Offre Unique</div>
 							<div className="plan-header">
-								<span className="plan-tier">Solo / Starter</span>
-								<h3 className="plan-price">
-									{getPricingPrice("starter")}<span>/mois</span>
-								</h3>
+								<span className="plan-tier">Plan Pro Tout-Inclus</span>
+								<h2 className="plan-price" id="price-unique" style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
+									{getPricingPrice("unique")}<span>/mois</span>
+									<span style={{ fontSize: "1.3rem", textDecoration: "line-through", color: "var(--text-muted)", fontWeight: 500, marginLeft: "0.5rem" }}>
+										{isAnnualPricing ? "46€" : "59€"}
+									</span>
+									<span className="discount-badge" style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}>
+										-50% À VIE
+									</span>
+								</h2>
 								{isAnnualPricing && (
-									<div style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}>
-										{PRICES.starter.saving}
+									<div
+										className="annual-saving-text"
+										style={{
+											fontSize: "0.72rem",
+											color: "var(--accent-green)",
+											fontWeight: 700,
+											marginTop: "0.2rem",
+										}}
+									>
+										{PRICES.unique.saving}
 									</div>
 								)}
-								<p className="plan-desc" style={{ marginTop: "0.5rem" }}>
-									Idéal pour les petits commerces de quartier et les food-trucks.
+								<div style={{ display: "inline-block", background: "rgba(229, 9, 20, 0.05)", border: "1px solid rgba(229, 9, 20, 0.15)", borderRadius: "6px", padding: "4px 10px", fontSize: "0.75rem", fontWeight: 700, color: "var(--primary)", width: "fit-content", marginTop: "0.4rem" }}>
+									🚀 + 1 MOIS GRATUIT
+								</div>
+								<p className="plan-desc" style={{ marginTop: "0.8rem" }}>
+									Toutes nos fonctionnalités pro pour démultiplier vos avis sans limite de scans ni d&apos;avis.
 								</p>
 							</div>
 							<div className="plan-divider"></div>
 							<ul className="plan-features-list">
-								<li><i className="fa-solid fa-check"></i> 1 établissement physique</li>
-								<li><i className="fa-solid fa-check"></i> Jusqu&apos;à 100 avis / mois</li>
-								<li><i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)</li>
-								<li><i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer</li>
-								<li><i className="fa-solid fa-check"></i> Statistiques de base (scans)</li>
-								<li className="disabled"><i className="fa-solid fa-xmark"></i> Logo personnalisé au centre de la roue</li>
-								<li className="disabled"><i className="fa-solid fa-xmark"></i> Filtrage intelligent des avis négatifs</li>
-							</ul>
-							<button className="btn-plan-select" onClick={openRegisterModal}>
-								Essayer gratuitement
-							</button>
-							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
-								{getPricingReassurance()}
-							</p>
-						</div>
-
-						{/* Plan Business */}
-						<div className="pricing-card featured reveal reveal-slide-up delay-200">
-							<div className="featured-ribbon">Recommandé</div>
-							<div className="plan-header">
-								<span className="plan-tier">Business / Growth</span>
-								<h3 className="plan-price">
-									{getPricingPrice("business")}<span>/mois</span>
-								</h3>
-								{isAnnualPricing && (
-									<div style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}>
-										{PRICES.business.saving}
-									</div>
-								)}
-								<p className="plan-desc" style={{ marginTop: "0.5rem" }}>
-									Le choix idéal pour les restaurants et boutiques physiques dynamiques.
-								</p>
-							</div>
-							<div className="plan-divider"></div>
-							<ul className="plan-features-list">
-								<li><i className="fa-solid fa-check"></i> 1 établissement physique</li>
-								<li><i className="fa-solid fa-check"></i> Avis &amp; Scans illimités</li>
-								<li><i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)</li>
-								<li><i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer et personnalisable</li>
-								<li><i className="fa-solid fa-check"></i> Filtrage intelligent (triage des avis privés)</li>
-								<li><i className="fa-solid fa-check"></i> Logo personnalisé et charte graphique</li>
-								<li><i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)</li>
-								<li><i className="fa-solid fa-check"></i> Support client prioritaire 7j/7</li>
+								<li>
+									<i className="fa-solid fa-check"></i> 1 établissement physique
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Avis &amp; Scans illimités
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> QR Code de table personnalisé prêt à imprimer
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Filtrage intelligent (retours négatifs en privé)
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Logo personnalisé et charte graphique
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)
+								</li>
+								<li>
+									<i className="fa-solid fa-check"></i> Support client prioritaire 7j/7
+								</li>
 							</ul>
 							<button className="btn-plan-select featured" onClick={openRegisterModal}>
 								Essayer gratuitement
 							</button>
-							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
-								{getPricingReassurance()}
-							</p>
-						</div>
-
-						{/* Plan Franchise */}
-						<div className="pricing-card reveal reveal-slide-up delay-300">
-							<div className="plan-header">
-								<span className="plan-tier">Franchise &amp; Réseau</span>
-								<h3 className="plan-price">
-									{getPricingPrice("franchise")}<span>/mois</span>
-								</h3>
-								{isAnnualPricing && (
-									<div style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}>
-										{PRICES.franchise.saving}
-									</div>
-								)}
-								<p className="plan-desc" style={{ marginTop: "0.5rem" }}>
-									Tout ce qui est inclus dans Business, multiplié par 5 établissements.
-								</p>
-							</div>
-							<div className="plan-divider"></div>
-							<ul className="plan-features-list">
-								<li><i className="fa-solid fa-check"></i> <strong>Jusqu&apos;à 5 adresses incluses</strong></li>
-								<li><i className="fa-solid fa-check"></i> Tableau de bord multi-commerces centralisé</li>
-								<li><i className="fa-solid fa-check"></i> QR codes uniques par table et serveur</li>
-								<li><i className="fa-solid fa-check"></i> Statistiques par serveur et établissement</li>
-								<li><i className="fa-solid fa-check"></i> Intégrations caisse &amp; API</li>
-								<li><i className="fa-solid fa-check"></i> Accompagnement et conseiller dédié</li>
-							</ul>
-							<button className="btn-plan-select" onClick={openRegisterModal}>
-								Contacter le service commercial
-							</button>
-							<p className="plan-reassurance" style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}>
+							<p
+								className="plan-reassurance"
+								style={{
+									fontSize: "0.7rem",
+									color: "var(--text-muted)",
+									textAlign: "center",
+									marginTop: "0.6rem",
+									opacity: 0.8,
+									lineHeight: 1.3,
+								}}
+							>
 								{getPricingReassurance()}
 							</p>
 						</div>
