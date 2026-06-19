@@ -9,10 +9,6 @@ git push origin main
 -------------------------------------------------------------------------------------------------
 
 
-
-
-bug d'affichage de la roue dans le nouveau site, et l'animation des confettis s'affiche en plein milieu de l'ecran -> à modifier
-
 modifier les prix, trop cher pour l'instant, à augmenter plus tard au fil des clients, ou soit mettre 1 seule case prix, mais on met notre prix en gros, + 50% à côté, + 1 mois gratuit
 
 modifier la roulette du simulateur, la roulette est mal affichée, il manque des trucs et les cases ne sont pas alignés -> c'est exactement la même que l'ancienne, sauf qu'elle est plus grande
@@ -23,6 +19,7 @@ rendre plus jolie la page client quand on teste l'app, adapter aux differents fo
 
 rendre le fond du site plus vivant.
 
+bug d'affichage sur telephone portable
 
 (POUR PLUS TARD) : faire les conditions générales de vente, les mentions légales, etc.
 

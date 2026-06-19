@@ -2157,7 +2157,7 @@ footer {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding: 7rem 2rem 4rem;
+    padding: 5rem 2rem 4rem;
     position: relative;
     overflow: hidden;
     background:
@@ -2191,7 +2191,7 @@ footer {
 .hero-content-wrap {
     max-width: 1280px;
     width: 100%;
-    margin: 0 auto;
+    margin: -3.5rem auto 0;
     display: grid;
     grid-template-columns: 1fr 430px;
     gap: 4rem;
@@ -2204,17 +2204,19 @@ footer {
     .hero-content-wrap {
         grid-template-columns: 1fr 360px;
         gap: 2.5rem;
+        margin: -3.5rem auto 0;
     }
 }
 
 @media (max-width: 860px) {
     .section-hero {
-        padding: 6rem 1.5rem 3rem;
+        padding: 5rem 1.5rem 3rem;
     }
     .hero-content-wrap {
         grid-template-columns: 1fr;
         gap: 2rem;
         justify-items: center;
+        margin: -1.5rem auto 0;
     }
     .hero-left {
         text-align: center;
