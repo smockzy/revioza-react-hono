@@ -629,7 +629,7 @@ export default function Home() {
 										JE TENTE MA CHANCE
 									</button>
 								)}
-								<span className="google-legal-notice">Connexion sécurisée via OAuth Google</span>
+
 							</div>
 						</div>
 
@@ -1743,7 +1743,7 @@ export default function Home() {
 							<div className="plan-divider"></div>
 							<ul className="plan-features-list">
 								<li><i className="fa-solid fa-check"></i> 1 établissement physique</li>
-								<li><i className="fa-solid fa-check"></i> Jusqu&apos;à 50 avis / mois</li>
+								<li><i className="fa-solid fa-check"></i> Jusqu&apos;à 100 avis / mois</li>
 								<li><i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)</li>
 								<li><i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer</li>
 								<li><i className="fa-solid fa-check"></i> Statistiques de base (scans)</li>
@@ -1871,9 +1871,9 @@ export default function Home() {
 					<div className="footer-legal-col">
 						<h4>Légal</h4>
 						<nav className="footer-nav">
-							<a href="#">Mentions légales</a>
-							<a href="#">Politique de confidentialité</a>
-							<a href="#">Conditions d&apos;utilisation</a>
+							<a href="/legal/mentions-legales">Mentions légales</a>
+							<a href="/legal/politique-confidentialite">Politique de confidentialité</a>
+							<a href="/legal/conditions-utilisation">Conditions d&apos;utilisation</a>
 						</nav>
 						<div className="footer-badges">
 							<div className="footer-badge">
@@ -1888,6 +1888,10 @@ export default function Home() {
 				<div className="footer-bottom-bar">
 					<span>© 2026 Revioza. Tous droits réservés.</span>
 					<span className="footer-bottom-made">Fait avec ❤️ pour les commerçants français</span>
+				</div>
+				{/* TODO: Remplacer par le nom légal de la société et le numéro SIREN */}
+				<div style={{ fontSize: "0.75rem", color: "var(--text-muted)", opacity: 0.6, textAlign: "center", paddingTop: "0.5rem", paddingBottom: "0.5rem" }}>
+					Société : [NOM À COMPLÉTER] — SIREN : [À COMPLÉTER]
 				</div>
 			</footer>
 

@@ -156,7 +156,7 @@ export default function Pricing() {
 								<i className="fa-solid fa-check"></i> 1 établissement physique
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Jusqu&apos;à 50 avis / mois
+								<i className="fa-solid fa-check"></i> Jusqu&apos;à 100 avis / mois
 							</li>
 							<li>
 								<i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)
