@@ -28,7 +28,7 @@ import {
 
 export function meta({ }: Route.MetaArgs) {
 	return [
-		{ title: "Revioza - Roulette Avis Google | Gamification Locale" },
+		{ title: "Revioza - Augmentez vos avis Google ! | Gamification Locale" },
 		{
 			name: "description",
 			content:
@@ -66,34 +66,39 @@ const PRICES: Record<string, PlanConfig> = {
 
 const FAKE_REVIEWS = [
 	{
-		name: "Lucas M.",
+		name: "Brasserie Le Central",
 		city: "Lyon",
-		text: "Concept génial ! J'ai laissé un avis et gagné un café. Les notes du resto ont grimpé en 3 semaines.",
-		avatar: "👨‍🍳",
+		text: "On a mis le QR code sur les tables il y a 3 semaines. 89 avis au départ, 141 aujourd'hui. Mes serveurs adorent voir les clients tourner la roue.",
+		avatar: "LC",
+		avatarBg: "#c0392b",
 	},
 	{
-		name: "Camille R.",
-		city: "Paris",
-		text: "Super expérience, le QR code était sur la table et en 2 minutes c'était réglé. J'ai gagné un dessert !",
-		avatar: "👩‍💼",
-	},
-	{
-		name: "Antoine P.",
-		city: "Bordeaux",
-		text: "Revioza m'a permis de doubler mes avis Google en moins d'un mois. Vraiment impressionnant.",
-		avatar: "👨‍💻",
-	},
-	{
-		name: "Sophie L.",
+		name: "Pizzeria Napoli Nostra",
 		city: "Marseille",
-		text: "Mes clients adorent jouer ! La roue tourne et ils repartent avec un sourire. Note globale : 4.8 ★",
-		avatar: "👩‍🍳",
+		text: "Franchement simple à configurer. En 20 minutes c'était en place. Les clients jouent, l'ambiance est bonne, et les avis s'accumulent. Que du positif.",
+		avatar: "NN",
+		avatarBg: "#e74c3c",
 	},
 	{
-		name: "Thomas B.",
+		name: "Burger Station",
+		city: "Paris",
+		text: "J'étais sceptique mais les chiffres parlent d'eux-mêmes. Plus de 60 avis en un mois. La roue amuse vraiment les gens, ils restent plus longtemps.",
+		avatar: "BS",
+		avatarBg: "#922b21",
+	},
+	{
+		name: "O'Maki Sushi",
+		city: "Bordeaux",
+		text: "Notre note est passée de 3.9 à 4.5 étoiles en 6 semaines. Les retours négatifs restent en privé, les bons vont sur Google. Vraiment bien pensé.",
+		avatar: "OM",
+		avatarBg: "#cd6155",
+	},
+	{
+		name: "Café des Halles",
 		city: "Toulouse",
-		text: "Facile à configurer, les lots sont personnalisables. Exactement ce qu'il me fallait pour ma pizzeria.",
-		avatar: "🧑‍🦱",
+		text: "Ça fait 2 mois qu'on utilise Revioza. On reçoit entre 5 et 8 avis par jour maintenant. Pour le prix, c'est très rentable.",
+		avatar: "CH",
+		avatarBg: "#a93226",
 	},
 ];
 
@@ -132,9 +137,7 @@ export default function Home() {
 		saved.selectedPrize = null;
 		saved.isSpinning = false;
 		setAppState(saved);
-
-		// Apply primary color
-		document.documentElement.style.setProperty("--primary", saved.primaryColor);
+		// Note: primaryColor is applied as a scoped CSS var on the demo phone preview only.
 
 		// Restore hero image
 		const savedHero = localStorage.getItem("revioza_custom_hero_image");
@@ -168,9 +171,7 @@ export default function Home() {
 				primaryColor: cookieColor || prev.primaryColor,
 				imageUrl: cookieImage || prev.imageUrl,
 			}));
-			if (cookieColor) {
-				document.documentElement.style.setProperty("--primary", cookieColor);
-			}
+			// primaryColor from cookie is applied via scoped CSS var on the demo phone preview only
 		}
 
 		// URL parameter check for registration popup
@@ -328,10 +329,11 @@ export default function Home() {
 
 	const handleColorChange = useCallback(
 		(color: string) => {
-			document.documentElement.style.setProperty("--primary", color);
+			// Color is scoped to the demo phone preview via .demo-phone-scope CSS class.
+			// document.documentElement is NOT mutated, preventing global theme leakage.
 			updateAndSave({ primaryColor: color });
 			setCookie("admin_theme_color", color);
-			// Re-render wheel
+			// Re-render wheel canvas (uses prize.color directly, not --primary)
 			const canvas = canvasRef.current;
 			if (canvas) {
 				const ctx = canvas.getContext("2d");
@@ -439,7 +441,7 @@ export default function Home() {
 					console.warn("Upload ImgBB échoué:", err);
 					localStorage.setItem("revioza_custom_hero_image", base64);
 					setUploadStatus({
-						msg: "⚠️ Hébergement échoué. L'image sera visible localement uniquement.",
+						msg: "📱 Image enregistrée sur cet appareil. Pour la rendre visible sur tous les appareils, collez son URL dans le champ ci-dessous.",
 						isError: true,
 					});
 				}
@@ -542,7 +544,10 @@ export default function Home() {
 		const displaySub = isHero ? "Pizzeria" : appState.restaurantSub;
 
 		return (
-			<div className={`phone-simulator-wrapper${isHero ? " hero-phone" : ""}`}>
+			<div
+				className={`phone-simulator-wrapper${isHero ? " hero-phone" : " demo-phone-scope"}`}
+				style={!isHero ? ({ "--preview-primary": appState.primaryColor } as React.CSSProperties) : undefined}
+			>
 				<div className="phone-container">
 					<div className="phone-notch">
 						<div className="phone-notch-camera"></div>
@@ -1126,15 +1131,13 @@ export default function Home() {
 						>
 							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
 								<i className="fa-solid fa-star"></i>
-								<span>Gamification d&apos;avis Google pour commerces</span>
+								<span>+50 commerces boostent leurs avis Google</span>
 							</motion.div>
 							<motion.h1 variants={heroItemVariants}>
 								Démultipliez vos <span>Avis Google</span> par le Jeu
 							</motion.h1>
 							<motion.p variants={heroItemVariants}>
-								Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
-								sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
-								gain instantané configuré par vos soins.
+								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
 							</motion.p>
 							<motion.div className="hero-cta-group" variants={heroItemVariants}>
 								<motion.button
@@ -1160,8 +1163,8 @@ export default function Home() {
 							<motion.div className="hero-social-proof-mini" variants={heroItemVariants}>
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+50 établissements nous suivent déjà !</span>
-									<div className="hero-social-proof-invite">Pourquoi pas vous ?</div>
+									<span>+50 établissements ont boosté leur réputation Google</span>
+									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</motion.div>
 						</motion.div>
@@ -1169,13 +1172,11 @@ export default function Home() {
 						<div className="hero-left">
 							<div className="hero-eyebrow">
 								<i className="fa-solid fa-star"></i>
-								<span>Gamification d&apos;avis Google pour restaurateurs</span>
+								<span>+50 commerces boostent leurs avis Google</span>
 							</div>
 							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
 							<p>
-								Transformez vos clients physiques en ambassadeurs locaux. En scannant un QR code unique posé
-								sur leur table, vos clients déposent un avis honnête et font tourner la roue pour gagner un
-								gain instantané configuré par vos soins.
+								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
 							</p>
 							<div className="hero-cta-group">
 								<button className="btn-primary hero-cta-main" id="hero-cta-demo" onClick={handleScrollToDemo}>
@@ -1188,27 +1189,22 @@ export default function Home() {
 							<div className="hero-social-proof-mini">
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+50 établissements nous suivent déjà !</span>
-									<div className="hero-social-proof-invite">Pourquoi pas vous ?</div>
+									<span>+50 établissements ont boosté leur réputation Google</span>
+									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</div>
 						</div>
 					)}
 
-					{/* Right: Static phone simulator — floating animation */}
+					{/* Right: Static phone simulator — entry animation only, no floating */}
 					{isMounted && !prefersReducedMotion ? (
 						<motion.div
 							className="hero-right"
 							variants={heroPhoneVariants}
 							initial="hidden"
-							animate={["visible", "float"]}
+							animate="visible"
 						>
-							<motion.div
-								animate={{ y: [0, -10, 0] }}
-								transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
-							>
-								{renderPhoneSimulator(true)}
-							</motion.div>
+							{renderPhoneSimulator(true)}
 						</motion.div>
 					) : (
 						<div className="hero-right">
@@ -1231,7 +1227,7 @@ export default function Home() {
 							3 étapes pour <span>multiplier vos avis</span>
 						</h2>
 						<p className="section-subheading">
-							Un parcours fluide en 3 étapes simples pour transformer chaque repas en avis Google authentique.
+							Un parcours fluide en 3 étapes simples pour transformer chaque visite client en avis Google authentique.
 						</p>
 					</FadeInSection>
 					<div className="how-steps">
@@ -1285,224 +1281,200 @@ export default function Home() {
 						{/* Left: Admin Panel */}
 						<div className="demo-left reveal reveal-slide-up">
 							<section className="panel-card" id="admin-panel">
-								<h2>
-									<i className="fa-solid fa-sliders"></i> Personnalisation en Temps Réel (Admin)
-								</h2>
-								<p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginBottom: "1.5rem" }}>
-									Configurez le profil et les lots ci-dessous. Les modifications s&apos;appliquent
-									instantanément sur le simulateur mobile à droite !
-								</p>
+						<h2>
+							<i className="fa-solid fa-sliders"></i> Configuration
+						</h2>
+						<p style={{ fontSize: "0.83rem", color: "var(--text-muted)", marginBottom: "1.75rem", lineHeight: 1.5 }}>
+							Les modifications s&apos;appliquent instantanément sur le simulateur mobile à droite.
+						</p>
 
-								<div className="form-grid">
-									<div className="form-group">
-										<label htmlFor="admin-rest-name">Nom du Restaurant</label>
-										<input
-											type="text"
-											id="admin-rest-name"
-											value={appState.restaurantName}
-											onChange={(e) => {
-												updateAndSave({ restaurantName: e.target.value });
-												setCookie("admin_rest_name", e.target.value);
-											}}
-										/>
-									</div>
-									<div className="form-group">
-										<label htmlFor="admin-rest-sub">Spécialité / Type</label>
-										<input
-											type="text"
-											id="admin-rest-sub"
-											value={appState.restaurantSub}
-											onChange={(e) => {
-												updateAndSave({ restaurantSub: e.target.value });
-												setCookie("admin_rest_sub", e.target.value);
-											}}
-										/>
-									</div>
-									<div className="form-group">
-										<label htmlFor="admin-theme-color">Couleur du Thème Principal</label>
-										<input
-											type="color"
-											id="admin-theme-color"
-											value={appState.primaryColor}
-											onChange={(e) => handleColorChange(e.target.value)}
-											style={{ height: "42px", padding: "4px", cursor: "pointer" }}
-										/>
-									</div>
-								</div>
-
-								{/* Google Place ID */}
-								<div className="form-group" style={{ marginBottom: "1.5rem" }}>
-									<label htmlFor="admin-google-link">Place ID Google de votre Commerce</label>
+						{/* ── Identité ── */}
+						<div className="admin-group">
+							<div className="admin-group-label">
+								<i className="fa-solid fa-store"></i> Identité
+							</div>
+							<div className="form-grid">
+								<div className="form-group">
+									<label htmlFor="admin-rest-name">Nom du commerce</label>
 									<input
 										type="text"
-										id="admin-google-link"
-										value={appState.googleLink}
+										id="admin-rest-name"
+										value={appState.restaurantName}
 										onChange={(e) => {
-											updateAndSave({ googleLink: e.target.value });
-											setCookie("admin_google_link", e.target.value);
+											updateAndSave({ restaurantName: e.target.value });
+											setCookie("admin_rest_name", e.target.value);
 										}}
-										placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83VY24"
-										style={{ width: "100%" }}
 									/>
-									<div
-										style={{
-											cursor: "pointer",
-											color: "var(--primary)",
-											fontSize: "0.8rem",
-											marginTop: "0.5rem",
-											display: "flex",
-											alignItems: "center",
-											gap: "0.25rem",
-											fontWeight: 600,
-											userSelect: "none",
+								</div>
+								<div className="form-group">
+									<label htmlFor="admin-rest-sub">Type d&apos;établissement</label>
+									<input
+										type="text"
+										id="admin-rest-sub"
+										value={appState.restaurantSub}
+										onChange={(e) => {
+											updateAndSave({ restaurantSub: e.target.value });
+											setCookie("admin_rest_sub", e.target.value);
 										}}
-										onClick={() => setPlaceIdHelp(!placeIdHelp)}
-									>
-										<i className="fa-solid fa-circle-question"></i> Comment trouver mon Place ID ?
-									</div>
-									{placeIdHelp && (
-										<div
-											style={{
-												background: "var(--bg-input)",
-												border: "1px solid var(--border-color)",
-												borderRadius: "8px",
-												padding: "1rem",
-												marginTop: "0.5rem",
-												fontSize: "0.8rem",
-												lineHeight: 1.5,
-												color: "var(--text-muted)",
-											}}
-										>
-											<ol style={{ marginLeft: "1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-												<li>
-													Allez sur l&apos;outil officiel{" "}
-													<a
-														href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder"
-														target="_blank"
-														rel="noreferrer"
-														style={{ color: "var(--primary)", textDecoration: "underline" }}
-													>
-														Google Place ID Finder
-													</a>
-													.
-												</li>
-												<li>Recherchez le nom de votre commerce sur la carte.</li>
-												<li>
-													Copiez le code qui s&apos;affiche dans la bulle d&apos;info (ex :{" "}
-													<code>ChIJN1t_tDeuEmsRUsoyG83VY24</code>).
-												</li>
-												<li>Collez ce code dans la case ci-dessus !</li>
-											</ol>
+									/>
+								</div>
+							</div>
+						</div>
+
+						{/* ── Apparence ── */}
+						<div className="admin-group">
+							<div className="admin-group-label">
+								<i className="fa-solid fa-palette"></i> Couleur principale
+							</div>
+							<div style={{ display: "flex", alignItems: "center", gap: "0.85rem" }}>
+								<input
+									type="color"
+									id="admin-theme-color"
+									value={appState.primaryColor}
+									onChange={(e) => handleColorChange(e.target.value)}
+									style={{ width: "48px", height: "48px", padding: "4px", cursor: "pointer", borderRadius: "10px", border: "1px solid rgba(255,255,255,0.1)", background: "var(--bg-input)" }}
+								/>
+								<div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+									<span style={{ fontSize: "0.88rem", fontWeight: 700, color: "var(--text-main)", fontFamily: "monospace" }}>
+										{appState.primaryColor.toUpperCase()}
+									</span>
+									<span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+										Boutons · Roue · Accents
+									</span>
+								</div>
+								<div style={{
+									flex: 1,
+									height: "34px",
+									borderRadius: "8px",
+									background: `linear-gradient(90deg, ${appState.primaryColor}, ${appState.primaryColor}99)`,
+									border: "1px solid rgba(255,255,255,0.06)",
+								}} />
+							</div>
+						</div>
+
+						{/* ── Lien Google ── */}
+						<div className="admin-group">
+							<div className="admin-group-label">
+								<i className="fa-brands fa-google"></i> Place ID Google
+							</div>
+							<div className="form-group">
+								<input
+									type="text"
+									id="admin-google-link"
+									value={appState.googleLink}
+									onChange={(e) => {
+										updateAndSave({ googleLink: e.target.value });
+										setCookie("admin_google_link", e.target.value);
+									}}
+									placeholder="Ex: ChIJN1t_tDeuEmsRUsoyG83VY24"
+									style={{ width: "100%" }}
+								/>
+							</div>
+							<div
+								style={{
+									cursor: "pointer",
+									color: "var(--primary)",
+									fontSize: "0.78rem",
+									marginTop: "0.4rem",
+									display: "flex",
+									alignItems: "center",
+									gap: "0.25rem",
+									fontWeight: 600,
+									userSelect: "none",
+								}}
+								onClick={() => setPlaceIdHelp(!placeIdHelp)}
+							>
+								<i className="fa-solid fa-circle-question"></i> Comment trouver mon Place ID ?
+							</div>
+							{placeIdHelp && (
+								<div
+									style={{
+										background: "var(--bg-input)",
+										border: "1px solid var(--border-color)",
+										borderRadius: "8px",
+										padding: "1rem",
+										marginTop: "0.5rem",
+										fontSize: "0.8rem",
+										lineHeight: 1.5,
+										color: "var(--text-muted)",
+									}}
+								>
+									<ol style={{ marginLeft: "1.25rem", display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+										<li>
+											Allez sur l&apos;outil officiel{" "}
+											<a
+												href="https://developers.google.com/maps/documentation/javascript/examples/places-placeid-finder"
+												target="_blank"
+												rel="noreferrer"
+												style={{ color: "var(--primary)", textDecoration: "underline" }}
+											>
+												Google Place ID Finder
+											</a>
+											.
+										</li>
+										<li>Recherchez le nom de votre commerce sur la carte.</li>
+										<li>
+											Copiez le code (ex :{" "}
+											<code>ChIJN1t_tDeuEmsRUsoyG83VY24</code>).
+										</li>
+										<li>Collez ce code dans la case ci-dessus !</li>
+									</ol>
+								</div>
+							)}
+						</div>
+
+						{/* ── Image ── */}
+						<div className="admin-group">
+							<div className="admin-group-label">
+								<i className="fa-solid fa-image"></i> Image d&apos;accueil
+							</div>
+							<div className="form-group upload-group" style={{ marginBottom: 0 }}>
+								<div
+									className="upload-drop-zone"
+									onDragOver={(e) => {
+										e.preventDefault();
+										e.currentTarget.classList.add("drag-over");
+									}}
+									onDragLeave={(e) => e.currentTarget.classList.remove("drag-over")}
+									onDrop={(e) => {
+										e.preventDefault();
+										e.currentTarget.classList.remove("drag-over");
+										const file = e.dataTransfer.files[0];
+										if (file) handleFileUpload(file);
+									}}
+								>
+									{uploadPreview ? (
+										<div className="upload-preview-wrap" style={{ display: "flex" }}>
+											<img src={uploadPreview} alt="Aperçu" style={{ maxHeight: "90px", borderRadius: "8px", objectFit: "cover" }} />
+											<button
+												type="button"
+												className="upload-remove-btn"
+												title="Supprimer l'image"
+												onClick={(e) => {
+													e.stopPropagation();
+													handleRemoveImage();
+												}}
+											>
+												<i className="fa-solid fa-xmark"></i>
+											</button>
+										</div>
+									) : (
+										<div className="upload-placeholder">
+											<i className="fa-solid fa-image"></i>
+											<span>Cliquez ou déposez votre image ici</span>
+											<small>.jpg, .jpeg, .png, .webp</small>
 										</div>
 									)}
-								</div>
-
-								{/* Image Upload */}
-								<div className="form-group upload-group">
-									<label htmlFor="admin-hero-image">Image d&apos;Accueil (logo ou photo du commerce)</label>
-									<div
-										className="upload-drop-zone"
-										onDragOver={(e) => {
-											e.preventDefault();
-											e.currentTarget.classList.add("drag-over");
-										}}
-										onDragLeave={(e) => e.currentTarget.classList.remove("drag-over")}
-										onDrop={(e) => {
-											e.preventDefault();
-											e.currentTarget.classList.remove("drag-over");
-											const file = e.dataTransfer.files[0];
+									<input
+										type="file"
+										id="admin-hero-image"
+										ref={fileInputRef}
+										accept=".jpg,.jpeg,.png,.webp"
+										style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
+										onChange={(e) => {
+											const file = e.target.files?.[0];
 											if (file) handleFileUpload(file);
 										}}
-									>
-										{uploadPreview ? (
-											<div className="upload-preview-wrap" style={{ display: "flex" }}>
-												<img src={uploadPreview} alt="Aperçu" style={{ maxHeight: "90px", borderRadius: "8px", objectFit: "cover" }} />
-												<button
-													type="button"
-													className="upload-remove-btn"
-													title="Supprimer l'image"
-													onClick={(e) => {
-														e.stopPropagation();
-														handleRemoveImage();
-													}}
-												>
-													<i className="fa-solid fa-xmark"></i>
-												</button>
-											</div>
-										) : (
-											<div className="upload-placeholder">
-												<i className="fa-solid fa-image"></i>
-												<span>Cliquez ou déposez votre image ici</span>
-												<small>.jpg, .jpeg, .png, .webp</small>
-											</div>
-										)}
-										<input
-											type="file"
-											id="admin-hero-image"
-											ref={fileInputRef}
-											accept=".jpg,.jpeg,.png,.webp"
-											style={{ position: "absolute", inset: 0, opacity: 0, cursor: "pointer" }}
-											onChange={(e) => {
-												const file = e.target.files?.[0];
-												if (file) handleFileUpload(file);
-											}}
-										/>
-									</div>
-									{uploadStatus && (
-										<div
-											style={{
-												fontSize: "0.78rem",
-												marginTop: "0.4rem",
-												padding: "6px 10px",
-												borderRadius: "8px",
-												textAlign: "center",
-												background: uploadStatus.isError ? "rgba(229,9,20,0.12)" : "rgba(52,199,89,0.12)",
-												color: uploadStatus.isError ? "#e50914" : "#34c759",
-												border: uploadStatus.isError ? "1px solid rgba(229,9,20,0.3)" : "1px solid rgba(52,199,89,0.3)",
-											}}
-										>
-											{uploadStatus.msg}
-										</div>
-									)}
-								</div>
-
-								<div className="form-group" style={{ marginTop: "-0.5rem", marginBottom: "1.5rem" }}>
-									<label htmlFor="admin-image-url">Ou lien URL de l&apos;image (pour QR Code mobile)</label>
-									<input
-										type="text"
-										id="admin-image-url"
-										value={appState.imageUrl}
-										onChange={(e) => {
-											updateAndSave({ imageUrl: e.target.value });
-											setCookie("admin_image_url", e.target.value);
-											if (!uploadPreview) {
-												setHeroSrc(e.target.value || DEFAULT_HERO_IMAGE);
-											}
-										}}
-										placeholder="https://exemple.com/photo.jpg"
-										style={{ width: "100%" }}
-									/>
-								</div>
-
-								<div className="form-group" style={{ marginBottom: "1rem" }}>
-									<label>Configuration des Lots de la Roue</label>
-								</div>
-
-								{/* Prizes Editor */}
-								<div className="prizes-editor">
-									<div className="prize-row header-row">
-										<span>Nom du Lot</span>
-										<span>Probabilité</span>
-										<span style={{ textAlign: "center" }}>Couleur</span>
-									</div>
-									<div id="admin-prizes-list">
-										{appState.prizes.map((prize) => (
-											<div key={prize.id} className="prize-row">
-												<div className="prize-name-wrapper">
-													<input
-														type="text"
-														value={prize.name}
-														onChange={(e) => handlePrizeFieldChange(prize.id, "name", e.target.value)}
 													/>
 													<button className="btn-icon-delete" onClick={() => handleDeletePrize(prize.id)}>
 														<i className="fas fa-trash"></i>
@@ -1659,7 +1631,18 @@ export default function Home() {
 						{[...FAKE_REVIEWS, ...FAKE_REVIEWS].map((review, i) => (
 							<div className="review-card" key={i}>
 								<div className="review-card-header">
-									<div className="review-avatar-circle">{review.avatar}</div>
+								<div
+									className="review-avatar-circle"
+									style={{
+										background: (review as any).avatarBg ? `${(review as any).avatarBg}22` : "rgba(229,9,20,0.12)",
+										borderColor: (review as any).avatarBg ? `${(review as any).avatarBg}44` : "rgba(229,9,20,0.25)",
+										color: (review as any).avatarBg || "var(--primary)",
+										fontFamily: "var(--font-display)",
+										fontWeight: 700,
+										fontSize: "0.8rem",
+										letterSpacing: "0.02em",
+									}}
+								>{review.avatar}</div>
 									<div className="review-identity">
 										<div className="review-name">{review.name}</div>
 										<div className="review-city">
