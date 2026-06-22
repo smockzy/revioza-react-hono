@@ -2285,9 +2285,6 @@ footer {
     line-height: 1.05;
     letter-spacing: -0.04em;
     color: #ffffff;
-    background: linear-gradient(180deg, #ffffff 0%, #c0c0c0 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
     margin: 0;
 }
 
