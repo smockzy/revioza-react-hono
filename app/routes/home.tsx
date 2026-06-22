@@ -1433,18 +1433,18 @@ export default function Home() {
 						{[...FAKE_REVIEWS, ...FAKE_REVIEWS].map((review, i) => (
 							<div className="review-card" key={i}>
 								<div className="review-card-header">
-								<div
-									className="review-avatar-circle"
-									style={{
-										background: (review as any).avatarBg ? `${(review as any).avatarBg}22` : "rgba(229,9,20,0.12)",
-										borderColor: (review as any).avatarBg ? `${(review as any).avatarBg}44` : "rgba(229,9,20,0.25)",
-										color: (review as any).avatarBg || "var(--primary)",
-										fontFamily: "var(--font-display)",
-										fontWeight: 700,
-										fontSize: "0.8rem",
-										letterSpacing: "0.02em",
-									}}
-								>{review.avatar}</div>
+									<div
+										className="review-avatar-circle"
+										style={{
+											background: (review as any).avatarBg ? `${(review as any).avatarBg}22` : "rgba(229,9,20,0.12)",
+											borderColor: (review as any).avatarBg ? `${(review as any).avatarBg}44` : "rgba(229,9,20,0.25)",
+											color: (review as any).avatarBg || "var(--primary)",
+											fontFamily: "var(--font-display)",
+											fontWeight: 700,
+											fontSize: "0.8rem",
+											letterSpacing: "0.02em",
+										}}
+									>{review.avatar}</div>
 									<div className="review-identity">
 										<div className="review-name">{review.name}</div>
 										<div className="review-city">
@@ -1519,7 +1519,7 @@ export default function Home() {
 										{isAnnualPricing ? "46€" : "59€"}
 									</span>
 									<span className="discount-badge" style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}>
-										-50% À VIE
+										-50%
 									</span>
 								</h2>
 								{isAnnualPricing && (
