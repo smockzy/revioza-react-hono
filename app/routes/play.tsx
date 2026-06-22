@@ -167,7 +167,7 @@ export default function Play() {
 	};
 
 	const goTo = useCallback((step: number) => {
-		if (step < 1 || step > 5) return;
+		if (step < 1 || step > 6) return;
 		setState((prev) => ({ ...prev, step }));
 	}, []);
 
@@ -241,7 +241,7 @@ export default function Play() {
 				});
 			}
 			setParticipationStatus("Déjà effectuée");
-			setTimeout(() => goTo(4), 1000);
+			setTimeout(() => goTo(won.name.toLowerCase().match(/perdu|rien/) ? 6 : 4), 1000);
 		}, 4600);
 	}, [state.isSpinning, state.prizes, goTo]);
 
@@ -538,6 +538,28 @@ export default function Play() {
 							<i className="fa-solid fa-circle-exclamation"></i>
 							<p>Montrez cet <strong>écran actif</strong> (avec le compte à rebours défilant) ainsi que votre <strong>avis publié</strong> sur Google Maps au serveur pour recevoir votre gain !</p>
 						</div>
+					</div>
+				</div>
+			</div>
+
+			{/* SCREEN 6 — LOST/CONSOLATION */}
+			<div className={`app-screen ${state.step === 6 ? "active" : ""}`} id="screen-6">
+				<div className="app-header no-border">
+					<div className="app-header-center"><div className="header-title">Résultat</div></div>
+				</div>
+				<div className="screen-scroll">
+					<div className="screen-body" style={{ textAlign: "center", gap: "24px" }}>
+						<div style={{ fontSize: "3.5rem", marginTop: "1rem" }}>😔</div>
+						<h3 style={{ fontFamily: "var(--font-display)", fontWeight: 800, fontSize: "1.4rem" }}>
+							Pas de chance cette fois
+						</h3>
+						<p style={{ fontSize: "0.9rem", color: "var(--text-muted)", lineHeight: 1.6 }}>
+							Réessayez une prochaine fois !<br />
+							Revenez demain pour une nouvelle tentative.
+						</p>
+						<button className="btn-primary full-width" onClick={() => goTo(1)} style={{ marginTop: "1rem" }}>
+							<i className="fa-solid fa-arrow-left"></i> Retour à l'accueil
+						</button>
 					</div>
 				</div>
 			</div>

@@ -64,39 +64,39 @@ const PRICES: Record<string, PlanConfig> = {
 
 const FAKE_REVIEWS = [
 	{
-		name: "Brasserie Le Central",
-		city: "Lyon",
-		text: "On a mis le QR code sur les tables il y a 3 semaines. 89 avis au départ, 141 aujourd'hui. Mes serveurs adorent voir les clients tourner la roue.",
-		avatar: "LC",
-		avatarBg: "#c0392b",
+		name: "L'Atelier de Coiffure",
+		city: "Nantes",
+		text: "Installé près du miroir de caisse, le QR code cartonne. Nos clientes adorent faire tourner la roue après leur coupe. On a gagné 45 avis en un mois !",
+		avatar: "AC",
+		avatarBg: "#1b3a4b",
+	},
+	{
+		name: "Hôtel Le Grand Large",
+		city: "Saint-Malo",
+		text: "Nous présentons la roue au moment du check-out. C'est une excellente façon de terminer le séjour sur une note ludique. Notre note globale progresse enfin.",
+		avatar: "HL",
+		avatarBg: "#1b4332",
+	},
+	{
+		name: "Garage du Centre",
+		city: "Strasbourg",
+		text: "Les clients s'ennuient souvent en attendant leur véhicule. La roulette les occupe et nous permet de récolter des avis positifs très facilement.",
+		avatar: "GC",
+		avatarBg: "#581c87",
+	},
+	{
+		name: "Pharmacie de la Mairie",
+		city: "Lille",
+		text: "Une solution discrète et efficace. Les patients apprécient le côté ludique et nous avons doublé notre nombre d'avis en moins de six semaines.",
+		avatar: "PM",
+		avatarBg: "#b45309",
 	},
 	{
 		name: "Pizzeria Napoli Nostra",
 		city: "Marseille",
 		text: "Franchement simple à configurer. En 20 minutes c'était en place. Les clients jouent, l'ambiance est bonne, et les avis s'accumulent. Que du positif.",
 		avatar: "NN",
-		avatarBg: "#e74c3c",
-	},
-	{
-		name: "Burger Station",
-		city: "Paris",
-		text: "J'étais sceptique mais les chiffres parlent d'eux-mêmes. Plus de 60 avis en un mois. La roue amuse vraiment les gens, ils restent plus longtemps.",
-		avatar: "BS",
-		avatarBg: "#922b21",
-	},
-	{
-		name: "O'Maki Sushi",
-		city: "Bordeaux",
-		text: "Notre note est passée de 3.9 à 4.5 étoiles en 6 semaines. Les retours négatifs restent en privé, les bons vont sur Google. Vraiment bien pensé.",
-		avatar: "OM",
-		avatarBg: "#cd6155",
-	},
-	{
-		name: "Café des Halles",
-		city: "Toulouse",
-		text: "Ça fait 2 mois qu'on utilise Revioza. On reçoit entre 5 et 8 avis par jour maintenant. Pour le prix, c'est très rentable.",
-		avatar: "CH",
-		avatarBg: "#a93226",
+		avatarBg: "#881337",
 	},
 ];
 
@@ -1170,14 +1170,14 @@ export default function Home() {
 							animate="visible"
 						>
 							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
-								<i className="fa-solid fa-star"></i>
-								<span>+50 commerces boostent leurs avis Google</span>
+								<i className="fa-solid fa-chart-line"></i>
+								<span>Jusqu&apos;à +80 avis par mois</span>
 							</motion.div>
 							<motion.h1 variants={heroItemVariants}>
 								Démultipliez vos <span>Avis Google</span> par le Jeu
 							</motion.h1>
 							<motion.p variants={heroItemVariants}>
-								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
+								Affichez un QR code dans votre commerce. Vos clients rédigent un avis Google sincère, font tourner la roue et remportent un cadeau. Simple, ludique et efficace.
 							</motion.p>
 							<motion.div className="hero-cta-group" variants={heroItemVariants}>
 								<motion.button
@@ -1203,7 +1203,7 @@ export default function Home() {
 							<motion.div className="hero-social-proof-mini" variants={heroItemVariants}>
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+50 établissements ont boosté leur réputation Google</span>
+									<span>+15 000 avis Google collectés pour nos commerces partenaires</span>
 									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</motion.div>
@@ -1211,12 +1211,12 @@ export default function Home() {
 					) : (
 						<div className="hero-left">
 							<div className="hero-eyebrow">
-								<i className="fa-solid fa-star"></i>
-								<span>+50 commerces boostent leurs avis Google</span>
+								<i className="fa-solid fa-chart-line"></i>
+								<span>Jusqu&apos;à +80 avis par mois</span>
 							</div>
 							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
 							<p>
-								Posez un QR code sur votre comptoir. Vos clients déposent un avis Google sincère, tournent la roue et repartent avec un gain. Simple, rapide, efficace.
+								Affichez un QR code dans votre commerce. Vos clients rédigent un avis Google sincère, font tourner la roue et remportent un cadeau. Simple, ludique et efficace.
 							</p>
 							<div className="hero-cta-group">
 								<button className="btn-primary hero-cta-main" id="hero-cta-demo" onClick={handleScrollToDemo}>
@@ -1229,7 +1229,7 @@ export default function Home() {
 							<div className="hero-social-proof-mini">
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+50 établissements ont boosté leur réputation Google</span>
+									<span>+15 000 avis Google collectés pour nos commerces partenaires</span>
 									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</div>
