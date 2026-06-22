@@ -1352,7 +1352,7 @@ export default function Home() {
 					</FadeInSection>
 					<div className="features-grid">
 						<FadeInSection delay={0}>
-							<div className="feature-card featured delay-100">
+							<div className="feature-card delay-100">
 								<div className="feature-card-header-row">
 									<div className="feature-icon">
 										<i className="fa-solid fa-shield-halved"></i>
@@ -1382,7 +1382,7 @@ export default function Home() {
 							</div>
 						</FadeInSection>
 						<FadeInSection delay={0.2}>
-							<div className="feature-card featured delay-300">
+							<div className="feature-card delay-300">
 								<div className="feature-card-header-row">
 									<div className="feature-icon">
 										<i className="fa-solid fa-chart-line"></i>

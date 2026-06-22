@@ -2945,25 +2945,7 @@ footer {
     color: #e50914;
 }
 
-.feature-card.featured {
-    border-color: rgba(229, 9, 20, 0.35) !important;
-    background: linear-gradient(180deg, rgba(229, 9, 20, 0.02) 0%, transparent 100%), var(--glass-bg);
-    box-shadow: 0 10px 30px rgba(229, 9, 20, 0.06);
-    position: relative;
-}
 
-.feature-card.featured::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: 20px;
-    padding: 1px;
-    background: linear-gradient(135deg, rgba(229, 9, 20, 0.4), transparent 50%, rgba(229, 9, 20, 0.2));
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-}
 
 /* Premium Background Glow Blobs */
 .glow-blob {
