@@ -99,16 +99,11 @@ body::after {
     will-change: transform, opacity;
 
     background-image:
-        /* Blob 1 — rouge vif, haut gauche */
-        radial-gradient(ellipse 55% 30% at 18% 12%,  rgba(229, 9, 20, 0.14)  0%, transparent 65%),
-        /* Blob 2 — rouge sombre, bas droite */
-        radial-gradient(ellipse 60% 35% at 82% 78%,  rgba(229, 9, 20, 0.10)  0%, transparent 60%),
-        /* Blob 3 — rouge médian, centre-droite */
-        radial-gradient(ellipse 40% 25% at 70% 35%,  rgba(200, 0, 10, 0.07)  0%, transparent 55%),
-        /* Blob 4 — bleu électrique très subtil, centre */
-        radial-gradient(ellipse 45% 30% at 45% 55%,  rgba(66, 133, 244, 0.05) 0%, transparent 50%),
-        /* Blob 5 — rouge diffus, bas gauche */
-        radial-gradient(ellipse 50% 28% at 20% 85%,  rgba(229, 9, 20, 0.07)  0%, transparent 60%);
+        radial-gradient(ellipse 55% 30% at 18% 12%,  rgba(229, 9, 20, 0.45)  0%, transparent 65%),
+        radial-gradient(ellipse 60% 35% at 82% 78%,  rgba(229, 9, 20, 0.35)  0%, transparent 60%),
+        radial-gradient(ellipse 40% 25% at 70% 35%,  rgba(200, 0, 10, 0.25)  0%, transparent 55%),
+        radial-gradient(ellipse 45% 30% at 45% 55%,  rgba(66, 133, 244, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 28% at 20% 85%,  rgba(229, 9, 20, 0.25)  0%, transparent 60%);
 
     animation:
         aurora-blob-1 18s ease-in-out infinite,
