@@ -2266,16 +2266,43 @@ footer {
 .hero-eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.78rem;
-    font-weight: 700;
+    gap: 0.6rem;
+    font-size: 0.72rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #e50914;
-    background: rgba(229, 9, 20, 0.08);
-    border: 1px solid rgba(229, 9, 20, 0.2);
-    padding: 0.4rem 1rem;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0.35rem 0.8rem;
     border-radius: 999px;
+}
+
+.eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #e50914;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+    box-shadow: 0 0 8px #e50914;
+}
+
+.eyebrow-dot::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 50%;
+    border: 1px solid #e50914;
+    animation: statusPulse 2s infinite ease-out;
+}
+
+@keyframes statusPulse {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
 }
 
 .hero-left h1 {
@@ -2962,19 +2989,14 @@ footer {
 
 .feature-metric {
     font-size: 0.72rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-muted);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 4px 10px;
-    border-radius: 99px;
     text-transform: uppercase;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.05em;
 }
 
 .feature-metric.featured {
     color: #e50914;
-    background: rgba(229, 9, 20, 0.1);
-    border-color: rgba(229, 9, 20, 0.2);
 }
 
 .feature-card.featured {

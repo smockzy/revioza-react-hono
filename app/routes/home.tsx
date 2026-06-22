@@ -1170,7 +1170,7 @@ export default function Home() {
 							animate="visible"
 						>
 							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
-								<i className="fa-solid fa-chart-line"></i>
+								<span className="eyebrow-dot"></span>
 								<span>Jusqu&apos;à +80 avis par mois</span>
 							</motion.div>
 							<motion.h1 variants={heroItemVariants}>
@@ -1211,7 +1211,7 @@ export default function Home() {
 					) : (
 						<div className="hero-left">
 							<div className="hero-eyebrow">
-								<i className="fa-solid fa-chart-line"></i>
+								<span className="eyebrow-dot"></span>
 								<span>Jusqu&apos;à +80 avis par mois</span>
 							</div>
 							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
