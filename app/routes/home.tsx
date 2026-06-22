@@ -1169,10 +1169,6 @@ export default function Home() {
 							initial="hidden"
 							animate="visible"
 						>
-							<motion.div className="hero-eyebrow" variants={heroBadgeVariants}>
-								<span className="eyebrow-dot"></span>
-								<span>Jusqu&apos;à +80 avis par mois</span>
-							</motion.div>
 							<motion.h1 variants={heroItemVariants}>
 								Démultipliez vos <span>Avis Google</span> par le Jeu
 							</motion.h1>
@@ -1210,10 +1206,6 @@ export default function Home() {
 						</motion.div>
 					) : (
 						<div className="hero-left">
-							<div className="hero-eyebrow">
-								<span className="eyebrow-dot"></span>
-								<span>Jusqu&apos;à +80 avis par mois</span>
-							</div>
 							<h1>Démultipliez vos <span>Avis Google</span> par le Jeu</h1>
 							<p>
 								Affichez un QR code dans votre commerce. Vos clients rédigent un avis Google sincère, font tourner la roue et remportent un cadeau. Simple, ludique et efficace.
@@ -1262,7 +1254,6 @@ export default function Home() {
 			<section className="section-how" id="section-how">
 				<div className="section-inner">
 					<FadeInSection delay={0}>
-						<div className="section-label">Comment ça marche</div>
 						<h2 className="section-heading">
 							3 étapes pour <span>multiplier vos avis</span>
 						</h2>
@@ -1308,7 +1299,6 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-demo" id="section-demo" ref={demoSectionRef}>
 				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Démo interactive</div>
 					<h2 className="section-heading reveal reveal-slide-up">
 						Testez <span>l&apos;expérience client</span> en direct
 					</h2>
@@ -1356,7 +1346,6 @@ export default function Home() {
 			<section className="section-features" id="section-features">
 				<div className="section-inner">
 					<FadeInSection delay={0}>
-						<div className="section-label">Fonctionnalités</div>
 						<h2 className="section-heading">
 							Tout ce dont vous avez <span>besoin</span>
 						</h2>
@@ -1433,7 +1422,6 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-social" id="section-social">
 				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Témoignages</div>
 					<h2 className="section-heading reveal reveal-slide-up">
 						Ils nous font <span>confiance</span>
 					</h2>
@@ -1486,7 +1474,6 @@ export default function Home() {
 			    ═══════════════════════════════════════ */}
 			<section className="section-pricing" id="section-pricing">
 				<div className="section-inner">
-					<div className="section-label reveal reveal-slide-up">Tarifs</div>
 					<h2 className="section-heading reveal reveal-slide-up">
 						Des tarifs simples, <span>sans engagement</span>
 					</h2>
