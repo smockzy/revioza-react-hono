@@ -38,7 +38,6 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
-    isolation: isolate;
 }
 
 body::before {
@@ -68,47 +67,16 @@ body::before {
     pointer-events: none;
 }
 
-@keyframes aurora-blob-1 {
-    0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.55; }
-    25%  { transform: translate(3%, -4%)   scale(1.07); opacity: 0.75; }
-    50%  { transform: translate(-2%, 5%)   scale(0.96); opacity: 0.60; }
-    75%  { transform: translate(4%, 2%)    scale(1.04); opacity: 0.70; }
-    100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.55; }
-}
-
-@keyframes aurora-blob-2 {
-    0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.45; }
-    30%  { transform: translate(-5%, 3%)   scale(1.1);  opacity: 0.65; }
-    60%  { transform: translate(3%, -5%)   scale(0.93); opacity: 0.50; }
-    100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.45; }
-}
-
-@keyframes aurora-blob-3 {
-    0%   { transform: translate(0%, 0%)    scale(1);    opacity: 0.35; }
-    40%  { transform: translate(4%, 6%)    scale(1.06); opacity: 0.50; }
-    70%  { transform: translate(-3%, -3%)  scale(0.97); opacity: 0.40; }
-    100% { transform: translate(0%, 0%)    scale(1);    opacity: 0.35; }
-}
-
 body::after {
     content: '';
     position: absolute;
-    inset: -30% -20%;          /* déborde pour éviter les bords vides pendant les translations */
-    z-index: 0;
+    inset: 0;
+    z-index: -1;
+    background-image: 
+        radial-gradient(circle at 15% 15%, rgba(229, 9, 20, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(229, 9, 20, 0.05) 0%, transparent 45%),
+        radial-gradient(circle at 50% 40%, rgba(66, 133, 244, 0.03) 0%, transparent 35%);
     pointer-events: none;
-    will-change: transform, opacity;
-
-    background-image:
-        radial-gradient(ellipse 55% 30% at 18% 12%,  rgba(229, 9, 20, 0.45)  0%, transparent 65%),
-        radial-gradient(ellipse 60% 35% at 82% 78%,  rgba(229, 9, 20, 0.35)  0%, transparent 60%),
-        radial-gradient(ellipse 40% 25% at 70% 35%,  rgba(200, 0, 10, 0.25)  0%, transparent 55%),
-        radial-gradient(ellipse 45% 30% at 45% 55%,  rgba(66, 133, 244, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 28% at 20% 85%,  rgba(229, 9, 20, 0.25)  0%, transparent 60%);
-
-    animation:
-        aurora-blob-1 18s ease-in-out infinite,
-        aurora-blob-2 24s ease-in-out infinite 3s,
-        aurora-blob-3 20s ease-in-out infinite 7s;
 }
 
 /* Scroll-Reveal System */
