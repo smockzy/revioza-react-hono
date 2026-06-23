@@ -15,7 +15,7 @@
     --orange: #ff9f0a;
     --font-display: 'Outfit', sans-serif;
     --font-body: 'Plus Jakarta Sans', sans-serif;
-    --status-h: 44px;
+    --status-h: 0px;
     --header-h: 56px;
     --nav-h: 72px;
     --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -713,4 +713,173 @@ input[type="range"] {
 
 .full-width {
     width: 100%;
+}
+
+/* Responsive Desktop Layout (SaaS Dashboard style) */
+@media (min-width: 768px) {
+    body {
+        background: #020203;
+        background-image: radial-gradient(circle at 12% 15%, rgba(229, 9, 20, 0.04) 0%, transparent 50%);
+    }
+
+    .bottom-nav {
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: auto;
+        width: 240px;
+        height: 100vh;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+        padding: 2.5rem 1rem;
+        border-right: 1px solid var(--border);
+        border-top: none;
+        background: #09090c;
+        gap: 0.5rem;
+    }
+
+    .nav-item {
+        flex: none;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        width: 100%;
+        text-transform: none;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-item i {
+        font-size: 1.2rem;
+        width: 24px;
+        text-align: center;
+    }
+
+    .nav-item:hover {
+        background: rgba(255, 255, 255, 0.03);
+        color: #fff;
+    }
+
+    .nav-item.active {
+        background: rgba(229, 9, 20, 0.08);
+        color: var(--primary);
+    }
+
+    .nav-item .badge {
+        position: static;
+        margin-left: auto;
+        padding: 2px 6px;
+        font-size: 0.7rem;
+    }
+
+    .app-header {
+        left: 240px;
+        top: 0;
+        height: 70px;
+        padding: 0 2rem;
+        background: rgba(6, 6, 8, 0.85);
+    }
+
+    .header-title {
+        font-size: 1.05rem;
+    }
+
+    .header-rest-name {
+        font-size: 0.8rem;
+    }
+
+    .screens-container {
+        top: 70px;
+        left: 240px;
+        bottom: 0;
+        right: 0;
+    }
+
+    .screen-body {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2.5rem 2rem;
+        gap: 2.5rem;
+    }
+
+    .welcome-banner h3 {
+        font-size: 1.8rem;
+    }
+
+    .welcome-banner p {
+        font-size: 0.9rem;
+    }
+
+    .period-selector {
+        max-width: 320px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .stat-card {
+        padding: 20px;
+        gap: 12px;
+    }
+
+    .stat-num {
+        font-size: 2.2rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+
+    .gain-card {
+        padding: 24px;
+        gap: 16px;
+    }
+
+    .gain-amount {
+        font-size: 2.8rem;
+    }
+
+    .gain-desc {
+        font-size: 0.85rem;
+    }
+
+    .chart-card {
+        padding: 24px;
+    }
+
+    .chart-container {
+        height: 240px;
+    }
+
+    /* Configuration Panel grid fields */
+    .card-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .card-section .section-title,
+    .card-section .section-subtitle,
+    .card-section .full-width,
+    .card-section .qr-section,
+    .card-section .prizes-editor-mobile,
+    .card-section .form-group:nth-child(4),
+    .card-section .form-group:nth-child(5) {
+        grid-column: span 2;
+    }
+
+    /* Feedback list columns */
+    .feedbacks-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
 }

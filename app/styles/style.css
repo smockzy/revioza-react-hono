@@ -153,6 +153,33 @@ header {
     .header-container {
         padding: 0;
     }
+    #btn-header-login {
+        font-size: 0 !important;
+        padding: 0.55rem 0.85rem !important;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    #btn-header-login::before {
+        content: '\f2f6'; /* FontAwesome sign-in icon */
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+        font-size: 1rem;
+        color: var(--text-muted);
+    }
+    #btn-header-login:hover::before {
+        color: var(--primary);
+    }
+    #btn-header-register {
+        padding: 0.55rem 1rem !important;
+        font-size: 0.8rem !important;
+    }
+    .page-landing .header-container .cta-pitch {
+        display: none !important;
+    }
 }
 
 @media (max-width: 480px) {
