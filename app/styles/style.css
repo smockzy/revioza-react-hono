@@ -200,8 +200,9 @@ header {
     font-size: 1.7rem;
     letter-spacing: -0.05em;
     font-style: italic;
-    white-space: nowrap;
-    display: inline-block;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: baseline;
     color: var(--text-main);
 }
 
@@ -230,6 +231,7 @@ header {
     color: #e50914;
     margin-left: -0.05em;
     margin-right: -0.03em;
+    display: inline !important;
 }
 
 .logo-tagline {
@@ -3003,5 +3005,21 @@ footer {
 @keyframes floatBlob {
     0% { transform: translate(0, 0) scale(1); }
     100% { transform: translate(60px, 80px) scale(1.15); }
+}
+
+@media (max-width: 600px) {
+    .hero-cta-group {
+        flex-direction: column !important;
+        width: 100% !important;
+        align-items: stretch !important;
+    }
+    .hero-cta-main,
+    .hero-cta-secondary {
+        width: 100% !important;
+        text-align: center !important;
+    }
+    .hide-mobile {
+        display: none !important;
+    }
 }
 

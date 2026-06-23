@@ -1573,7 +1573,7 @@ export default function Home() {
 							className={`toggle-label ${!isAnnualPricing ? "active" : ""}`}
 							onClick={() => setIsAnnualPricing(false)}
 						>
-							Facturation mensuelle
+							<span className="hide-mobile">Facturation </span>Mensuelle
 						</span>
 						<button
 							className={`billing-switch ${isAnnualPricing ? "active" : ""}`}
@@ -1587,7 +1587,7 @@ export default function Home() {
 							className={`toggle-label ${isAnnualPricing ? "active" : ""}`}
 							onClick={() => setIsAnnualPricing(true)}
 						>
-							Facturation annuelle
+							<span className="hide-mobile">Facturation </span>Annuelle
 							<span className="discount-badge">-20%</span>
 						</span>
 					</div>

@@ -495,3 +495,10 @@
         font-size: 0.95rem;
     }
 }
+
+@media (max-width: 600px) {
+    .hide-mobile {
+        display: none !important;
+    }
+}
+

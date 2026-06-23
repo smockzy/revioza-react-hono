@@ -567,24 +567,6 @@ export default function Merchant() {
 										<span id="color-hex-label">{colorHexLabel}</span>
 									</div>
 								</div>
-								<div className="form-group" style={{ marginTop: "1rem" }}>
-									<label htmlFor="merchant-image-url">Lien URL de l&apos;image (pour QR Code mobile)</label>
-									<input
-										type="text"
-										id="merchant-image-url"
-										value={merchantState.imageUrl}
-										onChange={(e) => {
-											const val = e.target.value;
-											setMerchantState((prev) => {
-												const next = { ...prev, imageUrl: val };
-												saveConfig(next);
-												return next;
-											});
-											setCookie("merchant_image_url", val);
-										}}
-										placeholder="https://exemple.com/photo.jpg"
-									/>
-								</div>
 							</div>
 
 							<div className="card-section">

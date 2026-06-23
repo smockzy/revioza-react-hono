@@ -100,7 +100,7 @@ export default function Pricing() {
 							id="billing-monthly"
 							onClick={() => setIsAnnual(false)}
 						>
-							Facturation mensuelle
+							<span className="hide-mobile">Facturation </span>Mensuelle
 						</span>
 						<button
 							className={`billing-switch ${isAnnual ? "active" : ""}`}
@@ -115,7 +115,7 @@ export default function Pricing() {
 							id="billing-annual"
 							onClick={() => setIsAnnual(true)}
 						>
-							Facturation annuelle
+							<span className="hide-mobile">Facturation </span>Annuelle
 							<span className="discount-badge">-20%</span>
 						</span>
 					</div>
