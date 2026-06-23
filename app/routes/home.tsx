@@ -10,6 +10,7 @@ import {
 	DEFAULT_PRIZES,
 	DEFAULT_HERO_IMAGE,
 	IMGBB_API_KEY,
+	GOOGLE_CLIENT_ID,
 	getFullGoogleLink,
 	selectPrizeWeighted,
 	adjustWeights,
@@ -124,6 +125,10 @@ export default function Home() {
 	const [overlayQr, setOverlayQr] = useState(false);
 	const [overlayRegister, setOverlayRegister] = useState(false);
 	const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+	const [overlayGoogleAuth, setOverlayGoogleAuth] = useState(false);
+	const [googleAuthMode, setGoogleAuthMode] = useState<"loading" | "success" | "error">("loading");
+	const [googleAuthError, setGoogleAuthError] = useState({ msg: "", help: "" });
+	const [googleUser, setGoogleUser] = useState<{ name: string; email: string; picture: string } | null>(null);
 	const [alertOverlay, setAlertOverlay] = useState(false);
 	const [cookieBanner, setCookieBanner] = useState(false);
 	const [isAnnualPricing, setIsAnnualPricing] = useState(false);
@@ -196,6 +201,10 @@ export default function Home() {
 		const urlParams = new URLSearchParams(window.location.search);
 		if (urlParams.get("register") === "true") {
 			setActiveTab("register");
+			setOverlayRegister(true);
+			window.history.replaceState({}, document.title, window.location.pathname);
+		} else if (urlParams.get("login") === "true" || urlParams.get("login") === "required") {
+			setActiveTab("login");
 			setOverlayRegister(true);
 			window.history.replaceState({}, document.title, window.location.pathname);
 		}
@@ -526,10 +535,87 @@ export default function Home() {
 		[updateAndSave]
 	);
 
-	const handleGoogleLogin = useCallback(() => {
-		localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
-		window.location.href = "/merchant";
+	const handleGoogleError = useCallback((errorType: string, detailedMsg: string) => {
+		let friendlyError = "Une erreur d'authentification est survenue.";
+		let helpText = "Veuillez réessayer ou continuer en mode démo.";
+
+		if (errorType === "popup_closed_by_user") {
+			friendlyError = "La fenêtre de connexion a été fermée.";
+			helpText = "Vous devez terminer l'authentification dans la fenêtre pop-up de Google pour vous connecter, ou vous pouvez continuer en mode démo pour tester.";
+		} else if (errorType === "access_denied") {
+			friendlyError = "L'accès au compte a été refusé.";
+			helpText = "Vous devez accorder les autorisations demandées pour vous connecter via Google.";
+		} else if (errorType === "origin_mismatch" || errorType === "idpiframe_initialization_failed" || (detailedMsg && detailedMsg.toLowerCase().includes("origin"))) {
+			friendlyError = "Origine JavaScript non autorisée (Localhost).";
+			helpText = `Pour autoriser l'authentification Google sur <strong>${typeof window !== "undefined" ? window.location.origin : ""}</strong> :<br>1. Allez sur votre <a href="https://console.cloud.google.com/apis/credentials" target="_blank" style="color:var(--primary); text-decoration:underline;">Google Cloud Console</a>.<br>2. Sélectionnez votre Client ID OAuth 2.0.<br>3. Ajoutez l'origine exacte <strong>${typeof window !== "undefined" ? window.location.origin : ""}</strong> dans la section <strong>Origines JavaScript autorisées</strong>.<br>4. Sauvegardez et patientez 5 minutes, puis réactualisez.`;
+		} else if (errorType === "network_error") {
+			friendlyError = "Erreur de réseau ou blocage du SDK.";
+			helpText = "Vérifiez votre connexion internet ou vos extensions de navigateur (les bloqueurs de publicités bloquent souvent l'authentification Google en local).";
+		} else if (detailedMsg) {
+			friendlyError = detailedMsg;
+		}
+
+		setGoogleAuthError({ msg: friendlyError, help: helpText });
+		setGoogleAuthMode("error");
 	}, []);
+
+	const handleGoogleLogin = useCallback(() => {
+		if (typeof window === "undefined") return;
+
+		// Check if GIS SDK is available
+		if (typeof (window as unknown as Record<string, unknown>).google === "undefined") {
+			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
+			window.location.href = "/merchant";
+			return;
+		}
+
+		setOverlayGoogleAuth(true);
+		setGoogleAuthMode("loading");
+
+		try {
+			const google = (window as unknown as Record<string, unknown>).google as Record<string, unknown>;
+			const accounts = google.accounts as Record<string, unknown>;
+			const oauth2 = accounts.oauth2 as Record<string, (...args: unknown[]) => unknown>;
+
+			const tokenClient = oauth2.initTokenClient({
+				client_id: GOOGLE_CLIENT_ID,
+				scope: "openid email profile",
+				callback: async (tokenResponse: Record<string, string>) => {
+					if (tokenResponse.error) {
+						handleGoogleError(tokenResponse.error, tokenResponse.error_description);
+						return;
+					}
+					try {
+						const resp = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`);
+						if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+						const user = (await resp.json()) as any;
+						setGoogleUser({
+							name: user.name || "Utilisateur Google",
+							email: user.email || "",
+							picture: user.picture || "",
+						});
+						localStorage.setItem("revioza_merchant_email", user.email || "google-user@gmail.com");
+						setGoogleAuthMode("success");
+						
+						setTimeout(() => {
+							window.location.href = "/merchant";
+						}, 1200);
+					} catch (err) {
+						handleGoogleError("network_error", (err as Error).message);
+					}
+				},
+				error_callback: (err: Record<string, string>) => {
+					handleGoogleError("network_error", err.message || JSON.stringify(err));
+				},
+			}) as Record<string, (...args: unknown[]) => void>;
+
+			tokenClient.requestAccessToken({ prompt: "select_account" });
+		} catch (err) {
+			console.error("Google Auth Init Error", err);
+			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
+			window.location.href = "/merchant";
+		}
+	}, [handleGoogleError]);
 
 	// Smooth scroll to interactive demo section
 	const handleScrollToDemo = useCallback(() => {
@@ -1981,6 +2067,102 @@ export default function Home() {
 					</button>
 				</div>
 			)}
+
+			{/* GOOGLE AUTH OVERLAY */}
+			{overlayGoogleAuth && (
+				<div
+					className="phone-alert-overlay active"
+					style={{
+						zIndex: 1001,
+						position: "fixed",
+						background: "rgba(0,0,0,0.85)",
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+						inset: 0,
+					}}
+				>
+					<div
+						className="phone-alert-card"
+						style={{
+							maxWidth: "450px",
+							width: "90%",
+							textAlign: "center",
+							padding: "2rem",
+							background: "var(--bg-card)",
+							border: "1px solid var(--border-color)",
+							borderRadius: "20px",
+							boxShadow: "0 20px 40px rgba(0,0,0,0.6)",
+							display: "flex",
+							flexDirection: "column",
+							alignItems: "center",
+							gap: "1rem",
+						}}
+					>
+						{googleAuthMode === "loading" && (
+							<>
+								<div className="google-auth-spinner" style={{ margin: "1rem auto" }}>
+									<svg viewBox="0 0 48 48" width="40" height="40">
+										<path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+										<path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+										<path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+										<path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+									</svg>
+								</div>
+								<div style={{ color: "var(--text-muted)", fontSize: "0.85rem" }}>Connexion en cours…</div>
+							</>
+						)}
+						<h4 style={{ fontFamily: "var(--font-display)", fontSize: "1.3rem", fontWeight: 800, color: "#fff", margin: 0 }}>
+							{googleAuthMode === "loading" ? "Connexion avec Google" : googleAuthMode === "success" ? "Compte vérifié ✓" : "⚠️ Échec de connexion"}
+						</h4>
+						<p style={{ fontSize: "0.85rem", color: "var(--text-muted)", margin: 0 }}>
+							{googleAuthMode === "loading" ? "Authentification en cours…" : googleAuthMode === "success" ? "Vous êtes connecté avec votre compte Google." : "Nous n'avons pas pu valider votre identité Google."}
+						</p>
+						{googleAuthMode === "success" && googleUser && (
+							<div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "0.5rem", alignItems: "center" }}>
+								<div style={{ width: "56px", height: "56px", borderRadius: "50%", border: "3px solid var(--primary)", overflow: "hidden", margin: "0.5rem auto" }}>
+									{googleUser.picture ? (
+										<img src={googleUser.picture} alt={googleUser.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+									) : (
+										<div style={{ width: "100%", height: "100%", background: "var(--primary)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.4rem", fontWeight: 800 }}>
+											{googleUser.name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase()}
+										</div>
+									)}
+								</div>
+								<p style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff", margin: 0 }}>{googleUser.name}</p>
+								<p style={{ fontSize: "0.8rem", color: "var(--text-muted)", margin: 0 }}>{googleUser.email}</p>
+							</div>
+						)}
+						{googleAuthMode === "error" && (
+							<div style={{ width: "100%", display: "flex", flexDirection: "column", gap: "0.75rem", textAlign: "left" }}>
+								<p style={{ color: "var(--primary)", fontSize: "0.85rem", fontWeight: 700, margin: 0, textAlign: "center" }}>{googleAuthError.msg}</p>
+								<div style={{ color: "var(--text-muted)", fontSize: "0.78rem", lineHeight: 1.4, background: "var(--bg-input)", padding: "12px", borderRadius: "10px", border: "1px solid var(--border-color)" }} dangerouslySetInnerHTML={{ __html: googleAuthError.help }}></div>
+								<button
+									className="btn-primary"
+									onClick={() => {
+										setOverlayGoogleAuth(false);
+										localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
+										window.location.href = "/merchant";
+									}}
+									style={{ marginTop: "0.5rem", background: "#34c759", border: "none", cursor: "pointer", padding: "10px", width: "100%" }}
+								>
+									<i className="fa-solid fa-circle-play"></i> Continuer en mode Démo
+								</button>
+							</div>
+						)}
+						<button
+							className="btn-secondary"
+							onClick={() => setOverlayGoogleAuth(false)}
+							style={{ width: "100%", fontSize: "0.85rem", padding: "10px 14px", marginTop: "0.5rem", marginBottom: 0, cursor: "pointer" }}
+						>
+							Annuler
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Google Identity Services Script */}
+			<script src="https://accounts.google.com/gsi/client" async defer></script>
 		</motion.div>
 	);
 }

@@ -84,6 +84,14 @@ export default function Merchant() {
 
 	// Load config from localStorage
 	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const email = localStorage.getItem("revioza_merchant_email");
+			if (!email) {
+				window.location.href = "/?login=required";
+				return;
+			}
+		}
+
 		const saved = localStorage.getItem("revioza_merchant_config");
 		if (saved) {
 			try {
@@ -319,10 +327,27 @@ export default function Merchant() {
 					<div className="header-title">Espace Gérant</div>
 					<div className="restaurant-name-bind header-rest-name">{merchantState.restaurantName}</div>
 				</div>
-				<div className="app-header-right">
+				<div className="app-header-right" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
 					<a href="/play" target="_blank" title="Aperçu Client" className="preview-btn" rel="noreferrer">
 						<i className="fa-solid fa-eye"></i>
 					</a>
+					<button
+						onClick={() => {
+							localStorage.removeItem("revioza_merchant_email");
+							window.location.href = "/";
+						}}
+						title="Déconnexion"
+						className="preview-btn"
+						style={{
+							background: "none",
+							border: "none",
+							color: "var(--text-muted)",
+							cursor: "pointer",
+							fontSize: "1.1rem"
+						}}
+					>
+						<i className="fa-solid fa-arrow-right-from-bracket"></i>
+					</button>
 				</div>
 			</div>
 
