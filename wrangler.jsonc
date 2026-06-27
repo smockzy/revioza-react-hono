@@ -8,7 +8,9 @@
 	"compatibility_date": "2025-10-08",
 	"main": "./workers/app.ts",
 	"vars": {
-		"VALUE_FROM_CLOUDFLARE": "Hello from Hono/CF"
+		"VALUE_FROM_CLOUDFLARE": "Hello from Hono/CF",
+		"SUPABASE_URL": "https://placeholder.supabase.co",
+		"SUPABASE_ANON_KEY": "placeholder"
 	},
 	"observability": {
 		"enabled": true
@@ -49,6 +51,9 @@
 	 * https://developers.cloudflare.com/workers/configuration/routing/custom-domains/
 	 */
 	"routes": [
-		{ "pattern": "revioza.com", "custom_domain": true }
+		{
+			"pattern": "revioza.com",
+			"custom_domain": true
+		}
 	]
 }
