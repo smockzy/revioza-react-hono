@@ -23,6 +23,7 @@ import {
 	setCookie,
 	getCookie,
 } from "../utils/cookies";
+import { supabase } from "../utils/supabase-client";
 
 export function meta({ }: Route.MetaArgs) {
 	return [
@@ -483,61 +484,15 @@ export default function Demo() {
 		setGoogleAuthMode("error");
 	}, []);
 
-	const handleGoogleLogin = useCallback(() => {
-		if (typeof window === "undefined") return;
-
-		// Check if GIS SDK is available
-		if (typeof (window as unknown as Record<string, unknown>).google === "undefined") {
-			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
-			window.location.href = "/merchant";
-			return;
-		}
-
+	const handleGoogleLogin = useCallback(async () => {
 		setOverlayGoogleAuth(true);
 		setGoogleAuthMode("loading");
-
-		try {
-			const google = (window as unknown as Record<string, unknown>).google as Record<string, unknown>;
-			const accounts = google.accounts as Record<string, unknown>;
-			const oauth2 = accounts.oauth2 as Record<string, (...args: unknown[]) => unknown>;
-
-			const tokenClient = oauth2.initTokenClient({
-				client_id: GOOGLE_CLIENT_ID,
-				scope: "openid email profile",
-				callback: async (tokenResponse: Record<string, string>) => {
-					if (tokenResponse.error) {
-						handleGoogleError(tokenResponse.error, tokenResponse.error_description);
-						return;
-					}
-					try {
-						const resp = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`);
-						if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-						const user = (await resp.json()) as any;
-						setGoogleUser({
-							name: user.name || "Utilisateur Google",
-							email: user.email || "",
-							picture: user.picture || "",
-						});
-						localStorage.setItem("revioza_merchant_email", user.email || "google-user@gmail.com");
-						setGoogleAuthMode("success");
-						
-						setTimeout(() => {
-							window.location.href = "/merchant";
-						}, 1200);
-					} catch (err) {
-						handleGoogleError("network_error", (err as Error).message);
-					}
-				},
-				error_callback: (err: Record<string, string>) => {
-					handleGoogleError("network_error", err.message || JSON.stringify(err));
-				},
-			}) as Record<string, (...args: unknown[]) => void>;
-
-			tokenClient.requestAccessToken({ prompt: "select_account" });
-		} catch (err) {
-			console.error("Google Auth Init Error", err);
-			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
-			window.location.href = "/merchant";
+		const { error } = await supabase.auth.signInWithOAuth({
+			provider: "google",
+			options: { redirectTo: `${window.location.origin}/auth/callback` },
+		});
+		if (error) {
+			handleGoogleError("network_error", error.message);
 		}
 	}, [handleGoogleError]);
 
@@ -1743,8 +1698,6 @@ export default function Demo() {
 				</div>
 			)}
 
-			{/* Google Identity Services Script */}
-			<script src="https://accounts.google.com/gsi/client" async defer></script>
 		</div>
 	);
 }

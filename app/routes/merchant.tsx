@@ -9,6 +9,7 @@ import {
 	handlePrizeDeleted,
 } from "../utils/state";
 import { getCookie, setCookie } from "../utils/cookies";
+import { supabase } from "../utils/supabase-client";
 
 export function meta({}: Route.MetaArgs) {
 	return [
@@ -81,16 +82,43 @@ export default function Merchant() {
 
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstanceRef = useRef<unknown>(null);
+	const userIdRef = useRef<string | null>(null);
+	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	// Load config from localStorage
 	useEffect(() => {
-		if (typeof window !== "undefined") {
-			const email = localStorage.getItem("revioza_merchant_email");
-			if (!email) {
-				window.location.href = "/?login=required";
+		supabase.auth.getSession().then(async ({ data: { session } }) => {
+			if (!session) {
+				window.location.href = "/demo?login=required";
 				return;
 			}
-		}
+			userIdRef.current = session.user.id;
+
+			const { data, error } = await supabase
+				.from("merchants")
+				.select("*")
+				.eq("user_id", session.user.id)
+				.maybeSingle();
+
+			if (error) {
+				console.error("Erreur chargement config Supabase", error);
+				return;
+			}
+			if (data) {
+				const loaded: MerchantState = {
+					restaurantName: data.restaurant_name,
+					restaurantSub: data.restaurant_sub,
+					primaryColor: data.primary_color,
+					googleLink: data.google_link,
+					imageUrl: data.image_url,
+					prizes: Array.isArray(data.prizes) && data.prizes.length ? data.prizes : [...DEFAULT_PRIZES],
+				};
+				setMerchantState(loaded);
+				setColorHexLabel(loaded.primaryColor);
+				document.documentElement.style.setProperty("--primary", loaded.primaryColor);
+				localStorage.setItem("revioza_merchant_config", JSON.stringify(loaded));
+			}
+		});
 
 		const saved = localStorage.getItem("revioza_merchant_config");
 		if (saved) {
@@ -142,6 +170,30 @@ export default function Merchant() {
 			localStorage.removeItem("revioza_custom_hero_image");
 		}
 		document.documentElement.style.setProperty("--primary", state.primaryColor);
+
+		// Sync vers Supabase (debounce pour éviter une requête à chaque frappe)
+		if (!userIdRef.current) return;
+		if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+		saveTimeoutRef.current = setTimeout(() => {
+			supabase
+				.from("merchants")
+				.upsert(
+					{
+						user_id: userIdRef.current,
+						restaurant_name: state.restaurantName,
+						restaurant_sub: state.restaurantSub,
+						primary_color: state.primaryColor,
+						google_link: state.googleLink,
+						image_url: state.imageUrl,
+						prizes: state.prizes,
+						updated_at: new Date().toISOString(),
+					},
+					{ onConflict: "user_id" }
+				)
+				.then(({ error }) => {
+					if (error) console.error("Erreur sauvegarde config Supabase", error);
+				});
+		}, 800);
 	}, []);
 
 	const getDynamicStats = useCallback(() => {
@@ -332,8 +384,8 @@ export default function Merchant() {
 						<i className="fa-solid fa-eye"></i>
 					</a>
 					<button
-						onClick={() => {
-							localStorage.removeItem("revioza_merchant_email");
+						onClick={async () => {
+							await supabase.auth.signOut();
 							window.location.href = "/";
 						}}
 						title="Déconnexion"

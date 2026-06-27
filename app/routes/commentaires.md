@@ -7,7 +7,7 @@ git commit -m "ta description"
 git push origin main
 
 -------------------------------------------------------------------------------------------------
-
+mettre un pop up avertissement quand on teste la demo et qu'on met des etoiles mais qu'on a pas encore inséré un lien Place ID valide plutôt que de nous rediriger vers une page avec une erreur
 
 modifier les prix, trop cher pour l'instant, à augmenter plus tard au fil des clients, ou soit mettre 1 seule case prix, mais on met notre prix en gros, + 50% à côté, + 1 mois gratuit
 

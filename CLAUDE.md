@@ -61,7 +61,6 @@ concernés avant de proposer des modifications.
 ## Contexte opérationnel
 
 - Projet solo, développé principalement via assistant IA
-- Collaborateur Amine : feedback UI/UX externe
 - Stade actuel : MVP fonctionnel en production, auth à finaliser
 - Prochaine DA (design system visuel) à tester sur une branche dédiée, jamais sur main
 

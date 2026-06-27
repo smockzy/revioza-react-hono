@@ -10,4 +10,5 @@ export default [
 	route("legal/mentions-legales", "routes/legal/mentions-legales.tsx"),
 	route("legal/politique-confidentialite", "routes/legal/politique-confidentialite.tsx"),
 	route("legal/conditions-utilisation", "routes/legal/conditions-utilisation.tsx"),
+	route("auth/callback", "routes/auth.callback.tsx"),
 ] satisfies RouteConfig;
