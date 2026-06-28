@@ -8,6 +8,20 @@ git push origin main
 
 -------------------------------------------------------------------------------------------------
 
+faire en sorte que quand on se connecte avec un compte gerant, sur la navbar notre statut change et affiche "se deconnecter" et "mon espace gérant"
+
+qlq fois apres m'etre co avec google je ne suis pas redirigé sur /merchant mais sur /demo
+
+refonte de /demo
+
+dans rubrique "tentez l'experience en direct" bug des fleches
+
+régler les problemes de formats
+
+certaines animations ne vont pas s'appliquer pour mobile quand on ira sur le site, adapte les toutes pour qu'elles soient visibles tout de même sur tout les formats
+
+ajoutez des photos de profil aux avis virtuels dans la rubrique "ils nous font confiance" pour qu'ils aient l'air plus vrais et fait en sorte que les éléments faisant faux avis soient supprimés
+
 dans merchant.tsx faire en sorte qu'une bdd récolte le nombre d'avis obtenu (en prenant en compte le nb d'avis avant souscription à l'abo et le nb d'avis apres abo) par un gérant et l'affiche dans son espace
 
 mettre un pop up avertissement quand on teste la demo et qu'on met des etoiles mais qu'on a pas encore inséré un lien Place ID valide plutôt que de nous rediriger vers une page avec une erreur
@@ -15,8 +29,6 @@ mettre un pop up avertissement quand on teste la demo et qu'on met des etoiles m
 modifier les prix, trop cher pour l'instant, à augmenter plus tard au fil des clients, ou soit mettre 1 seule case prix, mais on met notre prix en gros, + 50% à côté, + 1 mois gratuit
 
 rendre plus jolie la page client quand on teste l'app, adapter aux differents formats d'ecrans.
-
-rendre le fond du site plus vivant.
 
 adapter la disposition des elements sur telephone portable
 
@@ -26,8 +38,7 @@ creer **base de données** pour les utilisateurs, les avis, les roues, les lots,
 
 Connecter un SDK Serverless comme **Supabase** ou **Firebase** pour gérer la persistance partagée de manière centralisée
 
-configurer **google OAUTH** (dans supabase?)
-
+google auth disfonctionnel depuis d'autres appareils
 
 
 COMMENTAIRE AMINE : 

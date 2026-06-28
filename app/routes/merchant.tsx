@@ -23,7 +23,7 @@ export function meta({}: Route.MetaArgs) {
 }
 
 interface PrivateFeedback {
-	id: number;
+	id: string; // id du scan (uuid)
 	name: string;
 	email: string;
 	rating: number;
@@ -31,38 +31,81 @@ interface PrivateFeedback {
 	text: string;
 }
 
-const defaultFeedbacks: PrivateFeedback[] = [
-	{
-		id: 1,
-		name: "Jean-Marc L.",
-		email: "jean.marc.l@yahoo.fr",
-		rating: 2,
-		date: "Hier, 19:42",
-		text: "Le temps d'attente était un peu trop long pour une simple pizza Margherita (25 minutes). La pizza était bonne mais arrivée tiède sur la table.",
-	},
-	{
-		id: 2,
-		name: "Amélie D.",
-		email: "amelie.dupont@gmail.com",
-		rating: 3,
-		date: "05 Juin, 13:15",
-		text: "La garniture de la pizza végétarienne était un peu légère aujourd'hui. L'accueil reste super mais j'espère un geste la prochaine fois.",
-	},
-	{
-		id: 3,
-		name: "Thomas R.",
-		email: "t.rodriguez@outlook.fr",
-		rating: 1,
-		date: "02 Juin, 21:30",
-		text: "La pâte de ma calzone n'était pas assez cuite au milieu, très déçu par rapport à mes visites précédentes.",
-	},
-];
+interface FeedbackRow {
+	id: string;
+	scanned_at: string;
+	rating: number | null;
+	google_name: string | null;
+	google_email: string | null;
+	feedback_text: string | null;
+}
 
-const baseStatsData = {
-	week: { reviews: 14, clients: 42, labels: ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"], dataset: [1, 2, 1, 3, 2, 3, 2] },
-	month: { reviews: 58, clients: 174, labels: ["Sem 1", "Sem 2", "Sem 3", "Sem 4"], dataset: [12, 15, 14, 17] },
-	year: { reviews: 712, clients: 2136, labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"], dataset: [45, 52, 60, 58, 62, 70, 68, 55, 61, 65, 58, 60] },
-};
+function formatFeedbackDate(iso: string): string {
+	const d = new Date(iso);
+	if (isNaN(d.getTime())) return "";
+	return d.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+}
+
+// ── Statistiques réelles, calculées depuis la table `scans` ──────────────
+interface ScanRow {
+	scanned_at: string;
+	rating: number | null;
+	played: boolean | null;
+}
+
+interface PeriodStats {
+	reviews: number; // avis Google laissés (note ≥ 4)
+	clients: number; // participations (roue tournée)
+	scans: number; // nombre total de scans
+	labels: string[];
+	dataset: number[]; // avis générés par segment de temps
+}
+
+type StatsData = { week: PeriodStats; month: PeriodStats; year: PeriodStats };
+
+const WEEK_LABELS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+const MONTH_LABELS = ["Sem 1", "Sem 2", "Sem 3", "Sem 4"];
+const YEAR_LABELS = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Août", "Sep", "Oct", "Nov", "Déc"];
+
+function emptyStats(): StatsData {
+	return {
+		week: { reviews: 0, clients: 0, scans: 0, labels: [...WEEK_LABELS], dataset: new Array(7).fill(0) },
+		month: { reviews: 0, clients: 0, scans: 0, labels: [...MONTH_LABELS], dataset: new Array(4).fill(0) },
+		year: { reviews: 0, clients: 0, scans: 0, labels: [...YEAR_LABELS], dataset: new Array(12).fill(0) },
+	};
+}
+
+function computeStats(rows: ScanRow[]): StatsData {
+	const stats = emptyStats();
+	const now = new Date();
+	rows.forEach((r) => {
+		const d = new Date(r.scanned_at);
+		if (isNaN(d.getTime())) return;
+		const diffDays = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+		const isReview = (r.rating ?? 0) >= 4;
+		const isPlayed = !!r.played;
+
+		if (diffDays >= 0 && diffDays < 7) {
+			const di = (d.getDay() + 6) % 7;
+			stats.week.scans++;
+			if (isPlayed) stats.week.clients++;
+			if (isReview) { stats.week.reviews++; stats.week.dataset[di]++; }
+		}
+		if (diffDays >= 0 && diffDays < 30) {
+			const wi = Math.min(3, Math.floor((d.getDate() - 1) / 7));
+			stats.month.scans++;
+			if (isPlayed) stats.month.clients++;
+			if (isReview) { stats.month.reviews++; stats.month.dataset[wi]++; }
+		}
+		if (d.getFullYear() === now.getFullYear()) {
+			const mi = d.getMonth();
+			stats.year.scans++;
+			if (isPlayed) stats.year.clients++;
+			if (isReview) { stats.year.reviews++; stats.year.dataset[mi]++; }
+		}
+	});
+	return stats;
+}
 
 export default function Merchant() {
 	const [activeTab, setActiveTab] = useState<"stats" | "config" | "reviews">("stats");
@@ -74,11 +117,13 @@ export default function Merchant() {
 		imageUrl: "",
 		prizes: [...DEFAULT_PRIZES],
 	});
-	const [feedbacks, setFeedbacks] = useState<PrivateFeedback[]>(defaultFeedbacks);
+	const [feedbacks, setFeedbacks] = useState<PrivateFeedback[]>([]);
 	const [currentPeriod, setCurrentPeriod] = useState<"week" | "month" | "year">("week");
 	const [averageBasket, setAverageBasket] = useState(25);
 	const [placeIdHelp, setPlaceIdHelp] = useState(false);
 	const [colorHexLabel, setColorHexLabel] = useState("#e50914");
+	const [statsData, setStatsData] = useState<StatsData>(() => emptyStats());
+	const [statsLoading, setStatsLoading] = useState(true);
 
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstanceRef = useRef<unknown>(null);
@@ -93,6 +138,48 @@ export default function Merchant() {
 				return;
 			}
 			userIdRef.current = session.user.id;
+
+			// Statistiques réelles : tous les scans de cet établissement.
+			supabase
+				.from("scans")
+				.select("scanned_at, rating, played")
+				.eq("user_id", session.user.id)
+				.then(({ data: scanRows, error: scanErr }) => {
+					if (scanErr) {
+						console.error("Erreur chargement stats Supabase", scanErr);
+					} else if (scanRows) {
+						setStatsData(computeStats(scanRows as ScanRow[]));
+					}
+					setStatsLoading(false);
+				});
+
+			// Retours privés réels (note < 4 avec texte, non archivés).
+			supabase
+				.from("scans")
+				.select("id, scanned_at, rating, google_name, google_email, feedback_text")
+				.eq("user_id", session.user.id)
+				.lt("rating", 4)
+				.not("feedback_text", "is", null)
+				.eq("feedback_archived", false)
+				.order("scanned_at", { ascending: false })
+				.then(({ data: fbRows, error: fbErr }) => {
+					if (fbErr) {
+						console.error("Erreur chargement retours privés Supabase", fbErr);
+						return;
+					}
+					if (fbRows) {
+						setFeedbacks(
+							(fbRows as FeedbackRow[]).map((r) => ({
+								id: r.id,
+								name: r.google_name || "Client anonyme",
+								email: r.google_email || "",
+								rating: r.rating ?? 0,
+								date: formatFeedbackDate(r.scanned_at),
+								text: r.feedback_text || "",
+							}))
+						);
+					}
+				});
 
 			const { data, error } = await supabase
 				.from("merchants")
@@ -134,15 +221,6 @@ export default function Merchant() {
 			}
 		}
 
-		// Sync hero image
-		const savedReviews = localStorage.getItem("revioza_private_reviews");
-		if (savedReviews) {
-			try {
-				setFeedbacks(JSON.parse(savedReviews));
-			} catch {}
-		} else {
-			localStorage.setItem("revioza_private_reviews", JSON.stringify(defaultFeedbacks));
-		}
 
 		// Apply primary color
 		document.documentElement.style.setProperty("--primary", merchantState.primaryColor);
@@ -196,39 +274,6 @@ export default function Merchant() {
 		}, 800);
 	}, []);
 
-	const getDynamicStats = useCallback(() => {
-		const stats = JSON.parse(JSON.stringify(baseStatsData));
-		try {
-			const savedHistory = localStorage.getItem("revioza_reviews_history");
-			if (!savedHistory) return stats;
-			const history = JSON.parse(savedHistory);
-			const now = new Date();
-			history.forEach((item: { date: string; rating: number }) => {
-				const itemDate = new Date(item.date);
-				const diffDays = (now.getTime() - itemDate.getTime()) / (1000 * 60 * 60 * 24);
-				if (diffDays < 7) {
-					const dayIndex = (itemDate.getDay() + 6) % 7;
-					stats.week.dataset[dayIndex]++;
-					stats.week.reviews++;
-					stats.week.clients += 3;
-				}
-				if (diffDays < 30) {
-					const weekIndex = Math.min(3, Math.floor((itemDate.getDate() - 1) / 7));
-					stats.month.dataset[weekIndex]++;
-					stats.month.reviews++;
-					stats.month.clients += 3;
-				}
-				if (itemDate.getFullYear() === now.getFullYear()) {
-					const monthIndex = itemDate.getMonth();
-					stats.year.dataset[monthIndex]++;
-					stats.year.reviews++;
-					stats.year.clients += 3;
-				}
-			});
-		} catch {}
-		return stats;
-	}, []);
-
 	// Render chart
 	useEffect(() => {
 		if (activeTab !== "stats") return;
@@ -243,8 +288,7 @@ export default function Merchant() {
 				(chartInstanceRef.current as { destroy: () => void }).destroy();
 			}
 
-			const stats = getDynamicStats();
-			const pData = stats[currentPeriod];
+			const pData = statsData[currentPeriod];
 
 			chartInstanceRef.current = new Chart(canvas, {
 				type: "line",
@@ -279,18 +323,20 @@ export default function Merchant() {
 		// Small delay to ensure canvas dimensions are correct
 		const timer = setTimeout(renderChart, 50);
 		return () => clearTimeout(timer);
-	}, [activeTab, currentPeriod, merchantState.primaryColor, getDynamicStats]);
+	}, [activeTab, currentPeriod, merchantState.primaryColor, statsData]);
 
-	const currentStats = getDynamicStats()[currentPeriod];
+	const currentStats = statsData[currentPeriod];
 	const earnings = currentStats.clients * averageBasket;
 
 	const handleArchiveFeedback = useCallback(
-		(reviewId: number) => {
-			const updated = feedbacks.filter((r) => r.id !== reviewId);
-			setFeedbacks(updated);
-			localStorage.setItem("revioza_private_reviews", JSON.stringify(updated));
+		(reviewId: string) => {
+			// Retrait optimiste de la liste + archivage en base.
+			setFeedbacks((prev) => prev.filter((r) => r.id !== reviewId));
+			supabase.rpc("archive_feedback", { p_scan: reviewId }).then(({ error }) => {
+				if (error) console.error("Erreur archivage retour Supabase", error);
+			});
 		},
-		[feedbacks]
+		[]
 	);
 
 	const handleAddPrize = useCallback(() => {
@@ -411,6 +457,18 @@ export default function Merchant() {
 							<div className="welcome-banner">
 								<h3>Bonjour, Gérant 👋</h3>
 								<p>Voici l&apos;impact de Revioza sur votre commerce.</p>
+								{statsLoading ? (
+									<p style={{ fontSize: "0.78rem", color: "var(--muted)", marginTop: "0.35rem" }}>
+										<i className="fa-solid fa-circle-notch fa-spin" style={{ marginRight: "6px" }}></i>
+										Chargement de vos données…
+									</p>
+								) : currentStats.scans === 0 ? (
+									<p style={{ fontSize: "0.78rem", color: "var(--muted)", marginTop: "0.35rem" }}>
+										<i className="fa-solid fa-circle-info" style={{ marginRight: "6px", color: "var(--primary)" }}></i>
+										Aucune participation sur cette période. Imprimez votre QR code et placez-le en salle pour
+										commencer à collecter des avis.
+									</p>
+								) : null}
 							</div>
 
 							<div className="period-selector">
@@ -443,7 +501,7 @@ export default function Merchant() {
 									<div className="stat-num" id="stat-clients-count">
 										{currentStats.clients}
 									</div>
-									<div className="stat-label">Est. Clients Gagnés</div>
+									<div className="stat-label">Participations à la roue</div>
 								</div>
 							</div>
 
@@ -456,8 +514,8 @@ export default function Merchant() {
 									{earnings.toLocaleString("fr-FR")} €
 								</div>
 								<p className="gain-desc">
-									Revenus générés estimés grâce aux nouveaux clients ramenés par l&apos;amélioration de
-									votre référencement Google.
+									Estimation des revenus liés aux clients ayant participé à la roue
+									(participations × panier moyen).
 								</p>
 								<div className="slider-group">
 									<div className="slider-label">

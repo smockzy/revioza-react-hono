@@ -27,6 +27,8 @@ import {
 	getAllReviozaCookies,
 	clearAllReviozaCookies,
 } from "../utils/cookies";
+import { supabase } from "../utils/supabase-client";
+import { useMerchantSession } from "../utils/useMerchantSession";
 
 export function meta({ }: Route.MetaArgs) {
 	return [
@@ -428,6 +430,8 @@ export default function Home() {
 		[appState.googleLink]
 	);
 
+	const { loggedIn, signOut } = useMerchantSession();
+
 	const openRegisterModal = useCallback(() => {
 		setActiveTab("register");
 		setOverlayRegister(true);
@@ -698,61 +702,15 @@ export default function Home() {
 		setGoogleAuthMode("error");
 	}, []);
 
-	const handleGoogleLogin = useCallback(() => {
-		if (typeof window === "undefined") return;
-
-		// Check if GIS SDK is available
-		if (typeof (window as unknown as Record<string, unknown>).google === "undefined") {
-			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
-			window.location.href = "/merchant";
-			return;
-		}
-
+	const handleGoogleLogin = useCallback(async () => {
 		setOverlayGoogleAuth(true);
 		setGoogleAuthMode("loading");
-
-		try {
-			const google = (window as unknown as Record<string, unknown>).google as Record<string, unknown>;
-			const accounts = google.accounts as Record<string, unknown>;
-			const oauth2 = accounts.oauth2 as Record<string, (...args: unknown[]) => unknown>;
-
-			const tokenClient = oauth2.initTokenClient({
-				client_id: GOOGLE_CLIENT_ID,
-				scope: "openid email profile",
-				callback: async (tokenResponse: Record<string, string>) => {
-					if (tokenResponse.error) {
-						handleGoogleError(tokenResponse.error, tokenResponse.error_description);
-						return;
-					}
-					try {
-						const resp = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenResponse.access_token}`);
-						if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-						const user = (await resp.json()) as any;
-						setGoogleUser({
-							name: user.name || "Utilisateur Google",
-							email: user.email || "",
-							picture: user.picture || "",
-						});
-						localStorage.setItem("revioza_merchant_email", user.email || "google-user@gmail.com");
-						setGoogleAuthMode("success");
-						
-						setTimeout(() => {
-							window.location.href = "/merchant";
-						}, 1200);
-					} catch (err) {
-						handleGoogleError("network_error", (err as Error).message);
-					}
-				},
-				error_callback: (err: Record<string, string>) => {
-					handleGoogleError("network_error", err.message || JSON.stringify(err));
-				},
-			}) as Record<string, (...args: unknown[]) => void>;
-
-			tokenClient.requestAccessToken({ prompt: "select_account" });
-		} catch (err) {
-			console.error("Google Auth Init Error", err);
-			localStorage.setItem("revioza_merchant_email", "google-user@gmail.com");
-			window.location.href = "/merchant";
+		const { error } = await supabase.auth.signInWithOAuth({
+			provider: "google",
+			options: { redirectTo: `${window.location.origin}/auth/callback` },
+		});
+		if (error) {
+			handleGoogleError("network_error", error.message);
 		}
 	}, [handleGoogleError]);
 
@@ -1435,42 +1393,84 @@ export default function Home() {
 						<span className="logo-tagline">L&apos;avis qui vous rapporte</span>
 					</div>
 					<div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-						<button
-							id="btn-header-login"
-							className="btn-secondary"
-							style={{
-								fontSize: "0.85rem",
-								padding: "0.55rem 1.1rem",
-								borderRadius: "9999px",
-								cursor: "pointer",
-								border: "1px solid var(--border-color)",
-								height: "38px",
-							}}
-							onClick={openLoginModal}
-						>
-							Je suis déjà client
-						</button>
-						<button
-							id="btn-header-register"
-							className="btn-primary"
-							style={{
-								fontSize: "0.85rem",
-								padding: "0.55rem 1.2rem",
-								borderRadius: "9999px",
-								cursor: "pointer",
-								border: "none",
-								height: "38px",
-								fontWeight: 600,
-								boxShadow: "0 4px 12px var(--primary-glow)",
-								transition: "transform 0.2s"
-							}}
-							onClick={openRegisterModal}
-						>
-							S&apos;inscrire
-						</button>
-						<a href="/pricing" className="cta-pitch" style={{ textDecoration: "none" }}>
-							Essayer Revioza
-						</a>
+						{loggedIn ? (
+							<>
+								<a
+									href="/merchant"
+									className="btn-primary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.2rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "none",
+										height: "38px",
+										display: "flex",
+										alignItems: "center",
+										gap: "0.4rem",
+										fontWeight: 600,
+										textDecoration: "none",
+										boxShadow: "0 4px 12px var(--primary-glow)",
+									}}
+								>
+									<i className="fa-solid fa-gauge-high"></i> Mon espace gérant
+								</a>
+								<button
+									id="btn-header-logout"
+									className="btn-secondary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.1rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										height: "38px",
+									}}
+									onClick={signOut}
+								>
+									Se déconnecter
+								</button>
+							</>
+						) : (
+							<>
+								<button
+									id="btn-header-login"
+									className="btn-secondary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.1rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										height: "38px",
+									}}
+									onClick={openLoginModal}
+								>
+									Je suis déjà client
+								</button>
+								<button
+									id="btn-header-register"
+									className="btn-primary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.2rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "none",
+										height: "38px",
+										fontWeight: 600,
+										boxShadow: "0 4px 12px var(--primary-glow)",
+										transition: "transform 0.2s"
+									}}
+									onClick={openRegisterModal}
+								>
+									S&apos;inscrire
+								</button>
+								<a href="/pricing" className="cta-pitch" style={{ textDecoration: "none" }}>
+									Essayer Revioza
+								</a>
+							</>
+						)}
 					</div>
 				</div>
 			</header>

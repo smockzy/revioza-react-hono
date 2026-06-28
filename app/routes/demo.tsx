@@ -24,6 +24,7 @@ import {
 	getCookie,
 } from "../utils/cookies";
 import { supabase } from "../utils/supabase-client";
+import { useMerchantSession } from "../utils/useMerchantSession";
 
 export function meta({ }: Route.MetaArgs) {
 	return [
@@ -216,6 +217,8 @@ export default function Demo() {
 		},
 		[appState.googleLink]
 	);
+
+	const { loggedIn, signOut } = useMerchantSession();
 
 	const openRegisterModal = useCallback(() => {
 		setActiveTab("register");
@@ -1022,39 +1025,81 @@ export default function Demo() {
 						<span className="logo-tagline">L&apos;avis qui vous rapporte</span>
 					</a>
 					<div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
-						<button
-							id="btn-header-login"
-							className="btn-secondary"
-							style={{
-								fontSize: "0.85rem",
-								padding: "0.55rem 1.1rem",
-								borderRadius: "9999px",
-								cursor: "pointer",
-								border: "1px solid var(--border-color)",
-								height: "38px",
-							}}
-							onClick={openLoginModal}
-						>
-							Je suis déjà client
-						</button>
-						<button
-							id="btn-header-register"
-							className="btn-primary"
-							style={{
-								fontSize: "0.85rem",
-								padding: "0.55rem 1.2rem",
-								borderRadius: "9999px",
-								cursor: "pointer",
-								border: "none",
-								height: "38px",
-								fontWeight: 600,
-								boxShadow: "0 4px 12px var(--primary-glow)",
-								transition: "transform 0.2s"
-							}}
-							onClick={openRegisterModal}
-						>
-							S&apos;inscrire
-						</button>
+						{loggedIn ? (
+							<>
+								<a
+									href="/merchant"
+									className="btn-primary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.2rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "none",
+										height: "38px",
+										display: "flex",
+										alignItems: "center",
+										gap: "0.4rem",
+										fontWeight: 600,
+										textDecoration: "none",
+										boxShadow: "0 4px 12px var(--primary-glow)",
+									}}
+								>
+									<i className="fa-solid fa-gauge-high"></i> Mon espace gérant
+								</a>
+								<button
+									id="btn-header-logout"
+									className="btn-secondary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.1rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										height: "38px",
+									}}
+									onClick={signOut}
+								>
+									Se déconnecter
+								</button>
+							</>
+						) : (
+							<>
+								<button
+									id="btn-header-login"
+									className="btn-secondary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.1rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "1px solid var(--border-color)",
+										height: "38px",
+									}}
+									onClick={openLoginModal}
+								>
+									Je suis déjà client
+								</button>
+								<button
+									id="btn-header-register"
+									className="btn-primary"
+									style={{
+										fontSize: "0.85rem",
+										padding: "0.55rem 1.2rem",
+										borderRadius: "9999px",
+										cursor: "pointer",
+										border: "none",
+										height: "38px",
+										fontWeight: 600,
+										boxShadow: "0 4px 12px var(--primary-glow)",
+										transition: "transform 0.2s"
+									}}
+									onClick={openRegisterModal}
+								>
+									S&apos;inscrire
+								</button>
+							</>
+						)}
 					</div>
 				</div>
 			</header>

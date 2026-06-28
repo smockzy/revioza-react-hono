@@ -67,10 +67,80 @@ export default function Play() {
 	const [heroSrc, setHeroSrc] = useState(DEFAULT_HERO_IMAGE_HQ);
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const scanIdRef = useRef<string | null>(null);
+	const [consent, setConsent] = useState(false);
+
+	// Enrichit la session de scan côté serveur (compte Google, consentement, résultat).
+	const sendScanComplete = useCallback(
+		(payload: {
+			consent?: boolean;
+			google?: { email: string; name: string; sub: string; picture: string };
+			rating?: number;
+			prizeName?: string;
+			played?: boolean;
+			feedbackText?: string;
+		}) => {
+			const scanId = scanIdRef.current;
+			if (!scanId) return;
+			fetch("/api/scan/complete", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ scanId, ...payload }),
+			}).catch(() => { });
+		},
+		[]
+	);
+
+	// Applique la config de roue chargée depuis Supabase (QR unique du commerçant).
+	const applyWheelConfig = useCallback((wheel: Record<string, unknown>) => {
+		const updates: Partial<PlayState> = {};
+		if (wheel.restaurant_name) updates.restaurantName = String(wheel.restaurant_name);
+		if (wheel.restaurant_sub) updates.restaurantSub = String(wheel.restaurant_sub);
+		if (wheel.google_link) updates.googleLink = String(wheel.google_link);
+		if (Array.isArray(wheel.prizes) && wheel.prizes.length >= 2) updates.prizes = wheel.prizes as Prize[];
+		const color = typeof wheel.primary_color === "string" ? wheel.primary_color : "";
+		if (/^#[0-9A-Fa-f]{6}$/.test(color)) updates.primaryColor = color;
+
+		setState((prev) => ({ ...prev, ...updates }));
+
+		if (wheel.image_url) setHeroSrc(String(wheel.image_url));
+
+		const finalColor = updates.primaryColor || "#e50914";
+		document.documentElement.style.setProperty("--primary", finalColor);
+		const hex = finalColor.replace("#", "");
+		const r = parseInt(hex.slice(0, 2), 16);
+		const g = parseInt(hex.slice(2, 4), 16);
+		const b = parseInt(hex.slice(4, 6), 16);
+		document.documentElement.style.setProperty("--primary-glow", `rgba(${r},${g},${b},0.35)`);
+	}, []);
 
 	// Parse URL params & load config
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
+
+		// QR code unique : charge la config depuis Supabase + enregistre le scan
+		// (l'appareil/IP/géo sont capturés côté serveur dans le Worker).
+		const qrId = params.get("q");
+		if (qrId) {
+			(async () => {
+				try {
+					const res = await fetch("/api/scan", {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ q: qrId }),
+					});
+					if (res.ok) {
+						const data = (await res.json()) as { scanId: string | null; wheel?: Record<string, unknown> };
+						scanIdRef.current = data.scanId ?? null;
+						if (data.wheel) applyWheelConfig(data.wheel);
+					}
+				} catch {
+					/* hors-ligne : la roue reste jouable avec les valeurs par défaut */
+				}
+			})();
+			return;
+		}
+
 		const updates: Partial<PlayState> = {};
 
 		if (params.has("name")) updates.restaurantName = params.get("name")!;
@@ -188,28 +258,13 @@ export default function Play() {
 		const feedbackText = txtarea ? txtarea.value.trim() : "";
 
 		if (feedbackText) {
-			const savedReviews = localStorage.getItem("revioza_private_reviews");
-			let list: Array<Record<string, unknown>> = [];
-			if (savedReviews) {
-				try { list = JSON.parse(savedReviews); } catch { }
-			}
-			const newId = list.length > 0 ? Math.max(...list.map((r: Record<string, unknown>) => r.id as number)) + 1 : 1;
-			const dateStr = "Aujourd'hui, " + new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-			list.unshift({
-				id: newId,
-				name: "Client Anonyme",
-				email: "client.anonyme@gmail.com",
-				rating: state.rating || 3,
-				date: dateStr,
-				text: feedbackText,
-			});
-			localStorage.setItem("revioza_private_reviews", JSON.stringify(list));
-			addReviewToHistory(state.rating || 3);
+			// Enregistre le retour privé en base (visible uniquement du gérant).
+			sendScanComplete({ rating: state.rating || 3, feedbackText, played: false });
 		}
 
 		if (txtarea) txtarea.value = "";
 		goTo(3);
-	}, [state.rating, goTo]);
+	}, [state.rating, goTo, sendScanComplete]);
 
 	const spinWheel = useCallback(() => {
 		if (state.isSpinning) return;
@@ -232,6 +287,8 @@ export default function Play() {
 
 		setTimeout(() => {
 			setState((prev) => ({ ...prev, isSpinning: false, wonPrize: won }));
+			// Enregistre le résultat (note + lot) sur la session de scan.
+			sendScanComplete({ rating: state.rating, prizeName: won.name, played: true });
 			if (!won.name.toLowerCase().includes("perdu")) {
 				import("canvas-confetti").then((mod) => {
 					const confetti = mod.default;
@@ -243,7 +300,7 @@ export default function Play() {
 			setParticipationStatus("Déjà effectuée");
 			setTimeout(() => goTo(won.name.toLowerCase().match(/perdu|rien/) ? 6 : 4), 1000);
 		}, 4600);
-	}, [state.isSpinning, state.prizes, goTo]);
+	}, [state.isSpinning, state.prizes, state.rating, goTo, sendScanComplete]);
 
 	const handleGoogleSignin = useCallback(() => {
 		if (typeof window === "undefined") return;
@@ -283,6 +340,17 @@ export default function Play() {
 						});
 						setProfileEmail(`Connecté avec<br><strong>${user.email}</strong>`);
 						setGoogleAuthMode("success");
+						// Enregistre le compte Google + le consentement sur la session de scan.
+						sendScanComplete({
+							consent: true,
+							google: {
+								email: user.email || "",
+								name: user.name || "",
+								sub: user.id || user.sub || "",
+								picture: user.picture || "",
+							},
+							played: false,
+						});
 					} catch (err) {
 						handleGoogleError("network_error", (err as Error).message);
 					}
@@ -297,7 +365,7 @@ export default function Play() {
 			setProfileEmail("Connecté avec<br><strong>client@gmail.com</strong>");
 			setTimeout(() => goTo(2), 900);
 		}
-	}, [goTo]);
+	}, [goTo, sendScanComplete]);
 
 	const handleGoogleError = (errorType: string, detailedMsg: string) => {
 		let friendlyError = "Une erreur d'authentification est survenue.";
@@ -374,7 +442,42 @@ export default function Play() {
 							</div>
 						</div>
 						<div className="cta-block">
-							<button className="btn-google-signin" id="btn-google-signin" onClick={handleGoogleSignin}>
+							<label
+								htmlFor="consent-checkbox"
+								style={{
+									display: "flex",
+									alignItems: "flex-start",
+									gap: "0.55rem",
+									textAlign: "left",
+									fontSize: "0.74rem",
+									lineHeight: 1.4,
+									color: "var(--text-muted)",
+									marginBottom: "0.85rem",
+									cursor: "pointer",
+								}}
+							>
+								<input
+									type="checkbox"
+									id="consent-checkbox"
+									checked={consent}
+									onChange={(e) => setConsent(e.target.checked)}
+									style={{ marginTop: "2px", accentColor: "var(--primary)", flexShrink: 0, width: "16px", height: "16px" }}
+								/>
+								<span>
+									J&apos;accepte que mes données (compte Google, type d&apos;appareil et localisation approximative)
+									soient collectées pour ma participation au jeu.{" "}
+									<a href="/legal/politique-confidentialite" target="_blank" rel="noreferrer" style={{ color: "var(--primary)", textDecoration: "underline" }}>
+										En savoir plus
+									</a>
+								</span>
+							</label>
+							<button
+								className="btn-google-signin"
+								id="btn-google-signin"
+								onClick={handleGoogleSignin}
+								disabled={!consent}
+								style={!consent ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
+							>
 								<img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" className="google-btn-logo" />
 								JE TENTE MA CHANCE
 							</button>

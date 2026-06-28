@@ -77,7 +77,7 @@ export default function Pricing() {
 						className="cta-pitch"
 						style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.5rem" }}
 					>
-						<i className="fa-solid fa-arrow-left"></i> Retour à la démo
+						<i className="fa-solid fa-arrow-left"></i> Retour à l'acceuil
 					</a>
 				</div>
 			</header>

@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import type { Route } from "./+types/qr-code";
 import "../styles/style.css";
+import { supabase } from "../utils/supabase-client";
+
+// Génère un identifiant public court, lisible et difficile à deviner (base36).
+function generateQrId(): string {
+	const bytes = new Uint8Array(8);
+	crypto.getRandomValues(bytes);
+	let out = "";
+	for (const b of bytes) out += b.toString(36).padStart(2, "0");
+	return out.slice(0, 12);
+}
 
 export function meta({}: Route.MetaArgs) {
 	return [
@@ -15,61 +25,74 @@ export function meta({}: Route.MetaArgs) {
 
 export default function QRCode() {
 	const [qrUrl, setQrUrl] = useState("");
-	const [badgeText, setBadgeText] = useState("Bella Napoli");
+	const [badgeText, setBadgeText] = useState("Chargement…");
+	const [targetUrl, setTargetUrl] = useState("");
+	const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
 
 	useEffect(() => {
-		// Load saved configuration
-		let config = {
-			restaurantName: "Bella Napoli",
-			restaurantSub: "Pizzeria",
-			primaryColor: "#e50914",
-			googleLink: "ChIJN1t_tDeuEmsRUsoyG83VY24",
-			imageUrl: "",
-			prizes: [
-				{ name: "CAFÉ OFFERT", weight: 45 },
-				{ name: "-15% SUR LA NOTE", weight: 20 },
-				{ name: "TIRAMISU OFFERT", weight: 15 },
-				{ name: "BOISSON OFFERTE", weight: 15 },
-				{ name: "PERDU DOMMAGE !", weight: 5 },
-			],
-		};
+		let cancelled = false;
 
-		const savedConfig = localStorage.getItem("revioza_merchant_config");
-		if (savedConfig) {
-			try {
-				config = JSON.parse(savedConfig);
-			} catch (e) {
-				console.error("Error parsing saved config", e);
+		// Texte du badge depuis la config locale (affichage immédiat).
+		try {
+			const savedConfig = localStorage.getItem("revioza_merchant_config");
+			if (savedConfig) {
+				const cfg = JSON.parse(savedConfig);
+				if (cfg.restaurantName) setBadgeText(`${cfg.restaurantName}${cfg.restaurantSub ? ` (${cfg.restaurantSub})` : ""}`);
 			}
-		}
+		} catch { /* ignore */ }
 
-		setBadgeText(`${config.restaurantName} (${config.restaurantSub})`);
+		(async () => {
+			const { data: { session } } = await supabase.auth.getSession();
+			if (!session) {
+				window.location.href = "/demo?login=required";
+				return;
+			}
+			const userId = session.user.id;
 
-		const getFullGoogleLink = (placeId: string) => {
-			if (!placeId) return "";
-			if (placeId.startsWith("http")) return placeId;
-			return `https://search.google.com/local/writereview?placeid=${placeId}`;
+			// 1) Récupère le QR code existant du commerçant, sinon en crée un.
+			let qrId: string | null = null;
+			const { data: existing } = await supabase
+				.from("qr_codes")
+				.select("id")
+				.eq("user_id", userId)
+				.eq("active", true)
+				.limit(1)
+				.maybeSingle();
+
+			if (existing?.id) {
+				qrId = existing.id;
+			} else {
+				const newId = generateQrId();
+				const { data: inserted, error: insErr } = await supabase
+					.from("qr_codes")
+					.insert({ id: newId, user_id: userId })
+					.select("id")
+					.single();
+				if (insErr) {
+					if (!cancelled) setStatus("error");
+					console.error("Création QR code échouée", insErr);
+					return;
+				}
+				qrId = inserted.id;
+			}
+
+			if (cancelled || !qrId) return;
+
+			// 2) URL stable du QR : ne change jamais, la roue reste modifiable.
+			const clientUrl = new URL("/play", window.location.origin);
+			clientUrl.searchParams.set("q", qrId);
+			const url = clientUrl.toString();
+
+			setTargetUrl(url);
+			setQrUrl(
+				`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`
+			);
+			setStatus("ready");
+		})();
+
+		return () => {
+			cancelled = true;
 		};
-
-		// Build client page URL
-		const clientUrl = new URL("/play", window.location.href);
-		clientUrl.searchParams.set("name", config.restaurantName);
-		clientUrl.searchParams.set("sub", config.restaurantSub);
-		clientUrl.searchParams.set("color", config.primaryColor);
-		clientUrl.searchParams.set("google_link", getFullGoogleLink(config.googleLink));
-		if (config.imageUrl) {
-			clientUrl.searchParams.set("image", config.imageUrl);
-		}
-
-		const prizeNames = config.prizes.map((p) => p.name).join(",");
-		const prizeWeights = config.prizes.map((p) => p.weight || 10).join(",");
-		clientUrl.searchParams.set("prizes", prizeNames);
-		clientUrl.searchParams.set("weights", prizeWeights);
-
-		// Generate QR Code URL via free API
-		setQrUrl(
-			`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(clientUrl.toString())}`
-		);
 	}, []);
 
 	return (
@@ -95,15 +118,31 @@ export default function QRCode() {
 					</h1>
 					<p className="qr-desc">
 						Ce QR code est associé à votre compte de commerce. Imprimez-le et placez-le sur vos tables. En
-						le scannant, vos clients pourront directement laisser un avis et faire tourner la roue.
+						le scannant, vos clients accèdent à <strong>votre roue personnalisée</strong> et peuvent laisser
+						un avis. Vous pouvez modifier votre roue à tout moment&nbsp;: ce QR reste valable, pas besoin de
+						le réimprimer.
 					</p>
 
 					<div className="qr-box">
-						{qrUrl && <img id="qr-img" src={qrUrl} alt="QR Code Unique" />}
+						{status === "ready" && qrUrl && <img id="qr-img" src={qrUrl} alt="QR Code Unique" />}
+						{status === "loading" && (
+							<span style={{ color: "#8e8e93", fontSize: "0.85rem" }}>Génération…</span>
+						)}
+						{status === "error" && (
+							<span style={{ color: "#e50914", fontSize: "0.85rem", textAlign: "center", padding: "1rem" }}>
+								Impossible de générer le QR code.<br />Vérifiez votre connexion puis réessayez.
+							</span>
+						)}
 					</div>
 
+					{status === "ready" && targetUrl && (
+						<p style={{ fontSize: "0.72rem", color: "#8e8e93", wordBreak: "break-all", margin: 0 }}>
+							{targetUrl}
+						</p>
+					)}
+
 					<div className="action-buttons">
-						<button className="btn-qr btn-qr-print" id="btn-print" onClick={() => window.print()}>
+						<button className="btn-qr btn-qr-print" id="btn-print" onClick={() => window.print()} disabled={status !== "ready"} style={status !== "ready" ? { opacity: 0.5, cursor: "not-allowed" } : undefined}>
 							<i className="fa-solid fa-print"></i> Imprimer le QR Code
 						</button>
 						<a href="/" className="btn-qr btn-qr-back">
