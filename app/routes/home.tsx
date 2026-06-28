@@ -1245,7 +1245,16 @@ export default function Home() {
 			{/* ═══════════════════════════════════════
 			    SECTION: HERO
 			    ═══════════════════════════════════════ */}
-			<section className="section-hero" id="section-hero">
+			<section
+				className="section-hero"
+				id="section-hero"
+				onMouseMove={(e) => {
+					const rect = e.currentTarget.getBoundingClientRect();
+					e.currentTarget.style.setProperty("--glow-x", `${e.clientX - rect.left}px`);
+					e.currentTarget.style.setProperty("--glow-y", `${e.clientY - rect.top}px`);
+				}}
+			>
+				<div className="hero-cursor-glow" aria-hidden="true" />
 				<div className="hero-content-wrap">
 					{/* Left: Headline + CTAs — stagger animation when mounted */}
 					{isMounted && !prefersReducedMotion ? (
