@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Pages fonctionnelles / privées — pas de valeur SEO, on évite l'indexation
+Disallow: /merchant
+Disallow: /demo
+Disallow: /play
+Disallow: /qr-code
+Disallow: /auth/
+
+Sitemap: https://revioza.com/sitemap.xml
