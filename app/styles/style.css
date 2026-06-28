@@ -2249,21 +2249,6 @@ footer {
         100% 100%;
 }
 
-/* Variables animables pour que la grille rouge "poursuive" le curseur avec un léger délai */
-@property --glow-x {
-    syntax: '<length-percentage>';
-    inherits: true;
-    initial-value: 50%;
-}
-@property --glow-y {
-    syntax: '<length-percentage>';
-    inherits: true;
-    initial-value: 30%;
-}
-.section-hero {
-    transition: --glow-x 0.35s var(--ease-premium), --glow-y 0.35s var(--ease-premium);
-}
-
 .section-hero::before {
     content: '';
     position: absolute;
