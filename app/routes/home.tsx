@@ -300,7 +300,7 @@ export default function Home() {
 						yPercent: () => gsap.utils.random(-55, 55),
 						scale: () => gsap.utils.random(0.7, 1.6),
 						rotation: () => gsap.utils.random(-50, 50),
-						duration: () => gsap.utils.random(3, 6),
+						duration: () => gsap.utils.random(2, 4),
 						ease: "sine.inOut",
 						repeat: -1,
 						yoyo: true,
@@ -1417,6 +1417,14 @@ export default function Home() {
 			exit={{ opacity: 0, y: -20 }}
 			transition={{ duration: 0.4, ease: "easeInOut" }}
 		>
+			{/* Filtre SVG : déforme les nappes d'aurora en fumée irrégulière */}
+			<svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+				<filter id="aurora-smoke">
+					<feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves={2} seed={7} result="noise" />
+					<feDisplacementMap in="SourceGraphic" in2="noise" scale={260} xChannelSelector="R" yChannelSelector="G" />
+				</filter>
+			</svg>
+
 			{/* NAV */}
 			<header>
 				<div className="header-container">

@@ -25,7 +25,9 @@ Légende des types :
 
 L'aurora (#1) est appliquée **une rubrique sur deux** : **"Comment ça marche", "Fonctionnalités", "Des tarifs simples"** (pas le hero, pas la démo, pas les avis — pour casser la symétrie).
 Les nappes se déplacent **aléatoirement et en continu** (mouvement autonome via GSAP, amplitude large + `repeatRefresh`).
+Leur forme irrégulière "fumée" vient d'un filtre SVG `#aurora-smoke` (`feTurbulence` + `feDisplacementMap`, défini en haut de `home.tsx`) appliqué via `filter: url(#aurora-smoke)` sur `.aurora-blob`.
 Pour l'enlever d'une section : supprimer le `{renderAuroraBg()}` correspondant + remettre son ancien `background` dans style.css.
+Pour une forme ronde "classique" : retirer `url(#aurora-smoke)` du `filter` de `.aurora-blob`.
 
 ---
 
