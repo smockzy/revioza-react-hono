@@ -231,6 +231,78 @@ export default function Home() {
 		return () => observer.disconnect();
 	}, [isMounted]);
 
+	// GSAP — animations d'ambiance + reveals au scroll (additif, ne double pas les reveals existants)
+	useEffect(() => {
+		if (!isMounted || prefersReducedMotion) return;
+		let ctx: ReturnType<typeof gsap.context> | undefined;
+		let cancelled = false;
+
+		import("gsap/ScrollTrigger").then(({ ScrollTrigger }) => {
+			if (cancelled) return;
+			gsap.registerPlugin(ScrollTrigger);
+
+			ctx = gsap.context(() => {
+				// Icônes qui flottent doucement (étapes + fonctionnalités)
+				gsap.to(".how-step-icon i, .feature-icon i", {
+					y: -7,
+					duration: 1.9,
+					ease: "sine.inOut",
+					yoyo: true,
+					repeat: -1,
+					stagger: { each: 0.25, from: "random" },
+				});
+
+				// Flèches de liaison "qui coulent" vers la droite
+				gsap.to(".how-step-connector i", {
+					x: 6,
+					duration: 1,
+					ease: "sine.inOut",
+					yoyo: true,
+					repeat: -1,
+					stagger: 0.2,
+				});
+
+				// Séparateurs qui se déploient à l'arrivée dans le viewport
+				gsap.utils.toArray<HTMLElement>(".section-divider").forEach((el) => {
+					gsap.from(el, {
+						scaleX: 0,
+						transformOrigin: "50% 50%",
+						duration: 1,
+						ease: "power2.out",
+						scrollTrigger: { trigger: el, start: "top 92%" },
+					});
+				});
+
+				// Colonnes du footer qui montent en cascade
+				gsap.from(".footer-new-container > div", {
+					y: 32,
+					opacity: 0,
+					duration: 0.7,
+					ease: "power2.out",
+					stagger: 0.12,
+					scrollTrigger: { trigger: "footer", start: "top 85%" },
+				});
+
+				// Badge "offre" qui respire dans les tarifs
+				gsap.to(".featured-ribbon", {
+					scale: 1.05,
+					duration: 1.4,
+					ease: "sine.inOut",
+					yoyo: true,
+					repeat: -1,
+					transformOrigin: "50% 50%",
+				});
+
+				ScrollTrigger.refresh();
+			});
+		});
+
+		return () => {
+			cancelled = true;
+			ctx?.revert();
+		};
+	}, [isMounted, prefersReducedMotion]);
+
 	// Render wheel whenever prizes change, or when step changes (demo simulator canvas)
 	useEffect(() => {
 		const canvas = canvasRef.current;
