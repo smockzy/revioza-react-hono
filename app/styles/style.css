@@ -2491,6 +2491,16 @@ footer {
     align-items: flex-start;
 }
 
+/* Illustration du hero (téléphone + roue sur comptoir) */
+.hero-illustration {
+    width: 100%;
+    max-width: 430px;
+    height: auto;
+    display: block;
+    border-radius: 20px;
+    filter: drop-shadow(0 25px 55px rgba(0, 0, 0, 0.5));
+}
+
 /* Hero phone: scaled down, no bottom margin hack */
 .hero-phone.phone-simulator-wrapper {
     position: relative;

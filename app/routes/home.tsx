@@ -1323,7 +1323,7 @@ export default function Home() {
 						</div>
 					)}
 
-					{/* Right: Static phone simulator — entry animation only, no floating */}
+					{/* Right: Hero illustration — phone showing the wheel on a neutral counter */}
 					{isMounted && !prefersReducedMotion ? (
 						<motion.div
 							className="hero-right"
@@ -1331,11 +1331,21 @@ export default function Home() {
 							initial="hidden"
 							animate="visible"
 						>
-							{renderPhoneSimulator(true)}
+							<img
+								className="hero-illustration"
+								src="/assets/hero_wheel_counter.png"
+								alt="Un client fait tourner la roue Revioza sur son smartphone après avoir scanné le QR code posé sur un comptoir"
+								loading="eager"
+							/>
 						</motion.div>
 					) : (
 						<div className="hero-right">
-							{renderPhoneSimulator(true)}
+							<img
+								className="hero-illustration"
+								src="/assets/hero_wheel_counter.png"
+								alt="Un client fait tourner la roue Revioza sur son smartphone après avoir scanné le QR code posé sur un comptoir"
+								loading="eager"
+							/>
 						</div>
 					)}
 				</div>
