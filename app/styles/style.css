@@ -2491,14 +2491,145 @@ footer {
     align-items: flex-start;
 }
 
-/* Illustration du hero (téléphone + roue sur comptoir) */
-.hero-illustration {
-    width: 100%;
-    max-width: 430px;
-    height: auto;
+/* ── Roue décorative du hero ───────────────────────────── */
+.hero-wheel-stage {
+    position: relative;
+    width: 340px;
+    max-width: 100%;
+    height: 400px;
+    margin: 0 auto;
+}
+
+/* Lueur rouge pulsée derrière la roue */
+.hero-wheel-glow {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 300px;
+    height: 300px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(229, 9, 20, 0.4) 0%, transparent 70%);
+    filter: blur(35px);
+    animation: hero-wheel-glow-pulse 4.5s ease-in-out infinite;
+}
+
+@keyframes hero-wheel-glow-pulse {
+    0%, 100% { opacity: 0.55; transform: translateX(-50%) scale(1); }
+    50%      { opacity: 1;    transform: translateX(-50%) scale(1.08); }
+}
+
+/* La roue tourne lentement sur elle-même */
+.hero-wheel-spin {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 300px;
+    height: 300px;
+    transform: translateX(-50%);
+    animation: hero-wheel-spin 22s linear infinite;
+    filter: drop-shadow(0 12px 30px rgba(0, 0, 0, 0.55));
+}
+
+.hero-wheel-canvas {
     display: block;
-    border-radius: 20px;
-    filter: drop-shadow(0 25px 55px rgba(0, 0, 0, 0.5));
+    width: 300px;
+    height: 300px;
+}
+
+@keyframes hero-wheel-spin {
+    from { transform: translateX(-50%) rotate(0deg); }
+    to   { transform: translateX(-50%) rotate(360deg); }
+}
+
+/* Logo fixe au centre (ne tourne pas) */
+.hero-wheel-pin {
+    position: absolute;
+    left: 50%;
+    bottom: 150px;
+    transform: translate(-50%, 50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 3;
+    box-shadow: 0 0 0 4px #0d0d0d, 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+.hero-wheel-pin img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Étoiles révélées au survol (une à une) */
+.hero-wheel-stars {
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 4;
+}
+.hw-star {
+    font-size: 2rem;
+    line-height: 1;
+    color: #ffce3a;
+    opacity: 0;
+    transform: scale(0.2);
+    filter: drop-shadow(0 0 7px rgba(255, 206, 58, 0.6));
+    transition: opacity 0.3s var(--ease-premium);
+}
+
+/* Flèche qui sort de la roue vers les étoiles */
+.hero-wheel-arrow {
+    position: absolute;
+    top: 58px;
+    left: 50%;
+    transform: translate(-50%, 36px);
+    color: var(--primary);
+    font-size: 2rem;
+    opacity: 0;
+    z-index: 4;
+    transition: opacity 0.3s var(--ease-premium);
+    filter: drop-shadow(0 0 8px var(--primary-glow));
+}
+
+/* Séquence au survol : flèche sort, puis les étoiles poppent en cascade */
+.hero-wheel-stage:hover .hero-wheel-arrow {
+    animation: hero-arrow-out 0.5s var(--ease-premium) forwards;
+}
+@keyframes hero-arrow-out {
+    0%   { opacity: 0; transform: translate(-50%, 40px); }
+    60%  { opacity: 1; transform: translate(-50%, -6px); }
+    100% { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.hero-wheel-stage:hover .hw-star {
+    animation: hero-star-pop 0.4s var(--ease-premium) forwards;
+    animation-delay: calc(0.45s + var(--i) * 0.13s);
+}
+@keyframes hero-star-pop {
+    0%   { opacity: 0; transform: scale(0.2); }
+    60%  { opacity: 1; transform: scale(1.25); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Accessibilité : pas de rotation/pulse, révélation instantanée au survol */
+@media (prefers-reduced-motion: reduce) {
+    .hero-wheel-spin,
+    .hero-wheel-glow {
+        animation: none;
+    }
+    .hero-wheel-stage:hover .hero-wheel-arrow,
+    .hero-wheel-stage:hover .hw-star {
+        animation: none;
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    .hero-wheel-stage:hover .hw-star {
+        transform: scale(1);
+    }
 }
 
 /* Hero phone: scaled down, no bottom margin hack */

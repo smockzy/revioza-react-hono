@@ -145,6 +145,8 @@ export default function Home() {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	// Ref to the interactive demo section for smooth scroll
 	const demoSectionRef = useRef<HTMLElement>(null);
+	// Hero wheel canvas (decorative, auto-rotating)
+	const heroWheelRef = useRef<HTMLCanvasElement>(null);
 
 	useEffect(() => setIsMounted(true), []);
 
@@ -235,6 +237,15 @@ export default function Home() {
 		if (!ctx) return;
 		renderWheelCanvas(canvas, ctx, appState.prizes, 270);
 	}, [appState.prizes, appState.currentStep]);
+
+	// Render the decorative hero wheel once mounted
+	useEffect(() => {
+		const canvas = heroWheelRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext("2d");
+		if (!ctx) return;
+		renderWheelCanvas(canvas, ctx, DEFAULT_PRIZES, 300);
+	}, [isMounted]);
 
 	// Timer management
 	useEffect(() => {
@@ -1162,6 +1173,31 @@ export default function Home() {
 	};
 
 	// ─────────────────────────────────────────────────────────────
+	// HERO WHEEL — roue décorative auto-rotative + effet au survol
+	// ─────────────────────────────────────────────────────────────
+	const renderHeroWheel = () => (
+		<div className="hero-wheel-stage">
+			<div className="hero-wheel-stars" aria-hidden="true">
+				{[0, 1, 2, 3, 4].map((i) => (
+					<span key={i} className="hw-star" style={{ "--i": i } as React.CSSProperties}>
+						★
+					</span>
+				))}
+			</div>
+			<div className="hero-wheel-arrow" aria-hidden="true">
+				<i className="fa-solid fa-arrow-up-long"></i>
+			</div>
+			<div className="hero-wheel-glow" aria-hidden="true" />
+			<div className="hero-wheel-spin">
+				<canvas ref={heroWheelRef} className="hero-wheel-canvas" />
+			</div>
+			<div className="hero-wheel-pin" aria-hidden="true">
+				<img src="/assets/logo_icon.png" alt="" />
+			</div>
+		</div>
+	);
+
+	// ─────────────────────────────────────────────────────────────
 	// HERO MOTION VARIANTS
 	// ─────────────────────────────────────────────────────────────
 	const heroContainerVariants = {
@@ -1323,7 +1359,7 @@ export default function Home() {
 						</div>
 					)}
 
-					{/* Right: Hero illustration — phone showing the wheel on a neutral counter */}
+					{/* Right: decorative auto-rotating wheel with hover reveal */}
 					{isMounted && !prefersReducedMotion ? (
 						<motion.div
 							className="hero-right"
@@ -1331,21 +1367,11 @@ export default function Home() {
 							initial="hidden"
 							animate="visible"
 						>
-							<img
-								className="hero-illustration"
-								src="/assets/hero_wheel_counter.png"
-								alt="Un client fait tourner la roue Revioza sur son smartphone après avoir scanné le QR code posé sur un comptoir"
-								loading="eager"
-							/>
+							{renderHeroWheel()}
 						</motion.div>
 					) : (
 						<div className="hero-right">
-							<img
-								className="hero-illustration"
-								src="/assets/hero_wheel_counter.png"
-								alt="Un client fait tourner la roue Revioza sur son smartphone après avoir scanné le QR code posé sur un comptoir"
-								loading="eager"
-							/>
+							{renderHeroWheel()}
 						</div>
 					)}
 				</div>
