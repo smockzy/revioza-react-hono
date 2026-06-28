@@ -40,6 +40,15 @@ interface FeedbackRow {
 	feedback_text: string | null;
 }
 
+// Correspondance code forfait (colonne merchants.plan) → libellé affiché.
+// Ajoute ici tes futurs forfaits au fur et à mesure.
+const PLAN_LABELS: Record<string, string> = {
+	pro: "Plan Pro",
+	starter: "Starter",
+	business: "Business",
+	franchise: "Franchise",
+};
+
 function formatFeedbackDate(iso: string): string {
 	const d = new Date(iso);
 	if (isNaN(d.getTime())) return "";
@@ -124,6 +133,7 @@ export default function Merchant() {
 	const [colorHexLabel, setColorHexLabel] = useState("#e50914");
 	const [statsData, setStatsData] = useState<StatsData>(() => emptyStats());
 	const [statsLoading, setStatsLoading] = useState(true);
+	const [plan, setPlan] = useState("pro");
 
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstanceRef = useRef<unknown>(null);
@@ -192,6 +202,7 @@ export default function Merchant() {
 				return;
 			}
 			if (data) {
+				if (data.plan) setPlan(data.plan);
 				const loaded: MerchantState = {
 					restaurantName: data.restaurant_name,
 					restaurantSub: data.restaurant_sub,
@@ -418,14 +429,18 @@ export default function Merchant() {
 	return (
 		<div className="page-merchant">
 			<div className="app-header">
-				<div className="app-header-spacer">
-					<i className="fa-solid fa-circle-user" style={{ color: "var(--primary)" }}></i>
-				</div>
+				<a href="/" className="app-header-spacer header-home-link" title="Retour à l'accueil">
+					<i className="fa-solid fa-house"></i>
+				</a>
 				<div className="app-header-center">
 					<div className="header-title">Espace Gérant</div>
 					<div className="restaurant-name-bind header-rest-name">{merchantState.restaurantName}</div>
 				</div>
-				<div className="app-header-right" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+				<div className="app-header-right" style={{ display: "flex", gap: "10px", alignItems: "center", width: "auto" }}>
+					<a href="/pricing" className="plan-badge" title="Voir mon forfait actuel">
+						<i className="fa-solid fa-crown"></i>
+						<span className="plan-badge-text">{PLAN_LABELS[plan] ?? plan}</span>
+					</a>
 					<a href="/play" target="_blank" title="Aperçu Client" className="preview-btn" rel="noreferrer">
 						<i className="fa-solid fa-eye"></i>
 					</a>

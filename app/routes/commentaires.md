@@ -6,7 +6,9 @@ git add -A
 git commit -m "ta description"
 git push origin main
 
--------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+
+affiche la navbar quand on est dans l'espace gerant pour que l'on puisse revenir à l'acceuil et voir son forfait actuel
 
 faire en sorte que quand on se connecte avec un compte gerant, sur la navbar notre statut change et affiche "se deconnecter" et "mon espace gérant"
 
