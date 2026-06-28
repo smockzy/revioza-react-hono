@@ -2261,19 +2261,31 @@ footer {
     z-index: 0;
 }
 
-/* Halo qui suit le curseur sur le hero (point 2) — desktop uniquement */
+/* Grille du hero qui s'illumine en rouge autour du curseur (point 2) — desktop uniquement */
 .hero-cursor-glow {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: radial-gradient(
-        340px circle at var(--glow-x, 50%) var(--glow-y, 30%),
-        rgba(229, 9, 20, 0.10) 0%,
-        transparent 65%
+    /* Même grille que .section-hero (40px, origine 0 0) mais en rouge */
+    background-image:
+        linear-gradient(rgba(229, 9, 20, 0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(229, 9, 20, 0.6) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0;
+    /* On ne révèle la grille rouge que dans un disque autour du curseur */
+    -webkit-mask-image: radial-gradient(
+        170px circle at var(--glow-x, 50%) var(--glow-y, 30%),
+        #000 0%,
+        transparent 70%
+    );
+    mask-image: radial-gradient(
+        170px circle at var(--glow-x, 50%) var(--glow-y, 30%),
+        #000 0%,
+        transparent 70%
     );
     opacity: 0;
-    transition: opacity 0.5s var(--ease-premium);
+    transition: opacity 0.4s var(--ease-premium);
 }
 
 .section-hero:hover .hero-cursor-glow {
