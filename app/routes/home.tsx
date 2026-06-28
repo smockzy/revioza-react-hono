@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import gsap from "gsap";
 import { FadeInSection } from "../utils/FadeInSection";
 import type { Route } from "./+types/home";
 import "../styles/style.css";
@@ -147,6 +148,7 @@ export default function Home() {
 	const demoSectionRef = useRef<HTMLElement>(null);
 	// Hero wheel canvas (decorative, auto-rotating)
 	const heroWheelRef = useRef<HTMLCanvasElement>(null);
+	const heroStageRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => setIsMounted(true), []);
 
@@ -1173,13 +1175,66 @@ export default function Home() {
 	};
 
 	// ─────────────────────────────────────────────────────────────
-	// HERO WHEEL — roue décorative auto-rotative + effet au survol
+	// HERO WHEEL — roue décorative auto-rotative + effet au survol (GSAP)
 	// ─────────────────────────────────────────────────────────────
+	const handleWheelEnter = useCallback(() => {
+		const stage = heroStageRef.current;
+		if (!stage) return;
+		const arrow = stage.querySelector(".hero-wheel-arrow");
+		const stars = gsap.utils.toArray<HTMLElement>(stage.querySelectorAll(".hw-star"));
+		gsap.killTweensOf([arrow, ...stars]);
+
+		if (prefersReducedMotion) {
+			gsap.set(arrow, { opacity: 1, xPercent: -50, y: 0 });
+			gsap.set(stars, { opacity: 1, scale: 1 });
+			return;
+		}
+
+		const tl = gsap.timeline();
+		tl.fromTo(
+			arrow,
+			{ y: 38, opacity: 0, xPercent: -50 },
+			{ y: 0, opacity: 1, xPercent: -50, duration: 0.45, ease: "back.out(2.2)" }
+		).fromTo(
+			stars,
+			{ scale: 0, opacity: 0 },
+			{ scale: 1, opacity: 1, duration: 0.5, ease: "back.out(3)", stagger: 0.12 },
+			"-=0.15"
+		);
+	}, [prefersReducedMotion]);
+
+	const handleWheelLeave = useCallback(() => {
+		const stage = heroStageRef.current;
+		if (!stage) return;
+		const arrow = stage.querySelector(".hero-wheel-arrow");
+		const stars = gsap.utils.toArray<HTMLElement>(stage.querySelectorAll(".hw-star"));
+		gsap.killTweensOf([arrow, ...stars]);
+
+		if (prefersReducedMotion) {
+			gsap.set([arrow, ...stars], { opacity: 0 });
+			return;
+		}
+
+		// Bounce out : les étoiles rebondissent puis disparaissent (de la dernière à la première)
+		const tl = gsap.timeline();
+		tl.to(stars, {
+			scale: 0,
+			opacity: 0,
+			duration: 0.45,
+			ease: "back.in(3)",
+			stagger: { each: 0.08, from: "end" },
+		}).to(
+			arrow,
+			{ y: 38, opacity: 0, xPercent: -50, duration: 0.4, ease: "back.in(2.2)" },
+			"-=0.3"
+		);
+	}, [prefersReducedMotion]);
+
 	const renderHeroWheel = () => (
-		<div className="hero-wheel-stage">
+		<div className="hero-wheel-stage" ref={heroStageRef} onMouseEnter={handleWheelEnter} onMouseLeave={handleWheelLeave}>
 			<div className="hero-wheel-stars" aria-hidden="true">
 				{[0, 1, 2, 3, 4].map((i) => (
-					<span key={i} className="hw-star" style={{ "--i": i } as React.CSSProperties}>
+					<span key={i} className="hw-star">
 						★
 					</span>
 				))}

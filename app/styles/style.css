@@ -2571,6 +2571,7 @@ footer {
     gap: 10px;
     z-index: 4;
 }
+/* États cachés de base — l'apparition/disparition est pilotée par GSAP */
 .hw-star {
     font-size: 2rem;
     line-height: 1;
@@ -2578,7 +2579,6 @@ footer {
     opacity: 0;
     transform: scale(0.2);
     filter: drop-shadow(0 0 7px rgba(255, 206, 58, 0.6));
-    transition: opacity 0.3s var(--ease-premium);
 }
 
 /* Flèche qui sort de la roue vers les étoiles */
@@ -2586,49 +2586,19 @@ footer {
     position: absolute;
     top: 58px;
     left: 50%;
-    transform: translate(-50%, 36px);
+    transform: translateX(-50%);
     color: var(--primary);
     font-size: 2rem;
     opacity: 0;
     z-index: 4;
-    transition: opacity 0.3s var(--ease-premium);
     filter: drop-shadow(0 0 8px var(--primary-glow));
 }
 
-/* Séquence au survol : flèche sort, puis les étoiles poppent en cascade */
-.hero-wheel-stage:hover .hero-wheel-arrow {
-    animation: hero-arrow-out 0.5s var(--ease-premium) forwards;
-}
-@keyframes hero-arrow-out {
-    0%   { opacity: 0; transform: translate(-50%, 40px); }
-    60%  { opacity: 1; transform: translate(-50%, -6px); }
-    100% { opacity: 1; transform: translate(-50%, 0); }
-}
-
-.hero-wheel-stage:hover .hw-star {
-    animation: hero-star-pop 0.4s var(--ease-premium) forwards;
-    animation-delay: calc(0.45s + var(--i) * 0.13s);
-}
-@keyframes hero-star-pop {
-    0%   { opacity: 0; transform: scale(0.2); }
-    60%  { opacity: 1; transform: scale(1.25); }
-    100% { opacity: 1; transform: scale(1); }
-}
-
-/* Accessibilité : pas de rotation/pulse, révélation instantanée au survol */
+/* Accessibilité : pas de rotation/pulse (le survol est géré par GSAP) */
 @media (prefers-reduced-motion: reduce) {
     .hero-wheel-spin,
     .hero-wheel-glow {
         animation: none;
-    }
-    .hero-wheel-stage:hover .hero-wheel-arrow,
-    .hero-wheel-stage:hover .hw-star {
-        animation: none;
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
-    .hero-wheel-stage:hover .hw-star {
-        transform: scale(1);
     }
 }
 
