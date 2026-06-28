@@ -3124,7 +3124,9 @@ footer {
 }
 
 .section-demo {
-    background: linear-gradient(180deg, transparent 0%, rgba(229, 9, 20, 0.025) 50%, transparent 100%), #0d0d0d;
+    background: #050506;
+    position: relative;
+    overflow: hidden;
 }
 
 .section-features {
@@ -3136,11 +3138,56 @@ footer {
 }
 
 .section-pricing {
-    background: linear-gradient(180deg, transparent 0%, rgba(229, 9, 20, 0.02) 50%, transparent 100%), #111111;
+    background: #050506;
+    position: relative;
+    overflow: hidden;
 }
 
 footer {
     background: #0d0d0d !important;
+}
+
+/* ── Aurora rouge "fumée" (fond animé des sections sombres) ── */
+.section-aurora {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+.aurora-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    mix-blend-mode: screen;
+    will-change: transform;
+    opacity: 0.85;
+}
+.aurora-blob.blob-1 {
+    width: 46vw; height: 38vw;
+    top: -8%; left: -6%;
+    background: radial-gradient(circle at 50% 50%, rgba(229, 9, 20, 0.55) 0%, rgba(229, 9, 20, 0) 65%);
+}
+.aurora-blob.blob-2 {
+    width: 40vw; height: 46vw;
+    top: 18%; right: -12%;
+    background: radial-gradient(circle at 50% 50%, rgba(198, 18, 31, 0.5) 0%, rgba(198, 18, 31, 0) 65%);
+}
+.aurora-blob.blob-3 {
+    width: 38vw; height: 30vw;
+    bottom: -14%; left: 22%;
+    background: radial-gradient(circle at 50% 50%, rgba(255, 46, 59, 0.4) 0%, rgba(255, 46, 59, 0) 65%);
+}
+.aurora-blob.blob-4 {
+    width: 30vw; height: 34vw;
+    top: 32%; left: 38%;
+    background: radial-gradient(circle at 50% 50%, rgba(139, 0, 8, 0.6) 0%, rgba(139, 0, 8, 0) 70%);
+}
+@media (max-width: 768px) {
+    .aurora-blob { filter: blur(45px); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .aurora-blob { opacity: 0.5; }
 }
 
 /* Ensure page contents render above the global noise layer */

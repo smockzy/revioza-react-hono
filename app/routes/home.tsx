@@ -293,6 +293,22 @@ export default function Home() {
 					transformOrigin: "50% 50%",
 				});
 
+				// Aurora "fumée" : chaque nappe dérive indépendamment, de façon organique
+				gsap.utils.toArray<HTMLElement>(".aurora-blob").forEach((blob, i) => {
+					gsap.to(blob, {
+						xPercent: () => gsap.utils.random(-28, 28),
+						yPercent: () => gsap.utils.random(-28, 28),
+						scale: () => gsap.utils.random(0.8, 1.45),
+						rotation: () => gsap.utils.random(-35, 35),
+						duration: () => gsap.utils.random(9, 18),
+						ease: "sine.inOut",
+						repeat: -1,
+						yoyo: true,
+						repeatRefresh: true,
+						delay: i * 0.4,
+					});
+				});
+
 				ScrollTrigger.refresh();
 			});
 		});
@@ -1246,6 +1262,16 @@ export default function Home() {
 		);
 	};
 
+	// Fond "aurora fumée" rouge (sections sombres) — animé indépendamment via GSAP
+	const renderAuroraBg = () => (
+		<div className="section-aurora" aria-hidden="true">
+			<span className="aurora-blob blob-1" />
+			<span className="aurora-blob blob-2" />
+			<span className="aurora-blob blob-3" />
+			<span className="aurora-blob blob-4" />
+		</div>
+	);
+
 	// ─────────────────────────────────────────────────────────────
 	// HERO WHEEL — roue décorative auto-rotative + effet au survol (GSAP)
 	// ─────────────────────────────────────────────────────────────
@@ -1556,6 +1582,7 @@ export default function Home() {
 			    SECTION: DÉMO INTERACTIVE
 			    ═══════════════════════════════════════ */}
 			<section className="section-demo" id="section-demo" ref={demoSectionRef}>
+				{renderAuroraBg()}
 				<div className="section-inner">
 					<h2 className="section-heading reveal reveal-slide-up">
 						Testez <span>l&apos;expérience client</span> en direct
@@ -1731,6 +1758,7 @@ export default function Home() {
 			    SECTION: PRICING (inline)
 			    ═══════════════════════════════════════ */}
 			<section className="section-pricing" id="section-pricing">
+				{renderAuroraBg()}
 				<div className="section-inner">
 					<h2 className="section-heading reveal reveal-slide-up">
 						Des tarifs simples, <span>sans engagement</span>
