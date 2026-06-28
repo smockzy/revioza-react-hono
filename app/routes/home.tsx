@@ -300,7 +300,7 @@ export default function Home() {
 						yPercent: () => gsap.utils.random(-55, 55),
 						scale: () => gsap.utils.random(0.7, 1.6),
 						rotation: () => gsap.utils.random(-50, 50),
-						duration: () => gsap.utils.random(7, 13),
+						duration: () => gsap.utils.random(3, 6),
 						ease: "sine.inOut",
 						repeat: -1,
 						yoyo: true,
@@ -1305,8 +1305,6 @@ export default function Home() {
 		<div className="section-aurora" aria-hidden="true">
 			<span className="aurora-blob blob-1" />
 			<span className="aurora-blob blob-2" />
-			<span className="aurora-blob blob-3" />
-			<span className="aurora-blob blob-4" />
 		</div>
 	);
 
