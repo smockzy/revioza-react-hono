@@ -23,7 +23,8 @@ Légende des types :
 | 2 | **Halos qui dérivent** (aurora de fond) | CSS | `body::after` + `@keyframes aurora-drift` | Supprimer `animation: aurora-drift...` |
 | 3 | **Grain de pellicule** (texture qui vibre) | CSS | `body::before` + `@keyframes grain-shift` | Supprimer `animation: grain-shift...` |
 
-L'aurora (#1) est appliquée dans : **hero, "Comment ça marche", "Testez l'expérience", "Fonctionnalités", "Ils nous font confiance", "Des tarifs simples"**.
+L'aurora (#1) est appliquée **une rubrique sur deux** : **"Comment ça marche", "Fonctionnalités", "Des tarifs simples"** (pas le hero, pas la démo, pas les avis — pour casser la symétrie).
+Les nappes se déplacent **aléatoirement et en continu** (mouvement autonome via GSAP, amplitude large + `repeatRefresh`).
 Pour l'enlever d'une section : supprimer le `{renderAuroraBg()}` correspondant + remettre son ancien `background` dans style.css.
 
 ---
@@ -36,8 +37,9 @@ Pour l'enlever d'une section : supprimer le `{renderAuroraBg()}` correspondant +
 | 5 | **Entrée du hero en cascade** (titre, texte, CTA, roue) | Framer | `motion.*` + `heroContainerVariants`/`heroItemVariants`/`heroPhoneVariants` | Remplacer les `motion.div` par des `div` simples |
 | 6 | **Roue qui tourne + lueur qui pulse** | CSS | `@keyframes hero-wheel-spin` / `hero-wheel-glow-pulse` | Supprimer les `animation:` sur `.hero-wheel-spin` / `.hero-wheel-glow` |
 | 7 | **Survol roue : flèche sort + étoiles poppent + bounce out** | GSAP | `handleWheelEnter` / `handleWheelLeave` (home.tsx) | Retirer `onMouseEnter`/`onMouseLeave` sur `.hero-wheel-stage` |
-| 8 | **Parallaxe de la roue** (bouge au scroll) | GSAP | bloc "Parallaxe de la roue du hero" | Supprimer ce bloc |
 | 9 | **Compteur +15 000** (s'incrémente) | GSAP | `.count-up` + bloc "Compteurs" | Remplacer `<span className="count-up"...>` par le texte fixe `15 000` |
+
+> _(#8 parallaxe de la roue : supprimée.)_
 
 ---
 
@@ -46,7 +48,7 @@ Pour l'enlever d'une section : supprimer le `{renderAuroraBg()}` correspondant +
 | # | Nom | Type | Où | Pour retirer |
 |---|-----|------|----|--------------|
 | 10 | **Titre qui apparaît** | Framer | `FadeInSection` autour du `<h2>` | Retirer le `FadeInSection` |
-| 11 | **Cartes : entrée 3D** (slide + scale + rotateX, en cascade) | GSAP | bloc "Entrées musclées des cartes étapes" | Supprimer ce bloc (les cartes restent visibles) |
+| 11 | **Cartes : entrée** (slide + scale + cascade, **sans 3D**) | GSAP | bloc "Entrées des cartes étapes" | Supprimer ce bloc (les cartes restent visibles) |
 | 12 | **Icônes qui flottent** | GSAP | bloc "Icônes qui flottent" (`.how-step-icon i`) | Retirer `.how-step-icon i` du sélecteur |
 | 13 | **Flèches de liaison qui coulent** | GSAP | bloc "Flèches de liaison" (`.how-step-connector i`) | Supprimer ce bloc |
 | 14 | **Cartes : survol qui soulève** | CSS | `.how-step-card:hover` | Supprimer la règle `:hover` |
@@ -99,9 +101,11 @@ Pour l'enlever d'une section : supprimer le `{renderAuroraBg()}` correspondant +
 |---|-----|------|----|--------------|
 | 27 | **Séparateurs qui se déploient au scroll** | GSAP | bloc "Séparateurs" (`.section-divider`) | Supprimer ce bloc |
 | 28 | **Colonnes du footer en cascade** | GSAP | bloc "Colonnes du footer" | Supprimer ce bloc |
-| 29 | **Parallaxe des titres de section** | GSAP | bloc "Parallaxe douce des titres" | Supprimer ce bloc |
 | 30 | **Fondu d'entrée de la page** | Framer | `motion.div className="page-landing"` | Remplacer par une `div` |
 | 31 | **Système de reveal générique** | Observer | `useEffect` "Scroll Reveal Observer" + CSS `.reveal` | Retirer les classes `.reveal` voulues |
+| 32 | **Lumière qui traverse les lignes de transition** | CSS | `.section-divider::after` + `@keyframes divider-light` | Supprimer la règle `::after` |
+
+> _(#29 parallaxe des titres : supprimée.)_
 
 ---
 

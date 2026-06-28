@@ -296,25 +296,24 @@ export default function Home() {
 				// Aurora "fumée" : chaque nappe dérive indépendamment, de façon organique
 				gsap.utils.toArray<HTMLElement>(".aurora-blob").forEach((blob, i) => {
 					gsap.to(blob, {
-						xPercent: () => gsap.utils.random(-28, 28),
-						yPercent: () => gsap.utils.random(-28, 28),
-						scale: () => gsap.utils.random(0.8, 1.45),
-						rotation: () => gsap.utils.random(-35, 35),
-						duration: () => gsap.utils.random(9, 18),
+						xPercent: () => gsap.utils.random(-70, 70),
+						yPercent: () => gsap.utils.random(-55, 55),
+						scale: () => gsap.utils.random(0.7, 1.6),
+						rotation: () => gsap.utils.random(-50, 50),
+						duration: () => gsap.utils.random(7, 13),
 						ease: "sine.inOut",
 						repeat: -1,
 						yoyo: true,
 						repeatRefresh: true,
-						delay: i * 0.4,
+						delay: i * 0.3,
 					});
 				});
 
-				// Entrées musclées des cartes "étapes" (3D + scale + stagger)
+				// Entrées des cartes "étapes" (slide + scale + stagger, sans 3D)
 				gsap.from(".how-step-card", {
 					y: 60,
 					opacity: 0,
-					scale: 0.9,
-					rotateX: -14,
+					scale: 0.92,
 					duration: 0.7,
 					ease: "power3.out",
 					stagger: 0.15,
@@ -346,32 +345,6 @@ export default function Home() {
 							el.textContent = Math.floor(counter.val).toLocaleString("fr-FR");
 						},
 					});
-				});
-
-				// Parallaxe douce des titres de section
-				gsap.utils.toArray<HTMLElement>(".section-heading").forEach((h) => {
-					gsap.to(h, {
-						yPercent: -16,
-						ease: "none",
-						scrollTrigger: {
-							trigger: h,
-							start: "top bottom",
-							end: "bottom top",
-							scrub: true,
-						},
-					});
-				});
-
-				// Parallaxe de la roue du hero
-				gsap.to(".hero-wheel-stage", {
-					yPercent: 16,
-					ease: "none",
-					scrollTrigger: {
-						trigger: ".section-hero",
-						start: "top top",
-						end: "bottom top",
-						scrub: true,
-					},
 				});
 
 				ScrollTrigger.refresh();
@@ -1509,7 +1482,6 @@ export default function Home() {
 				}}
 			>
 				<div className="hero-cursor-glow" aria-hidden="true" />
-				{renderAuroraBg()}
 				<div className="hero-content-wrap">
 					{/* Left: Headline + CTAs — stagger animation when mounted */}
 					{isMounted && !prefersReducedMotion ? (
@@ -1643,7 +1615,6 @@ export default function Home() {
 			    SECTION: DÉMO INTERACTIVE
 			    ═══════════════════════════════════════ */}
 			<section className="section-demo" id="section-demo" ref={demoSectionRef}>
-				{renderAuroraBg()}
 				<div className="section-inner">
 					<h2 className="section-heading reveal reveal-slide-up">
 						Testez <span>l&apos;expérience client</span> en direct
@@ -1760,7 +1731,6 @@ export default function Home() {
 			    SECTION: SOCIAL PROOF
 			    ═══════════════════════════════════════ */}
 			<section className="section-social" id="section-social">
-				{renderAuroraBg()}
 				<div className="section-inner">
 					<h2 className="section-heading reveal reveal-slide-up">
 						Ils nous font <span>confiance</span>

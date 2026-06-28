@@ -2663,7 +2663,6 @@ footer {
     gap: 1.5rem;
     align-items: start;
     margin-top: 0;
-    perspective: 1200px;
 }
 
 @media (max-width: 900px) {
@@ -3128,9 +3127,7 @@ footer {
 }
 
 .section-demo {
-    background: #050506;
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(180deg, transparent 0%, rgba(229, 9, 20, 0.025) 50%, transparent 100%), #0d0d0d;
 }
 
 .section-features {
@@ -3140,9 +3137,7 @@ footer {
 }
 
 .section-social {
-    background: #050506;
-    position: relative;
-    overflow: hidden;
+    background: #0d0d0d;
 }
 
 .section-pricing {
@@ -3219,6 +3214,39 @@ footer {
     );
     border: none;
     margin: 0;
+    position: relative;
+}
+
+/* Lumière qui traverse la ligne de transition entre chaque rubrique */
+.section-divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translate(0, -50%);
+    height: 2px;
+    width: 200px;
+    border-radius: 2px;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.95) 50%,
+        transparent 100%
+    );
+    box-shadow: 0 0 14px 2px rgba(229, 9, 20, 0.8);
+    animation: divider-light 6s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes divider-light {
+    0% { left: -200px; opacity: 0; }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-divider::after { animation: none; opacity: 0; }
 }
 
 /* Features grid visual additions */
