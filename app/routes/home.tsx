@@ -1421,7 +1421,7 @@ export default function Home() {
 			<svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
 				<filter id="aurora-smoke">
 					<feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves={2} seed={7} result="noise" />
-					<feDisplacementMap in="SourceGraphic" in2="noise" scale={260} xChannelSelector="R" yChannelSelector="G" />
+					<feDisplacementMap in="SourceGraphic" in2="noise" scale={340} xChannelSelector="R" yChannelSelector="G" />
 				</filter>
 			</svg>
 
