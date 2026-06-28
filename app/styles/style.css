@@ -704,6 +704,7 @@ main {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
+    perspective: 1200px;
 }
 
 .feature-card {
@@ -2662,6 +2663,7 @@ footer {
     gap: 1.5rem;
     align-items: start;
     margin-top: 0;
+    perspective: 1200px;
 }
 
 @media (max-width: 900px) {
@@ -3120,7 +3122,9 @@ footer {
 
 /* Alternating background colors for sections */
 .section-how {
-    background: #111111;
+    background: #050506;
+    position: relative;
+    overflow: hidden;
 }
 
 .section-demo {
@@ -3130,11 +3134,15 @@ footer {
 }
 
 .section-features {
-    background: #111111;
+    background: #050506;
+    position: relative;
+    overflow: hidden;
 }
 
 .section-social {
-    background: #0d0d0d;
+    background: #050506;
+    position: relative;
+    overflow: hidden;
 }
 
 .section-pricing {

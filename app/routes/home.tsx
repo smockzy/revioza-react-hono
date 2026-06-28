@@ -309,6 +309,71 @@ export default function Home() {
 					});
 				});
 
+				// Entrées musclées des cartes "étapes" (3D + scale + stagger)
+				gsap.from(".how-step-card", {
+					y: 60,
+					opacity: 0,
+					scale: 0.9,
+					rotateX: -14,
+					duration: 0.7,
+					ease: "power3.out",
+					stagger: 0.15,
+					scrollTrigger: { trigger: ".how-steps", start: "top 80%" },
+				});
+
+				// Entrées musclées des cartes "fonctionnalités"
+				gsap.from(".feature-card", {
+					y: 60,
+					opacity: 0,
+					scale: 0.9,
+					rotateX: -10,
+					duration: 0.6,
+					ease: "power3.out",
+					stagger: 0.12,
+					scrollTrigger: { trigger: ".features-grid", start: "top 82%" },
+				});
+
+				// Compteurs qui s'incrémentent à l'arrivée à l'écran
+				gsap.utils.toArray<HTMLElement>(".count-up").forEach((el) => {
+					const target = Number(el.dataset.target || "0");
+					const counter = { val: 0 };
+					gsap.to(counter, {
+						val: target,
+						duration: 2,
+						ease: "power1.out",
+						scrollTrigger: { trigger: el, start: "top 92%" },
+						onUpdate: () => {
+							el.textContent = Math.floor(counter.val).toLocaleString("fr-FR");
+						},
+					});
+				});
+
+				// Parallaxe douce des titres de section
+				gsap.utils.toArray<HTMLElement>(".section-heading").forEach((h) => {
+					gsap.to(h, {
+						yPercent: -16,
+						ease: "none",
+						scrollTrigger: {
+							trigger: h,
+							start: "top bottom",
+							end: "bottom top",
+							scrub: true,
+						},
+					});
+				});
+
+				// Parallaxe de la roue du hero
+				gsap.to(".hero-wheel-stage", {
+					yPercent: 16,
+					ease: "none",
+					scrollTrigger: {
+						trigger: ".section-hero",
+						start: "top top",
+						end: "bottom top",
+						scrub: true,
+					},
+				});
+
 				ScrollTrigger.refresh();
 			});
 		});
@@ -1444,6 +1509,7 @@ export default function Home() {
 				}}
 			>
 				<div className="hero-cursor-glow" aria-hidden="true" />
+				{renderAuroraBg()}
 				<div className="hero-content-wrap">
 					{/* Left: Headline + CTAs — stagger animation when mounted */}
 					{isMounted && !prefersReducedMotion ? (
@@ -1483,7 +1549,7 @@ export default function Home() {
 							<motion.div className="hero-social-proof-mini" variants={heroItemVariants}>
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+15 000 avis Google collectés pour nos commerces partenaires</span>
+									<span>+<span className="count-up" data-target="15000">0</span> avis Google collectés pour nos commerces partenaires</span>
 									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</motion.div>
@@ -1505,7 +1571,7 @@ export default function Home() {
 							<div className="hero-social-proof-mini">
 								<div className="hero-mini-stars">★★★★★</div>
 								<div className="hero-social-proof-text-col">
-									<span>+15 000 avis Google collectés pour nos commerces partenaires</span>
+									<span>+<span className="count-up" data-target="15000">0</span> avis Google collectés pour nos commerces partenaires</span>
 									<div className="hero-social-proof-invite">Rejoignez-les dès aujourd&apos;hui</div>
 								</div>
 							</div>
@@ -1536,6 +1602,7 @@ export default function Home() {
 			    SECTION: COMMENT ÇA MARCHE
 			    ═══════════════════════════════════════ */}
 			<section className="section-how" id="section-how">
+				{renderAuroraBg()}
 				<div className="section-inner">
 					<FadeInSection delay={0}>
 						<h2 className="section-heading">
@@ -1546,32 +1613,26 @@ export default function Home() {
 						</p>
 					</FadeInSection>
 					<div className="how-steps">
-						<FadeInSection delay={0}>
-							<div className="how-step-card">
-								<div className="how-step-num">01</div>
-								<div className="how-step-icon"><i className="fa-solid fa-sliders"></i></div>
-								<h3>Configurez votre roue</h3>
-								<p>En 2 minutes, personnalisez vos lots, votre identité visuelle et votre lien Google. Votre QR code unique est prêt à imprimer.</p>
-							</div>
-						</FadeInSection>
+						<div className="how-step-card">
+							<div className="how-step-num">01</div>
+							<div className="how-step-icon"><i className="fa-solid fa-sliders"></i></div>
+							<h3>Configurez votre roue</h3>
+							<p>En 2 minutes, personnalisez vos lots, votre identité visuelle et votre lien Google. Votre QR code unique est prêt à imprimer.</p>
+						</div>
 						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
-						<FadeInSection delay={0.15}>
-							<div className="how-step-card">
-								<div className="how-step-num">02</div>
-								<div className="how-step-icon"><i className="fa-solid fa-qrcode"></i></div>
-								<h3>Le client scanne et joue</h3>
-								<p>Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
-							</div>
-						</FadeInSection>
+						<div className="how-step-card">
+							<div className="how-step-num">02</div>
+							<div className="how-step-icon"><i className="fa-solid fa-qrcode"></i></div>
+							<h3>Le client scanne et joue</h3>
+							<p>Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
+						</div>
 						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
-						<FadeInSection delay={0.3}>
-							<div className="how-step-card">
-								<div className="how-step-num">03</div>
-								<div className="how-step-icon"><i className="fa-solid fa-star"></i></div>
-								<h3>Un avis sincère, un lot gagné</h3>
-								<p>Le client laisse son avis Google honnête et récupère son lot en caisse en montrant son ticket. Win-win pour tous.</p>
-							</div>
-						</FadeInSection>
+						<div className="how-step-card">
+							<div className="how-step-num">03</div>
+							<div className="how-step-icon"><i className="fa-solid fa-star"></i></div>
+							<h3>Un avis sincère, un lot gagné</h3>
+							<p>Le client laisse son avis Google honnête et récupère son lot en caisse en montrant son ticket. Win-win pour tous.</p>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -1629,6 +1690,7 @@ export default function Home() {
 			    SECTION: FEATURES
 			    ═══════════════════════════════════════ */}
 			<section className="section-features" id="section-features">
+				{renderAuroraBg()}
 				<div className="section-inner">
 					<FadeInSection delay={0}>
 						<h2 className="section-heading">
@@ -1636,66 +1698,58 @@ export default function Home() {
 						</h2>
 					</FadeInSection>
 					<div className="features-grid">
-						<FadeInSection delay={0}>
-							<div className="feature-card delay-100">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-shield-halved"></i>
-									</div>
-									<span className="feature-metric featured">1 participation / jour</span>
+						<div className="feature-card delay-100">
+							<div className="feature-card-header-row">
+								<div className="feature-icon">
+									<i className="fa-solid fa-shield-halved"></i>
 								</div>
-								<h3>Anti-Triche Avancé</h3>
-								<p>
-									Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour.
-									Tickets de gain éphémères.
-								</p>
+								<span className="feature-metric featured">1 participation / jour</span>
 							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.1}>
-							<div className="feature-card delay-200">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-qrcode"></i>
-									</div>
-									<span className="feature-metric">PDF en 2 min</span>
+							<h3>Anti-Triche Avancé</h3>
+							<p>
+								Connexion Google obligatoire limitant le jeu à 1 participation par personne et par jour.
+								Tickets de gain éphémères.
+							</p>
+						</div>
+						<div className="feature-card delay-200">
+							<div className="feature-card-header-row">
+								<div className="feature-icon">
+									<i className="fa-solid fa-qrcode"></i>
 								</div>
-								<h3>Prêt à Imprimer</h3>
-								<p>
-									Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
-									compte d&apos;établissement.
-								</p>
+								<span className="feature-metric">PDF en 2 min</span>
 							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.2}>
-							<div className="feature-card delay-300">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-chart-line"></i>
-									</div>
-									<span className="feature-metric featured">Temps réel</span>
+							<h3>Prêt à Imprimer</h3>
+							<p>
+								Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
+								compte d&apos;établissement.
+							</p>
+						</div>
+						<div className="feature-card delay-300">
+							<div className="feature-card-header-row">
+								<div className="feature-icon">
+									<i className="fa-solid fa-chart-line"></i>
 								</div>
-								<h3>Statistiques Avancées</h3>
-								<p>
-									Suivez le nombre de scans, de clics Google, les lots distribués et l&apos;évolution
-									globale de votre note moyenne.
-								</p>
+								<span className="feature-metric featured">Temps réel</span>
 							</div>
-						</FadeInSection>
-						<FadeInSection delay={0.3}>
-							<div className="feature-card delay-400">
-								<div className="feature-card-header-row">
-									<div className="feature-icon">
-										<i className="fa-solid fa-unlock"></i>
-									</div>
-									<span className="feature-metric">Sans engagement</span>
+							<h3>Statistiques Avancées</h3>
+							<p>
+								Suivez le nombre de scans, de clics Google, les lots distribués et l&apos;évolution
+								globale de votre note moyenne.
+							</p>
+						</div>
+						<div className="feature-card delay-400">
+							<div className="feature-card-header-row">
+								<div className="feature-icon">
+									<i className="fa-solid fa-unlock"></i>
 								</div>
-								<h3>Résiliable à tout moment</h3>
-								<p>
-									Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un
-									clic, en toute liberté.
-								</p>
+								<span className="feature-metric">Sans engagement</span>
 							</div>
-						</FadeInSection>
+							<h3>Résiliable à tout moment</h3>
+							<p>
+								Aucun engagement de durée. Vous pouvez suspendre ou résilier votre abonnement en un
+								clic, en toute liberté.
+							</p>
+						</div>
 					</div>
 				</div>
 			</section>
@@ -1706,6 +1760,7 @@ export default function Home() {
 			    SECTION: SOCIAL PROOF
 			    ═══════════════════════════════════════ */}
 			<section className="section-social" id="section-social">
+				{renderAuroraBg()}
 				<div className="section-inner">
 					<h2 className="section-heading reveal reveal-slide-up">
 						Ils nous font <span>confiance</span>
