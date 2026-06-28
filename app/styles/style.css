@@ -2249,6 +2249,21 @@ footer {
         100% 100%;
 }
 
+/* Variables animables pour que la grille rouge "poursuive" le curseur avec un léger délai */
+@property --glow-x {
+    syntax: '<length-percentage>';
+    inherits: true;
+    initial-value: 50%;
+}
+@property --glow-y {
+    syntax: '<length-percentage>';
+    inherits: true;
+    initial-value: 30%;
+}
+.section-hero {
+    transition: --glow-x 0.35s var(--ease-premium), --glow-y 0.35s var(--ease-premium);
+}
+
 .section-hero::before {
     content: '';
     position: absolute;
@@ -2284,8 +2299,40 @@ footer {
         #000 0%,
         transparent 70%
     );
+    /* Lueur néon rouge sur les lignes */
+    filter: drop-shadow(0 0 3px rgba(229, 9, 20, 0.7));
     opacity: 0;
     transition: opacity 0.4s var(--ease-premium);
+}
+
+/* Lueurs blanches qui balaient les lignes en diagonale */
+.hero-cursor-glow::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.95) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.95) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: 0 0;
+    /* Intersection : disque autour du curseur ∩ bande diagonale qui se déplace */
+    -webkit-mask-image:
+        radial-gradient(170px circle at var(--glow-x, 50%) var(--glow-y, 30%), #000 0%, transparent 70%),
+        linear-gradient(115deg, transparent 42%, #000 50%, transparent 58%);
+    mask-image:
+        radial-gradient(170px circle at var(--glow-x, 50%) var(--glow-y, 30%), #000 0%, transparent 70%),
+        linear-gradient(115deg, transparent 42%, #000 50%, transparent 58%);
+    -webkit-mask-size: 100% 100%, 300% 300%;
+    mask-size: 100% 100%, 300% 300%;
+    -webkit-mask-composite: source-in;
+    mask-composite: intersect;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+    animation: grid-sweep 3.2s linear infinite;
+}
+
+@keyframes grid-sweep {
+    0%   { -webkit-mask-position: 0 0, 130% 0; mask-position: 0 0, 130% 0; }
+    100% { -webkit-mask-position: 0 0, -130% 0; mask-position: 0 0, -130% 0; }
 }
 
 .section-hero:hover .hero-cursor-glow {
