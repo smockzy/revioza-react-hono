@@ -1110,6 +1110,43 @@ main {
     filter: brightness(0.65) contrast(1.1);
 }
 
+/* Placeholder noir cliquable (accueil) : invite à personnaliser l'image sur /demo */
+.hero-image-placeholder {
+    width: 100%;
+    height: 120px;
+    border-radius: 16px;
+    margin-bottom: 0.5rem;
+    border: 1px dashed var(--border-color);
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    cursor: pointer;
+    text-align: center;
+    padding: 0 0.75rem;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+
+.hero-image-placeholder:hover {
+    border-color: var(--primary);
+    color: #fff;
+    background: #0a0a0a;
+}
+
+.hero-image-placeholder i {
+    font-size: 1.5rem;
+    opacity: 0.7;
+}
+
+.hero-image-placeholder span {
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
 .hero-pizza-overlay {
     position: absolute;
     inset: 0;

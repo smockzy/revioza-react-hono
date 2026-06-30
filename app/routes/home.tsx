@@ -43,8 +43,8 @@ export function meta({ }: Route.MetaArgs) {
 
 const DEFAULT_APP_STATE: AppState = {
 	currentStep: 1,
-	restaurantName: "Bella Napoli",
-	restaurantSub: "Pizzeria",
+	restaurantName: "Votre établissement",
+	restaurantSub: "Votre activité",
 	primaryColor: "#e50914",
 	googleLink: "ChIJN1t_tDeuEmsRUsoyG83VY24",
 	imageUrl: "",
@@ -70,36 +70,36 @@ const FAKE_REVIEWS = [
 	{
 		name: "L'Atelier de Coiffure",
 		city: "Nantes",
-		text: "Installé près du miroir de caisse, le QR code cartonne. Nos clientes adorent faire tourner la roue après leur coupe. On a gagné 45 avis en un mois !",
+		text: "Posé près de la caisse, ça marche super bien. Les clientes adorent jouer après leur coupe. +45 avis en un mois.",
 		avatar: "AC",
 		avatarBg: "#1b3a4b",
 	},
 	{
 		name: "Hôtel Le Grand Large",
 		city: "Saint-Malo",
-		text: "Nous présentons la roue au moment du check-out. C'est une excellente façon de terminer le séjour sur une note ludique. Notre note globale progresse enfin.",
+		text: "On le présente au check-out. Notre note remonte enfin et les clients trouvent ça sympa.",
 		avatar: "HL",
 		avatarBg: "#1b4332",
 	},
 	{
 		name: "Garage du Centre",
 		city: "Strasbourg",
-		text: "Les clients s'ennuient souvent en attendant leur véhicule. La roulette les occupe et nous permet de récolter des avis positifs très facilement.",
+		text: "Parfait pour occuper les clients pendant l'attente. On récolte des avis sans rien forcer.",
 		avatar: "GC",
 		avatarBg: "#581c87",
 	},
 	{
 		name: "Pharmacie de la Mairie",
 		city: "Lille",
-		text: "Une solution discrète et efficace. Les patients apprécient le côté ludique et nous avons doublé notre nombre d'avis en moins de six semaines.",
+		text: "Discret et efficace. On a doublé notre nombre d'avis en quelques semaines.",
 		avatar: "PM",
 		avatarBg: "#b45309",
 	},
 	{
-		name: "Pizzeria Napoli Nostra",
+		name: "Fleuriste Côté Jardin",
 		city: "Marseille",
-		text: "Franchement simple à configurer. En 20 minutes c'était en place. Les clients jouent, l'ambiance est bonne, et les avis s'accumulent. Que du positif.",
-		avatar: "NN",
+		text: "Installé en 20 minutes, rien à configurer. Les clients jouent, les avis montent.",
+		avatar: "CJ",
 		avatarBg: "#881337",
 	},
 ];
@@ -742,8 +742,11 @@ export default function Home() {
 	// ─────────────────────────────────────────────────────────────
 	const renderPhoneSimulator = (isHero: boolean) => {
 		const displayHeroSrc = isHero ? DEFAULT_HERO_IMAGE : heroSrc;
-		const displayName = isHero ? "Bella Napoli" : appState.restaurantName;
-		const displaySub = isHero ? "Pizzeria" : appState.restaurantSub;
+		const displayName = isHero ? "Votre établissement" : appState.restaurantName;
+		const displaySub = isHero ? "Votre activité" : appState.restaurantSub;
+		// Sur l'accueil, l'image n'est pas éditable : on montre un placeholder noir
+		// cliquable qui invite à personnaliser sur /demo (sauf si une image custom existe déjà).
+		const hasCustomImage = !!displayHeroSrc && displayHeroSrc !== DEFAULT_HERO_IMAGE;
 
 		return (
 			<div
@@ -788,14 +791,25 @@ export default function Home() {
 							id={isHero ? "hero-screen-1" : "screen-1"}
 						>
 							<div className="app-screen-content">
-								<div className="hero-pizza-image">
-									<img
-										id={isHero ? "hero-display-img" : "hero-simulator-img"}
-										src={displayHeroSrc}
-										alt={displayName}
-									/>
-									<div className="hero-pizza-overlay"></div>
-								</div>
+								{hasCustomImage ? (
+									<div className="hero-pizza-image">
+										<img
+											id={isHero ? "hero-display-img" : "hero-simulator-img"}
+											src={displayHeroSrc}
+											alt={displayName}
+										/>
+										<div className="hero-pizza-overlay"></div>
+									</div>
+								) : (
+									<a
+										href="/demo"
+										className="hero-image-placeholder"
+										aria-label="Ajouter l'image de votre établissement"
+									>
+										<i className="fa-solid fa-image"></i>
+										<span>Image de votre établissement</span>
+									</a>
+								)}
 								<h2 className="app-title-large">
 									DONNEZ VOTRE AVIS <span>ET TENTEZ DE GAGNER !</span>
 								</h2>
@@ -960,7 +974,7 @@ export default function Home() {
 											style={{ display: appState.rating >= 4 ? "flex" : "none" }}
 										>
 											<i className="fa-solid fa-eye"></i>
-											<span>Le serveur validera visuellement l&apos;avis lors du retrait du lot.</span>
+											<span>Le commerçant validera visuellement l&apos;avis lors du retrait du lot.</span>
 										</div>
 									</div>
 								</div>
@@ -1060,7 +1074,7 @@ export default function Home() {
 										</a>
 										<p className="ticket-redeem-notice">
 											Montrez cet <strong>écran actif</strong> (compte à rebours défilant) ainsi que
-											votre <strong>avis publié</strong> au serveur pour recevoir votre gain !
+											votre <strong>avis publié</strong> au commerçant pour recevoir votre gain !
 										</p>
 									</div>
 								</div>
@@ -1111,7 +1125,7 @@ export default function Home() {
 										</div>
 										<h4 className="phone-alert-title">Redirection simulée</h4>
 										<p className="phone-alert-desc">
-											Le client est redirigé vers l&apos;interface Google Review du restaurant.
+											Le client est redirigé vers l&apos;interface Google Review de l&apos;établissement.
 											<br />
 											<br />
 											<em>
@@ -1603,7 +1617,7 @@ export default function Home() {
 							<div className="how-step-num">02</div>
 							<div className="how-step-icon"><i className="fa-solid fa-qrcode"></i></div>
 							<h3>Le client scanne et joue</h3>
-							<p>Le client scanne le QR code sur sa table, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
+							<p>Le client scanne le QR code sur place, s&apos;authentifie via Google et fait tourner la roue depuis son smartphone — sans friction.</p>
 						</div>
 						<div className="how-step-connector"><i className="fa-solid fa-arrow-right"></i></div>
 						<div className="how-step-card">
@@ -1698,7 +1712,7 @@ export default function Home() {
 							</div>
 							<h3>Prêt à Imprimer</h3>
 							<p>
-								Téléchargez et imprimez votre kit de table de QR codes associés directement à votre
+								Téléchargez et imprimez votre kit de QR codes associés directement à votre
 								compte d&apos;établissement.
 							</p>
 						</div>
@@ -1872,7 +1886,7 @@ export default function Home() {
 									<i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)
 								</li>
 								<li>
-									<i className="fa-solid fa-check"></i> QR Code de table personnalisé prêt à imprimer
+									<i className="fa-solid fa-check"></i> QR Code personnalisé prêt à imprimer
 								</li>
 								<li>
 									<i className="fa-solid fa-check"></i> Filtrage intelligent (retours négatifs en privé)
@@ -1929,8 +1943,8 @@ export default function Home() {
 						</div>
 						<p>
 							Une solution innovante et ludique pour multiplier le bouche-à-oreille et grimper sur les
-							premières places de Google Maps. Conçu spécifiquement pour les pizzerias, tacos, burgers et
-							commerces de proximité.
+							premières places de Google Maps. Conçue pour tous les commerces de proximité — restaurants,
+							salons, boutiques, garages et bien plus.
 						</p>
 						<a href="mailto:contact@revioza.com" className="footer-email-link">
 							<i className="fa-solid fa-envelope"></i> contact@revioza.com
@@ -2189,11 +2203,11 @@ export default function Home() {
 								</h3>
 								<div className="form-group" style={{ textAlign: "left" }}>
 									<label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px", display: "block" }}>Nom du commerce</label>
-									<input type="text" id="register-rest-name" placeholder="Ex: Bella Napoli" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
+									<input type="text" id="register-rest-name" placeholder="Ex: Salon Élégance" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
 								</div>
 								<div className="form-group" style={{ textAlign: "left" }}>
 									<label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px", display: "block" }}>Spécialité / Type</label>
-									<input type="text" id="register-rest-sub" placeholder="Ex: Pizzeria" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
+									<input type="text" id="register-rest-sub" placeholder="Ex: Salon de coiffure" required style={{ width: "100%", padding: "0.75rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }} />
 								</div>
 								<div className="form-group" style={{ textAlign: "left" }}>
 									<label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", marginBottom: "4px", display: "block" }}>Adresse Email</label>

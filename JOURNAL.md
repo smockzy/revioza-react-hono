@@ -8,6 +8,30 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 16:31 — Partie 2 : contenu & neutralité accueil
+
+Sur `feat/refonte-taches` (`app/routes/home.tsx`, `app/styles/style.css`) :
+- **Avis crédibles** : textes raccourcis (longueurs variées, ton plus brut),
+  **initiales conservées** (pas de logos, pas de fautes ajoutées). Le 5ᵉ avis
+  « Pizzeria Napoli Nostra » → « Fleuriste Côté Jardin » pour sortir du tout-resto
+  (avis désormais : coiffure, hôtel, garage, pharmacie, fleuriste).
+- **Exemple par défaut neutralisé** : « Bella Napoli / Pizzeria » →
+  « Votre établissement / Votre activité » (`DEFAULT_APP_STATE` + `renderPhoneSimulator`).
+- **Image du téléphone d'accueil** : l'image pizza est remplacée par un
+  **placeholder noir « Image de votre établissement »** (`.hero-image-placeholder`),
+  cliquable → `/demo`. S'affiche tant qu'aucune image custom n'existe (sinon l'image
+  custom est montrée). NB : l'upload de l'accueil était du code mort (aucun input rendu).
+- **Neutralité du reste de la copie** : « serveur » → « commerçant » (×2),
+  « du restaurant » → « de l'établissement », « sur sa table » → « sur place »,
+  « QR Code de table » → « QR Code », footer « pizzerias, tacos, burgers » →
+  « restaurants, salons, boutiques, garages et bien plus », placeholders du
+  formulaire d'inscription → « Salon Élégance » / « Salon de coiffure ».
+
+⚠️ À faire dans les parties suivantes : reproduire le placeholder noir dans le
+téléphone de `/demo` (Partie 5/6) tant que le gérant n'a pas uploadé son image.
+
+En attente de validation visuelle (Galaxy S23) avant la Partie 3.
+
 ## 2026-06-30 16:17 — Partie 1 : bugs visuels accueil (branche `feat/refonte-taches`)
 
 Lancement de la refonte des 8 parties sur la branche **`feat/refonte-taches`**
