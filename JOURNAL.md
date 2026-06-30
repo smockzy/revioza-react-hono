@@ -8,6 +8,24 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 17:50 — Partie 3 (suite) : header qui déborde sur mobile
+
+Retour test S23 : le débordement à droite global était corrigé, mais le **header**
+débordait encore (boutons « Mon espace gérant » / « Se déconnecter » trop grands).
+Cause : les règles responsive du header ne ciblaient que l'état **déconnecté**
+(`#btn-header-login`, `#btn-header-register`) ; les boutons de l'état **connecté**
+gardaient `fontSize: 0.85rem` en dur (style inline) → débordement.
+
+Correctif (`app/routes/home.tsx`, `app/styles/style.css`) :
+- Classe `.header-actions` ajoutée au groupe de boutons du header.
+- Rétrécissement **fluide** du texte et du padding via `clamp()` sur tous les
+  boutons du groupe (`font-size: clamp(0.6rem, 2.7vw, 0.85rem)`, padding idem),
+  avec `!important` pour battre les styles inline. Le texte se réduit tout seul
+  quand l'écran se resserre.
+- `.logo-text` réduit en ≤480px (1.4rem) et ≤380px (1.25rem) pour laisser la place.
+
+En attente de re-validation S23.
+
 ## 2026-06-30 17:38 — Partie 3 : responsive mobile (accueil, cible Galaxy S23)
 
 Sur `feat/refonte-taches` (`app/styles/style.css`) :

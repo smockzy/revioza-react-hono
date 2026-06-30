@@ -220,6 +220,38 @@ header {
     }
 }
 
+/* Boutons du header : le texte et le padding rétrécissent de façon FLUIDE
+   quand l'écran se resserre, pour qu'ils restent dans le header sans déborder
+   (couvre les états connecté « Mon espace gérant » / « Se déconnecter » qui
+   n'avaient aucune règle responsive). !important pour battre les styles inline. */
+.header-actions {
+    min-width: 0;
+    flex-shrink: 1;
+}
+
+.header-actions .btn-primary,
+.header-actions .btn-secondary {
+    font-size: clamp(0.6rem, 2.7vw, 0.85rem) !important;
+    padding-left: clamp(0.55rem, 2.6vw, 1.2rem) !important;
+    padding-right: clamp(0.55rem, 2.6vw, 1.2rem) !important;
+    white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+    .header-actions {
+        gap: 0.45rem !important;
+    }
+    .logo-text {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .logo-text {
+        font-size: 1.25rem;
+    }
+}
+
 .logo {
     display: flex;
     align-items: center;

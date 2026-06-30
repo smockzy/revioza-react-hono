@@ -1407,7 +1407,7 @@ export default function Home() {
 						</div>
 						<span className="logo-tagline">L&apos;avis qui vous rapporte</span>
 					</div>
-					<div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+					<div className="header-actions" style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
 						{loggedIn ? (
 							<>
 								<a
