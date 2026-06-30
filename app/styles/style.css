@@ -2439,19 +2439,29 @@ footer {
 
 @media (max-width: 860px) {
     .section-hero {
-        padding: 5rem 1.5rem 3rem;
+        padding: 5rem 1.25rem 3rem;
     }
     .hero-content-wrap {
         grid-template-columns: 1fr;
         gap: 2rem;
-        justify-items: center;
+        /* PAS de justify-items: center → sinon .hero-left passe en shrink-to-fit
+           et le paragraphe prend sa max-width (520px) au lieu de se limiter à
+           l'écran, ce qui décale tout le bloc et le fait déborder à droite. */
+        justify-items: stretch;
         margin: -1.5rem auto 0;
     }
     .hero-left {
+        width: 100%;
+        max-width: 100%;
         text-align: center;
         align-items: center;
     }
+    /* Le paragraphe se limite à l'écran (plus de 520px qui déborde) */
+    .hero-left p {
+        max-width: 100%;
+    }
     .hero-cta-group {
+        width: 100%;
         justify-content: center;
     }
     .hero-social-proof-mini {

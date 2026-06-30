@@ -8,6 +8,24 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 18:15 — Partie 3 (suite 3) : VRAIE cause du hero décalé à droite
+
+Le décalage touchait TOUT le bloc hero (titre + boutons + social proof) → problème
+de **positionnement**, pas de police. Cause exacte trouvée :
+`.hero-content-wrap` avait `justify-items: center` (≤860px) → `.hero-left` passait
+en **shrink-to-fit**, donc son paragraphe prenait sa `max-width: 520px` (largeur
+naturelle) au lieu de se limiter à l'écran. Résultat : `.hero-left` ≈ 520px > 360px,
+démarrant à gauche et **débordant à droite** (clippé par `overflow: hidden` du hero).
+
+Correctif (`app/styles/style.css`, bloc `@media max-width: 860px`) :
+- `justify-items: center` → `stretch` ;
+- `.hero-left { width: 100%; max-width: 100% }` ;
+- `.hero-left p { max-width: 100% }` (ne déborde plus à 520px) ;
+- `.hero-cta-group { width: 100% }`.
+Le bloc se recentre et tout rentre dans l'écran.
+
+En attente de re-validation S23.
+
 ## 2026-06-30 18:04 — Partie 3 (suite 2) : typo fluide du hero (débordement droite)
 
 Retour test S23 (capture) : header OK, mais le **hero débordait encore à droite**
