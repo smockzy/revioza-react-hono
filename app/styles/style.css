@@ -804,7 +804,8 @@ main {
 .phone-simulator-wrapper .phone-content,
 .phone-simulator-wrapper .bottom-nav,
 .phone-simulator-wrapper .app-bottom-nav,
-.phone-simulator-wrapper .nav-item {
+.phone-simulator-wrapper .nav-item,
+.phone-simulator-wrapper .preview-step-footer {
     pointer-events: auto;
 }
 

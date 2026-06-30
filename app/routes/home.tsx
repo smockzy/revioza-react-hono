@@ -420,15 +420,13 @@ export default function Home() {
 
 	const handleStarClick = useCallback(
 		(val: number) => {
+			// Simulation brève : effet visuel (étoiles) puis popup « J'ai déposé mon
+			// avis » et passage à la roue. Aucune redirection vers Google.
 			setAppState((prev) => ({ ...prev, rating: val }));
-			if (val >= 4) {
-				addReviewToHistory(val);
-				setAlertOverlay(true);
-				const fullLink = getFullGoogleLink(appState.googleLink);
-				if (fullLink) window.open(fullLink, "_blank");
-			}
+			addReviewToHistory(val);
+			setTimeout(() => setAlertOverlay(true), 350);
 		},
-		[appState.googleLink]
+		[]
 	);
 
 	const { loggedIn, signOut } = useMerchantSession();
@@ -900,11 +898,7 @@ export default function Home() {
 										>
 											<button
 												className="btn-google-action"
-												onClick={() => {
-													setAlertOverlay(true);
-													const fullLink = getFullGoogleLink(appState.googleLink);
-													if (fullLink) window.open(fullLink, "_blank");
-												}}
+												onClick={() => setAlertOverlay(true)}
 											>
 												LAISSER UN AVIS SUR GOOGLE{" "}
 												<i className="fa-solid fa-arrow-up-right-from-square"></i>
@@ -1120,18 +1114,14 @@ export default function Home() {
 									id="phone-alert-overlay"
 								>
 									<div className="phone-alert-card">
-										<div className="phone-alert-icon">
-											<i className="fa-solid fa-up-right-from-square"></i>
+										<div className="phone-alert-icon" style={{ backgroundColor: "rgba(52, 199, 89, 0.12)", color: "var(--accent-green)" }}>
+											<i className="fa-solid fa-circle-check"></i>
 										</div>
-										<h4 className="phone-alert-title">Redirection simulée</h4>
+										<h4 className="phone-alert-title">J&apos;ai déposé mon avis</h4>
 										<p className="phone-alert-desc">
-											Le client est redirigé vers l&apos;interface Google Review de l&apos;établissement.
+											Merci&nbsp;! Votre avis a bien été pris en compte.
 											<br />
-											<br />
-											<em>
-												(Dans la démo, cliquez sur le bouton ci-dessous pour revenir après avoir validé
-												votre avis)
-											</em>
+											Lancez la roue pour découvrir votre récompense.
 										</p>
 										<button
 											className="btn-alert-action"
@@ -1140,7 +1130,7 @@ export default function Home() {
 												goToStep(3);
 											}}
 										>
-											J&apos;ai déposé mon avis
+											Lancer la roue 🎡
 										</button>
 									</div>
 								</div>

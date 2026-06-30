@@ -8,6 +8,26 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 01:07 — Partie 4 : bugs /demo (flèches + clic étoiles) — Partie 3 validée
+
+Partie 3 **validée sur S23** (le correctif blindé du hero — flex centré + enfants
+≤100% — a réglé le décalage à droite). Mergée sur `main`.
+
+Partie 4 (`app/styles/style.css`, `app/routes/home.tsx`, `app/routes/demo.tsx`) :
+- **Flèches de navigation des étapes** (accueil « Tentez l'expérience » + /demo) :
+  le `.preview-step-footer` (frère du téléphone, dans le wrapper `pointer-events:
+  none`) n'était pas dans la liste `pointer-events: auto` → les clics étaient
+  ignorés. Ajouté à la règle → flèches fonctionnelles (passer/revenir, bornées 1–4).
+- **Clic sur les étoiles** (accueil + /demo) : suppression de la redirection
+  `window.open` vers Google (et du branchement Place ID). Désormais : effet visuel
+  (étoiles qui se remplissent) → popup « J'ai déposé mon avis » (icône check verte)
+  → bouton « Lancer la roue 🎡 » qui passe à l'étape 3. Aucune redirection.
+  Bouton « LAISSER UN AVIS SUR GOOGLE » : `window.open` retiré aussi.
+- Rappel grill : la logique Place ID + redirection réelle vivra sur **/merchant**
+  (pas /demo), à traiter plus tard.
+
+typecheck OK. En attente de validation avant la Partie 6.
+
 ## 2026-06-30 18:15 — Partie 3 (suite 3) : VRAIE cause du hero décalé à droite
 
 Le décalage touchait TOUT le bloc hero (titre + boutons + social proof) → problème
