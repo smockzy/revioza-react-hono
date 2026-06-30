@@ -8,6 +8,27 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 16:17 — Partie 1 : bugs visuels accueil (branche `feat/refonte-taches`)
+
+Lancement de la refonte des 8 parties sur la branche **`feat/refonte-taches`**
+(branche unique, commits granulaires, transfert sur `main` au choix de Quentin).
+
+Partie 1 corrigée (`app/styles/style.css`, `app/routes/home.tsx`) :
+- **Taches blanches sur les mots rouges des titres** : supprimé le double
+  `background-clip: text` (le titre parent clippait un dégradé blanc→gris sur
+  *tout* le texte, transparaissant sur les bords des mots rouges). Le parent
+  `.section-heading` est désormais en couleur pleine `#f5f5f7` ; seul le `span`
+  rouge garde le dégradé clippé. ⚠️ effet de bord : le titre n'a plus son léger
+  dégradé blanc→gris (remplacé par blanc plein, visuellement quasi identique).
+- **Cartes « 3 étapes » identiques** : `.how-steps` passe en `align-items: stretch`
+  + `.how-step-card { height: 100%; min-width: 0 }` → mêmes hauteur et largeur.
+- **Icônes flottantes des 3 étapes retirées** : sélecteur GSAP réduit à
+  `.feature-icon i` (les features gardent l'effet, les 3 étapes non).
+- **Zone vide scrollable en bas** : `body::after` (aurora) passé de
+  `position: absolute` à `fixed` → ne rallonge plus la zone scrollable.
+
+En attente de validation visuelle sur Galaxy S23 avant la Partie 2.
+
 ## 2026-06-30 14:04 — Analyse de commentaires.md + création de TODO.md
 
 - Analysé `app/routes/commentaires.md` (23 points : tâches + questions) et

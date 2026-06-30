@@ -244,8 +244,9 @@ export default function Home() {
 			gsap.registerPlugin(ScrollTrigger);
 
 			ctx = gsap.context(() => {
-				// Icônes qui flottent doucement (étapes + fonctionnalités)
-				gsap.to(".how-step-icon i, .feature-icon i", {
+				// Icônes qui flottent doucement (fonctionnalités uniquement —
+				// les icônes des "3 étapes" restent fixes, à la demande)
+				gsap.to(".feature-icon i", {
 					y: -7,
 					duration: 1.9,
 					ease: "sine.inOut",
