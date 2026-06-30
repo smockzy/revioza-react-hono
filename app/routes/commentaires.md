@@ -1,72 +1,49 @@
 
---------------------------------------------------------------------------------------------------
-commande à taper dans le terminal de antigravity (en bas) pour mettre à jour le site (2min~) :
+NOTES :
 
-git add -A
-git commit -m "ta description"
-git push origin main
+quand on se connecte la page sign in google affiche "to continue to vwjkdzydwsxwejarggsp.supabase.co", changer le nom du fichier et faire en sorte que ça affiche seulement revioza ou revioza.com
 
--------------------------------------------------------------------------------
+remettre les anciens forfaits du site statique (starter, pro, franchise) on établiera les prix (tu pourras me conseiller et me donner les prix que tu penses cohérent)
 
-affiche la navbar quand on est dans l'espace gerant pour que l'on puisse revenir à l'acceuil et voir son forfait actuel
+établir les différents avantages de chaque abonnement et mettre des croix avec en gris tout ce qui n'est pas dispo dans le starter pour mieux réaliser ce qu'on rate avec cet abonnement
 
-faire en sorte que quand on se connecte avec un compte gerant, sur la navbar notre statut change et affiche "se deconnecter" et "mon espace gérant"
 
 qlq fois apres m'etre co avec google je ne suis pas redirigé sur /merchant mais sur /demo
 
-refonte de /demo
+refonte de /demo pour que ce soit une page plus attractive, on reprend la même DA qu'à l'acceuil. Il faut rendre la page plus vivante avec des animations (dans le fond aussi) et rendre l'interface de personnalisation plus compacte pour que l'on ait pas besoin de scroll pour la voir en entier. Cette page est probablement la plus importante car elle montre directement le produit au gérant, il faut alors qu'elle soit le plus convaincant possible et qu'elle soit addictive (donne moi toutes les techniques pour la rendre ainsi)
 
-dans rubrique "tentez l'experience en direct" bug des fleches
+dans rubrique "tentez l'experience en direct" et dans /demo bug des fleches en bas du telephone : il faut les rendre fonctionnelles et qu'on puisse passer/revenir sur les etapes
 
-régler les problemes de formats
+régler les problemes de formats : quand je suis sur mon téléphone le site ne s'affiche pas bien. une grande partie du site est cachée à droite et je ne peux pas le voir, les ecritures sont trop grandes et dépassent de leur boutons
 
-certaines animations ne vont pas s'appliquer pour mobile quand on ira sur le site, adapte les toutes pour qu'elles soient visibles tout de même sur tout les formats
+dans /demo enlever la redirection vers une nouvelle page quand on clique sur les etoiles pour noter
 
-ajoutez des photos de profil aux avis virtuels dans la rubrique "ils nous font confiance" pour qu'ils aient l'air plus vrais et fait en sorte que les éléments faisant faux avis soient supprimés
+dans /demo faire en sorte que quand le gérant clique sur imprimer mon QR code celui-ci soit floutté avec un cadenas et qu'il y ait ecris "Pour débloquer veuillez souscrire à l'abonnement" avec un bouton "voir les tarifs" en dessous
 
-dans merchant.tsx faire en sorte qu'une bdd récolte le nombre d'avis obtenu (en prenant en compte le nb d'avis avant souscription à l'abo et le nb d'avis apres abo) par un gérant et l'affiche dans son espace
+supprimer le bug tout en bas de page : quand je scroll jusqu'en bas il y a une partie où il n'y a rien du tout et je peux quand même scroller en dessous de la navbar en bas de page
+
+il a des taches blanches sur les titres de certaines rubriques à l'acceuil (sur les mots en rouges)
+
+fait en sorte que les avis fassent vrais. Pour l'instant ils sont fictifs, mais rajoute les logos des commerces que tu as choisis en pdp et rajoute des fautes potentielles dans les commentaires : il faut qu'ils aient l'air moins parfait
 
 mettre un pop up avertissement quand on teste la demo et qu'on met des etoiles mais qu'on a pas encore inséré un lien Place ID valide plutôt que de nous rediriger vers une page avec une erreur
 
-modifier les prix, trop cher pour l'instant, à augmenter plus tard au fil des clients, ou soit mettre 1 seule case prix, mais on met notre prix en gros, + 50% à côté, + 1 mois gratuit
+Faire en sorte que si un gérant veut souscrire à un abonnement sans avoir créé de compte ou s'etre connecté auparavant, on lui affiche l'interface inscription/connexion lorsqu'il clique "essayer gratuitement" dans /pricing
+
+à l'acceuil dans la rubrique "3 étapes pour multiplier vos avis" les cartes n'ont pas la même taille, je veux qu'elle soient identiques. Retire également les animations flottantes de leur icones
+
+faire en sorte que le site soit completement neutre : il touche à tout type de commerce (pas que les retaurants)
 
 rendre plus jolie la page client quand on teste l'app, adapter aux differents formats d'ecrans.
 
 adapter la disposition des elements sur telephone portable
 
 (POUR PLUS TARD) : faire les conditions générales de vente, les mentions légales, etc.
- 
-creer **base de données** pour les utilisateurs, les avis, les roues, les lots, les clients, les abonnements, etc.
 
-Connecter un SDK Serverless comme **Supabase** ou **Firebase** pour gérer la persistance partagée de manière centralisée
+- La palette de couleur fait changer le style de tout le site -> il faut que ça change seulement le contenu dans le smartphone (plus tard on permettra au gerant de changer le thème de son espace gerant)
 
-google auth disfonctionnel depuis d'autres appareils
+Je voudrais savoir si désormais le systeme de QR code est fonctionnel : Si je crée mon app unique avec ma roue, et que je fais scanner mon QR code, est ce que mon ami arrivera sur ma roue ? 
 
+Est ce que les images sont visibles de tout le monde lorsqu'on les inseres dans personnalisation ? Sont elles toujours hebergées localement ?
 
-COMMENTAIRE AMINE : 
-
-Sur PC :
-
-- Le même badge fait "AI Slop" -> il faut le retirer/le remplacer par autre chose (appliqué)
-- Le texte "Transformez vos clients..." est trop long + certains termes font AI, comme "ambasaddeurs locaux"
-- Retirer les mouvements du smartphone (appliqué)
-- Agrandir le smartphone pour qu'on puisse mieux interagir avec (quand on est sur PC) (appliqué)
-- "+50 établissements nous suivent déjà !" -> "+50 établissements ont améliorés leur visibilité" ou qlqch comme ça (appliqué - mis à jour avec le nombre d'avis collectés)
-- "pour transformer chaque repas" ; on ne vises pas que les restaurants, donc fais plus général (appliqué)
-
-Dans la démo interactive :
-- La palette de couleur fait changer le style de tout le site -> il faut que ça change seulement le contenu dans le smartphone (appliqué)
-- J'ai essayé de mettre une image, ça m'a mis "⚠️ Hébergement échoué. L'image sera visible localement uniquement."²²
-- "Générer mon QRCode" -> "Imprimer le QR Code" ne fonctionne pas, la page est blanche
-- Il faut également agrandir le téléphone, il est beaucoup trop petit (appliqué)
-- Le panneau "Personnalisation en Temps Réel (Admin)" est trop brut, trop chargé, trop compact -> il faut une interface plus "douce" voir une page externe dédiée à la démo
-
-
-- Les rubriques de la section "Tout ce dont vous avez besoin" font trop AI, on les voit sur tous les sites générés par ia -> trouve un nouveau design, et ajoute des images (c'est ce qui retire l'aspect ia)
-
-- Les avis ont tous la même photo de profil (appliqué - initiales et couleurs de fond diversifiées)
-- Les avis sont des noms de particuliers -> tu vises les entreprises, donc il faut mettre des noms d'établissements (fictifs) (appliqué - coiffeur, hôtel, garage, pharmacie, restaurant)
-- Essaie de rendre les textes des avis moins parfaits, avec des potentielles fautes pour rendre ça plus crédible
-
-
-- J'ai cliqué sur "Essayer gratuitement" dans les offres, puis "Connexion" -> "Connexion avec Google", et je suis arrivé sur https://revioza.com/merchant ? c'est pas censé arriver
+Il y a un bug quand je clique sur imprimer mon QR code mais que je ne me suis pas connecté, j'aimerais que ça affiche l'interface de connexion/inscription

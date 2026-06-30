@@ -8,6 +8,21 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 14:04 — Analyse de commentaires.md + création de TODO.md
+
+- Analysé `app/routes/commentaires.md` (23 points : tâches + questions) et
+  établi un plan d'action **découpé en 8 parties** (1 session chacune) →
+  écrit dans **`TODO.md`** (racine, versionné).
+- Investigué et répondu aux 3 questions ouvertes :
+  - **QR fonctionnel de bout en bout** : oui (qr-code → /api/scan → `get_public_wheel`
+    → play), sous 3 conditions (migrations `qr_scans.sql`, config sauvée via `/merchant`,
+    auth OK). `/demo` utilise un circuit séparé (params d'URL).
+  - **Images** : hébergées sur **ImgBB** (public) avec fallback **base64 local** ;
+    clé API exposée côté client.
+  - **Palette** : fuit car posée sur `:root` dans `merchant.tsx` (L216/237/261) ;
+    `/demo` la scope déjà au conteneur téléphone → modèle à recopier.
+- Aucune modification de code applicatif : uniquement planification et doc.
+
 ## 2026-06-30 — Vérification post-crash + mise en place du journal
 
 - Vérifié que le dépôt local était **synchronisé avec GitHub** (`origin/main`) :
