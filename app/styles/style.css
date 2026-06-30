@@ -2275,10 +2275,12 @@ footer {
 
 .section-heading {
     font-family: var(--font-display);
-    font-size: 2.5rem;
+    /* Taille fluide : se réduit toute seule sur écran étroit (jamais de débordement) */
+    font-size: clamp(1.5rem, 5.5vw, 2.5rem);
     font-weight: 850;
     line-height: 1.1;
     letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
     /* Couleur pleine sur le titre : pas de background-clip sur le parent,
        sinon le dégradé blanc transparaît sur les bords des mots rouges (taches blanches). */
     color: #f5f5f7;
@@ -2302,9 +2304,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .section-heading {
-        font-size: 1.85rem;
-    }
     .section-inner {
         padding: 0 1rem;
     }
@@ -2465,18 +2464,22 @@ footer {
     flex-direction: column;
     align-items: flex-start;
     gap: 1.5rem;
+    min-width: 0;
+    max-width: 100%;
 }
 
 
 
 .hero-left h1 {
     font-family: var(--font-display);
-    font-size: 3.75rem;
+    /* Taille fluide : aucun mot ne peut déborder, le titre rétrécit avec l'écran */
+    font-size: clamp(1.75rem, 7vw, 3.75rem);
     font-weight: 900;
     line-height: 1.05;
     letter-spacing: -0.04em;
     color: #ffffff;
     margin: 0;
+    overflow-wrap: anywhere;
 }
 
 .hero-left h1 span {
@@ -2486,24 +2489,13 @@ footer {
     -webkit-text-fill-color: transparent;
 }
 
-@media (max-width: 1100px) {
-    .hero-left h1 {
-        font-size: 3rem;
-    }
-}
-
-@media (max-width: 600px) {
-    .hero-left h1 {
-        font-size: 2.4rem;
-    }
-}
-
 .hero-left p {
     color: var(--text-muted);
-    font-size: 1.15rem;
+    font-size: clamp(0.95rem, 3.8vw, 1.15rem);
     line-height: 1.65;
     max-width: 520px;
     margin: 0;
+    overflow-wrap: anywhere;
 }
 
 .hero-cta-group {
@@ -3435,16 +3427,8 @@ img, canvas, video, svg, table {
 }
 
 @media (max-width: 430px) {
-    /* Titres : on évite qu'un mot trop large déborde sur S23 */
-    .section-heading {
-        font-size: 1.6rem;
-    }
-    .hero-left h1 {
-        font-size: 2.1rem;
-    }
-    .hero-left p {
-        font-size: 1.02rem;
-    }
+    /* Les titres/paragraphes utilisent désormais clamp() (fluides) — voir plus haut.
+       Ici on ne touche qu'au sous-titre et aux boutons. */
     .section-subheading {
         font-size: 0.95rem;
     }

@@ -8,6 +8,24 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 18:04 — Partie 3 (suite 2) : typo fluide du hero (débordement droite)
+
+Retour test S23 (capture) : header OK, mais le **hero débordait encore à droite**
+(le `.section-hero` a `overflow: hidden` → la partie droite était clippée, donc
+invisible). Le h1 restait trop gros sur mobile.
+
+Correctif (`app/styles/style.css`) — passage à une **typographie fluide `clamp()`**
+qui se réduit automatiquement avec la largeur (exactement la demande de Quentin :
+« le texte se rétrécit quand le format se resserre ») :
+- `.hero-left h1` : `clamp(1.75rem, 7vw, 3.75rem)` (≈28px à 360px au lieu de ~45px).
+- `.section-heading` : `clamp(1.5rem, 5.5vw, 2.5rem)`.
+- `.hero-left p` : `clamp(0.95rem, 3.8vw, 1.15rem)`.
+- Ajout `overflow-wrap: anywhere` + `min-width: 0` / `max-width: 100%` sur `.hero-left`.
+- Suppression des overrides de breakpoint (`@media 1100/768/600/430`) qui fixaient
+  ces tailles et entraient en conflit avec les `clamp`.
+
+En attente de re-validation S23.
+
 ## 2026-06-30 17:50 — Partie 3 (suite) : header qui déborde sur mobile
 
 Retour test S23 : le débordement à droite global était corrigé, mais le **header**
