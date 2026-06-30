@@ -793,19 +793,34 @@ main {
 }
 
 @media (max-width: 1024px) {
+    /* IMPORTANT : un `transform: scale` sur le wrapper réduit le visuel mais PAS
+       la largeur de mise en page → le téléphone (375px) déborde sur mobile.
+       On scale l'enfant (origin top center) et on donne au wrapper une largeur
+       = taille réduite réelle, pour que le footprint corresponde au visuel. */
     .phone-simulator-wrapper {
         position: relative;
         top: 0;
-        transform: scale(0.85);
-        transform-origin: center center;
+        transform: none;
         height: auto;
         margin: 2rem auto 0;
+        width: calc(var(--phone-w) * 0.85);
+        max-width: 100%;
+        overflow: visible;
+    }
+    .phone-simulator-wrapper .phone-container {
+        transform: scale(0.85);
+        transform-origin: top center;
+        margin-bottom: calc(var(--phone-h) * -0.15);
     }
 }
 
 @media (max-width: 480px) {
     .phone-simulator-wrapper {
+        width: calc(var(--phone-w) * 0.72);
+    }
+    .phone-simulator-wrapper .phone-container {
         transform: scale(0.72);
+        margin-bottom: calc(var(--phone-h) * -0.28);
     }
 }
 
@@ -3349,6 +3364,68 @@ footer {
     }
     .hide-mobile {
         display: none !important;
+    }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   GARDE-FOUS RESPONSIVE GLOBAUX (anti-débordement horizontal)
+   Cible prioritaire : Galaxy S23 (≈360px de large)
+   ───────────────────────────────────────────────────────────── */
+html {
+    overflow-x: hidden;
+    max-width: 100%;
+}
+
+/* Empêche les longs mots / URLs de pousser la largeur au-delà du viewport */
+p, h1, h2, h3, h4, span, a, li, button, label, div {
+    overflow-wrap: break-word;
+}
+
+/* Les médias ne dépassent jamais leur conteneur */
+img, canvas, video, svg, table {
+    max-width: 100%;
+}
+
+@media (max-width: 480px) {
+    /* Padding latéral resserré pour gagner de la place utile */
+    .section-inner,
+    .section-how .section-inner,
+    .section-features .section-inner {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    .section-demo,
+    .section-how,
+    .section-features {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+@media (max-width: 430px) {
+    /* Titres : on évite qu'un mot trop large déborde sur S23 */
+    .section-heading {
+        font-size: 1.6rem;
+    }
+    .hero-left h1 {
+        font-size: 2.1rem;
+    }
+    .hero-left p {
+        font-size: 1.02rem;
+    }
+    .section-subheading {
+        font-size: 0.95rem;
+    }
+    /* Boutons : le texte reste DANS le bouton (jamais de débordement) */
+    .btn-primary,
+    .btn-secondary,
+    .hero-cta-main,
+    .hero-cta-secondary,
+    .btn-plan-select {
+        white-space: normal;
+        word-break: break-word;
+        line-height: 1.2;
+        max-width: 100%;
     }
 }
 

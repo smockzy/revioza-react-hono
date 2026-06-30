@@ -8,6 +8,30 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-06-30 17:38 — Partie 3 : responsive mobile (accueil, cible Galaxy S23)
+
+Sur `feat/refonte-taches` (`app/styles/style.css`) :
+- **Bug n°1 du débordement à droite identifié** : le simulateur téléphone utilisait
+  `transform: scale()` sur le wrapper — or un `transform` réduit le **visuel** mais
+  **pas la largeur de mise en page** (le téléphone occupait toujours 375px → débordait
+  sur 360px). Correctif : `transform` retiré du wrapper, scale appliqué à l'enfant
+  `.phone-container` (origin top center) + largeur du wrapper = taille réduite réelle
+  (`calc(var(--phone-w) * 0.85)` puis `* 0.72` en ≤480) + `margin-bottom` négatif pour
+  récupérer l'espace vertical du scale. Le footprint correspond enfin au visuel.
+- **Garde-fous globaux** : `html { overflow-x: hidden; max-width: 100% }`,
+  `overflow-wrap: break-word` sur le texte, `max-width: 100%` sur img/canvas/svg/table.
+- **Breakpoint S23 (≤430px)** : titres de section 1.6rem, hero h1 2.1rem, sous-titres
+  réduits ; boutons en `white-space: normal` + `word-break` pour que le texte reste
+  DANS le bouton (corrige « écritures qui dépassent des boutons »).
+- **≤480px** : padding latéral des sections resserré (plus de place utile).
+- La roue décorative du hero (340px) était déjà bornée par `max-width: 100%`.
+
+**/play non modifiée** : déjà mobile-first et responsive (full-screen, centrée 420px
+desktop, breakpoints hauteur). Une vraie passe « plus jolie » relèverait de la DA
+(à cadrer comme la Partie 5) — en attente de l'avis de Quentin.
+
+En attente de validation visuelle sur Galaxy S23 avant la Partie 4.
+
 ## 2026-06-30 16:31 — Partie 2 : contenu & neutralité accueil
 
 Sur `feat/refonte-taches` (`app/routes/home.tsx`, `app/styles/style.css`) :
