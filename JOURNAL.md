@@ -8,6 +8,29 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 01:25 — Partie 6 (a+b) : QR — connexion + gating cadenas
+
+Partie 4 validée et mergée sur `main`.
+
+Partie 6 découpée (6c images/Storage à suivre). Fait ici (6a + 6b) :
+- **6a — connexion** (`app/routes/qr-code.tsx`) : non connecté → redirection vers
+  `/?login=required` (ouvre la modale connexion/inscription de l'accueil) au lieu de
+  l'ancienne redirection muette vers `/demo?login=required`. Couvre aussi le clic
+  « Imprimer mon QR code » depuis /demo (qui navigue vers /qr-code).
+- **6b — gating abonnement** : décision grill = nouveau flag booléen
+  **`merchants.subscription_active`** (migration `supabase/merchant_subscription.sql`,
+  défaut `false`). qr-code.tsx lit ce flag :
+  - non abonné → **QR flouté + cadenas** + « Pour débloquer veuillez souscrire à
+    l'abonnement » + bouton **« Voir les tarifs »** (→ /pricing) + Retour.
+  - abonné → QR net + bouton Imprimer (comportement normal).
+  Stripe passera le flag à `true` plus tard (webhooks = source de vérité).
+
+⚠️ **ACTION REQUISE QUENTIN** : appliquer `supabase/merchant_subscription.sql` dans
+le SQL editor Supabase. Pour tester le QR débloqué :
+`update public.merchants set subscription_active = true where user_id = '<ton-id>';`
+
+typecheck OK. Reste 6c : images → Supabase Storage (nécessitera un bucket + policy).
+
 ## 2026-07-01 01:07 — Partie 4 : bugs /demo (flèches + clic étoiles) — Partie 3 validée
 
 Partie 3 **validée sur S23** (le correctif blindé du hero — flex centré + enfants

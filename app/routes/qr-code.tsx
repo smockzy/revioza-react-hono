@@ -28,6 +28,9 @@ export default function QRCode() {
 	const [badgeText, setBadgeText] = useState("Chargement…");
 	const [targetUrl, setTargetUrl] = useState("");
 	const [status, setStatus] = useState<"loading" | "ready" | "error">("loading");
+	// Abonnement actif ? Le QR n'est imprimable (net) que si oui ; sinon il est
+	// flouté + verrouillé avec un CTA vers les tarifs.
+	const [subscribed, setSubscribed] = useState(false);
 
 	useEffect(() => {
 		let cancelled = false;
@@ -44,7 +47,9 @@ export default function QRCode() {
 		(async () => {
 			const { data: { session } } = await supabase.auth.getSession();
 			if (!session) {
-				window.location.href = "/demo?login=required";
+				// Non connecté → on ouvre l'interface connexion/inscription (modale
+				// de l'accueil) au lieu d'une redirection muette.
+				window.location.href = "/?login=required";
 				return;
 			}
 			const userId = session.user.id;
@@ -87,6 +92,15 @@ export default function QRCode() {
 			setQrUrl(
 				`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`
 			);
+
+			// Statut d'abonnement : débloque (ou non) l'impression du QR.
+			const { data: merchantRow } = await supabase
+				.from("merchants")
+				.select("subscription_active")
+				.eq("user_id", userId)
+				.maybeSingle();
+			if (!cancelled) setSubscribed(Boolean(merchantRow?.subscription_active));
+
 			setStatus("ready");
 		})();
 
@@ -123,8 +137,13 @@ export default function QRCode() {
 						le réimprimer.
 					</p>
 
-					<div className="qr-box">
+					<div className={`qr-box${status === "ready" && !subscribed ? " qr-locked" : ""}`}>
 						{status === "ready" && qrUrl && <img id="qr-img" src={qrUrl} alt="QR Code Unique" />}
+						{status === "ready" && !subscribed && (
+							<div className="qr-lock-overlay" aria-hidden="true">
+								<i className="fa-solid fa-lock"></i>
+							</div>
+						)}
 						{status === "loading" && (
 							<span style={{ color: "#8e8e93", fontSize: "0.85rem" }}>Génération…</span>
 						)}
@@ -135,20 +154,35 @@ export default function QRCode() {
 						)}
 					</div>
 
-					{status === "ready" && targetUrl && (
+					{/* URL visible uniquement quand le QR est débloqué */}
+					{status === "ready" && subscribed && targetUrl && (
 						<p style={{ fontSize: "0.72rem", color: "#8e8e93", wordBreak: "break-all", margin: 0 }}>
 							{targetUrl}
 						</p>
 					)}
 
-					<div className="action-buttons">
-						<button className="btn-qr btn-qr-print" id="btn-print" onClick={() => window.print()} disabled={status !== "ready"} style={status !== "ready" ? { opacity: 0.5, cursor: "not-allowed" } : undefined}>
-							<i className="fa-solid fa-print"></i> Imprimer le QR Code
-						</button>
-						<a href="/" className="btn-qr btn-qr-back">
-							<i className="fa-solid fa-house"></i> Retour Admin
-						</a>
-					</div>
+					{status === "ready" && !subscribed ? (
+						<div className="qr-lock-notice">
+							<p className="qr-lock-text">
+								Pour débloquer veuillez souscrire à l&apos;abonnement
+							</p>
+							<a href="/pricing" className="btn-qr btn-qr-print">
+								<i className="fa-solid fa-tags"></i> Voir les tarifs
+							</a>
+							<a href="/" className="btn-qr btn-qr-back">
+								<i className="fa-solid fa-house"></i> Retour Admin
+							</a>
+						</div>
+					) : (
+						<div className="action-buttons">
+							<button className="btn-qr btn-qr-print" id="btn-print" onClick={() => window.print()} disabled={status !== "ready"} style={status !== "ready" ? { opacity: 0.5, cursor: "not-allowed" } : undefined}>
+								<i className="fa-solid fa-print"></i> Imprimer le QR Code
+							</button>
+							<a href="/" className="btn-qr btn-qr-back">
+								<i className="fa-solid fa-house"></i> Retour Admin
+							</a>
+						</div>
+					)}
 				</div>
 			</main>
 
@@ -218,16 +252,72 @@ export default function QRCode() {
 					height: 260px;
 					margin: 1rem 0;
 					transition: transform 0.3s;
+					position: relative;
 				}
 
 				.page-qrcode .qr-box:hover {
 					transform: scale(1.02);
 				}
 
+				.page-qrcode .qr-box.qr-locked:hover {
+					transform: none;
+				}
+
 				.page-qrcode .qr-box img {
 					width: 100%;
 					height: 100%;
 					object-fit: contain;
+				}
+
+				/* QR verrouillé : flouté + cadenas par-dessus */
+				.page-qrcode .qr-box.qr-locked img {
+					filter: blur(8px);
+					opacity: 0.55;
+				}
+
+				.page-qrcode .qr-lock-overlay {
+					position: absolute;
+					inset: 0;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					pointer-events: none;
+				}
+
+				.page-qrcode .qr-lock-overlay i {
+					font-size: 2.6rem;
+					color: #111115;
+					background: rgba(255,255,255,0.92);
+					width: 72px;
+					height: 72px;
+					border-radius: 50%;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+				}
+
+				.page-qrcode .qr-lock-notice {
+					display: flex;
+					flex-direction: column;
+					gap: 0.75rem;
+					width: 100%;
+					max-width: 450px;
+					margin-top: 1rem;
+					align-items: stretch;
+					text-align: center;
+				}
+
+				.page-qrcode .qr-lock-text {
+					font-family: 'Outfit', sans-serif;
+					font-weight: 700;
+					font-size: 1rem;
+					color: #f5f5f7;
+					margin: 0 0 0.25rem;
+				}
+
+				.page-qrcode .qr-lock-notice .btn-qr {
+					flex: 0 0 auto;
 				}
 
 				.page-qrcode .action-buttons {
