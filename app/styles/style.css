@@ -3455,3 +3455,50 @@ img, canvas, video, svg, table {
     }
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   CORRECTIF BLINDÉ HERO MOBILE (dernier dans la cascade = gagne)
+   Le hero (titre/paragraphe/boutons/social proof) était décalé à droite :
+   en grille, .hero-left passait en shrink-to-fit et le paragraphe prenait sa
+   largeur naturelle (>écran). On force ici un empilement flex centré où AUCUN
+   enfant ne peut dépasser la largeur de l'écran.
+   ═══════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+    .section-hero {
+        overflow-x: hidden;
+    }
+    .hero-content-wrap {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        grid-template-columns: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        text-align: center;
+    }
+    .hero-left {
+        width: 100% !important;
+        max-width: 100% !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    /* Aucun enfant du hero ne dépasse l'écran */
+    .hero-left > *,
+    .hero-left h1,
+    .hero-left p,
+    .hero-cta-group,
+    .hero-social-proof-mini {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .hero-cta-main,
+    .hero-cta-secondary {
+        max-width: 100% !important;
+    }
+    .hero-right {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex;
+        justify-content: center;
+    }
+}
+
