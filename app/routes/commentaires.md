@@ -1,5 +1,17 @@
 
+NOTES APRES PROMPT   : 
+
+revoir l'apparence de la roue à l'acceuil
+
+refaire favicon du site (bords blancs)
+
+en bas de page supprimer société : ... et siren : ...
+
+
 NOTES :
+
+revoir l'apparence de la roue à l'acceuil
+
 
 quand on se connecte la page sign in google affiche "to continue to vwjkdzydwsxwejarggsp.supabase.co", changer le nom du fichier et faire en sorte que ça affiche seulement revioza ou revioza.com
 
