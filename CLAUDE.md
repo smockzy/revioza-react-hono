@@ -75,7 +75,7 @@ concernés avant de proposer des modifications.
 7. Avant toute intervention sur l'auth, demander les fichiers concernés —
    ne pas supposer leur état actuel
 8. À la fin de chaque tâche, toujours rédiger un résumé de ce qui a été fait
-   avec la date et l'heure (format `AAAA-MM-JJ HH:MM`), et l'ajouter dans le
-   journal de session `memory/journal_sessions.md`. But : permettre à Quentin de
-   se repérer entre deux sessions (notamment en cas de crash ou de changement
-   d'appareil). Une entrée par tâche, la plus récente en haut.
+   avec la date et l'heure (format `AAAA-MM-JJ HH:MM`), et l'ajouter en haut du
+   fichier `JOURNAL.md` (à la racine, versionné dans Git). But : permettre à
+   Quentin de se repérer entre deux sessions (notamment en cas de crash ou de
+   changement d'appareil). Une entrée par tâche, la plus récente en haut.
