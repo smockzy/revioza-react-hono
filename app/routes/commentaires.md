@@ -5,9 +5,11 @@ revoir l'apparence de la roue à l'acceuil
 
 refaire favicon du site (bords blancs)
 
+retirer completement l'image de pizza par défaut quand on arrive sur une app client apres avoir scanné le qr code car il y a un délai avant que l'image hebergée arrive
+
 en bas de page supprimer société : ... et siren : ...
 
-
+je n'arrive plus à obtenir l'interface d'impression du QR code, il n'y a pas non plus de popup
 NOTES :
 
 revoir l'apparence de la roue à l'acceuil

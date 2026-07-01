@@ -12,6 +12,8 @@
 --  Pour TESTER le QR débloqué dès maintenant, mets manuellement la colonne à
 --  `true` sur ta ligne :
 --    update public.merchants set subscription_active = true where user_id = '<ton-user-id>';
+-- OU ALORS SANS UTILISER MON ID ET EN DEBLOQUANT TOUT : 
+--	update public.merchants set subscription_active = true;
 -- ════════════════════════════════════════════════════════════════
 
 alter table public.merchants
