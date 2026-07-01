@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import type { Route } from "./+types/pricing";
 import "../styles/style.css";
 import "../styles/pricing.css";
@@ -57,15 +57,32 @@ export default function Pricing() {
 	const getPrice = (plan: string) => (isAnnual ? prices[plan].annual : prices[plan].monthly);
 	const getReassurance = () =>
 		isAnnual
-			? "🔒 Facturé en une fois · Non remboursable · Accès garanti 12 mois complets"
-			: "🔒 Sans engagement · Résiliation en 1 clic";
+			? "Facturé en une fois · Non remboursable · Accès garanti 12 mois complets"
+			: "Sans engagement · Résiliation en 1 clic";
 
-	const handlePlanClick = () => {
-		window.location.href = "/?register=true";
+	const handlePlanClick = (e: MouseEvent<HTMLButtonElement>) => {
+		const target = "/?register=true";
+		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+			window.location.href = target;
+			return;
+		}
+		const btn = e.currentTarget;
+		btn.classList.add("btn-pressed");
+		window.setTimeout(() => {
+			window.location.href = target;
+		}, 180);
 	};
 
 	return (
-		<div className="page-pricing">
+		<div className="page-pricing page-landing">
+			{/* Filtre SVG : déforme les nappes d'aurora en fumée irrégulière (identique à l'accueil) */}
+			<svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+				<filter id="aurora-smoke">
+					<feTurbulence type="fractalNoise" baseFrequency="0.009 0.014" numOctaves={2} seed={7} result="noise" />
+					<feDisplacementMap in="SourceGraphic" in2="noise" scale={340} xChannelSelector="R" yChannelSelector="G" />
+				</filter>
+			</svg>
+
 			<header>
 				<div className="header-container">
 					<a href="/" className="logo" style={{ textDecoration: "none" }}>
@@ -87,6 +104,12 @@ export default function Pricing() {
 			<main className="pricing-container">
 				{/* Hero Title */}
 				<section className="pricing-hero reveal reveal-slide-up">
+					{/* Fond "aurora fumée" rouge — dérive en CSS pur, cf. section-aurora de l'accueil */}
+					<div className="section-aurora pricing-aurora" aria-hidden="true">
+						<span className="aurora-blob blob-1" />
+						<span className="aurora-blob blob-2" />
+					</div>
+
 					<h1>
 						Des tarifs simples, <span>sans engagement</span>
 					</h1>
@@ -96,30 +119,35 @@ export default function Pricing() {
 					</p>
 
 					{/* Monthly/Annual Toggle */}
-					<div className="billing-toggle-wrap">
-						<span
+					<div className="billing-toggle-wrap" role="group" aria-label="Cycle de facturation">
+						<button
+							type="button"
 							className={`toggle-label ${!isAnnual ? "active" : ""}`}
 							id="billing-monthly"
 							onClick={() => setIsAnnual(false)}
 						>
 							<span className="hide-mobile">Facturation </span>Mensuelle
-						</span>
+						</button>
 						<button
+							type="button"
 							className={`billing-switch ${isAnnual ? "active" : ""}`}
 							id="billing-switch-btn"
-							aria-label="Toggle billing cycle"
+							role="switch"
+							aria-checked={isAnnual}
+							aria-label="Basculer entre facturation mensuelle et annuelle"
 							onClick={() => setIsAnnual(!isAnnual)}
 						>
 							<span className="switch-dot"></span>
 						</button>
-						<span
+						<button
+							type="button"
 							className={`toggle-label ${isAnnual ? "active" : ""}`}
 							id="billing-annual"
 							onClick={() => setIsAnnual(true)}
 						>
 							<span className="hide-mobile">Facturation </span>Annuelle
 							<span className="discount-badge">-20%</span>
-						</span>
+						</button>
 					</div>
 				</section>
 
@@ -128,17 +156,12 @@ export default function Pricing() {
 					{/* Plan 1 : Starter */}
 					<div className="pricing-card reveal reveal-slide-up delay-100">
 						<div className="plan-header">
-							<span className="plan-tier">Solo / Starter</span>
-							<h2 className="plan-price" id="price-starter">
+							<span className="plan-tier">Starter</span>
+							<h2 className="plan-price" id="price-starter" key={isAnnual ? "annual" : "monthly"}>
 								{getPrice("starter")}<span>/mois</span>
 							</h2>
 							{isAnnual && (
-								<div
-									className="annual-saving-text"
-									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
-								>
-									{prices.starter.saving}
-								</div>
+								<div className="annual-saving-text">{prices.starter.saving}</div>
 							)}
 							<p className="plan-desc" style={{ marginTop: "0.5rem" }}>
 								Idéal pour les petits commerces de quartier et les food-trucks.
@@ -147,70 +170,63 @@ export default function Pricing() {
 						<div className="plan-divider"></div>
 						<ul className="plan-features-list">
 							<li>
-								<i className="fa-solid fa-check"></i> 1 établissement physique
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>1 établissement physique
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Jusqu&apos;à 250 avis / mois
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Jusqu&apos;à 250 avis / mois
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Roue de loterie standard (5 lots max)
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>QR Code de table prêt à imprimer
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Statistiques de base (scans)
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Statistiques de base (scans)
 							</li>
 							<li className="disabled">
-								<i className="fa-solid fa-xmark"></i> Logo personnalisé au centre de la roue
+								<span className="feature-icon excluded"><i className="fa-solid fa-xmark" aria-hidden="true"></i></span>
+								<span className="sr-only">Non inclus : </span>Logo personnalisé au centre de la roue
 							</li>
 							<li className="disabled">
-								<i className="fa-solid fa-xmark"></i> Filtrage intelligent des avis négatifs
+								<span className="feature-icon excluded"><i className="fa-solid fa-xmark" aria-hidden="true"></i></span>
+								<span className="sr-only">Non inclus : </span>Filtrage intelligent des avis négatifs
 							</li>
 							<li className="disabled">
-								<i className="fa-solid fa-xmark"></i> Essai gratuit 14 jours
+								<span className="feature-icon excluded"><i className="fa-solid fa-xmark" aria-hidden="true"></i></span>
+								<span className="sr-only">Non inclus : </span>Essai gratuit 14 jours
 							</li>
 						</ul>
 						<button className="btn-plan-select" onClick={handlePlanClick}>
 							Commencer
 						</button>
-						<p
-							className="plan-reassurance"
-							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
-						>
-							{getReassurance()}
+						<p className="plan-reassurance">
+							<i className="fa-solid fa-lock" aria-hidden="true"></i> {getReassurance()}
 						</p>
 					</div>
 
 					{/* Plan 2 : Business (Featured — offre exclusive) */}
 					<div className="pricing-card featured reveal reveal-slide-up delay-200">
-						<div className="featured-ribbon">Offre exclusive</div>
+						<div className="featured-ribbon">
+							<i className="fa-solid fa-star" aria-hidden="true"></i> Offre exclusive
+						</div>
 						<div className="plan-header">
-							<span className="plan-tier">Business / Growth</span>
-							<h2 className="plan-price" id="price-business" style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
+							<span className="plan-tier">Business</span>
+							<h2 className="plan-price" id="price-business" key={isAnnual ? "annual" : "monthly"}>
 								{getPrice("business")}<span>/mois</span>
-								<span style={{ fontSize: "1.3rem", textDecoration: "line-through", color: "var(--text-muted)", fontWeight: 500, marginLeft: "0.25rem" }}>
-									{isAnnual ? "60€" : "75€"}
-								</span>
-								<span
-									className="discount-badge"
-									style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}
-								>
-									-35%
-								</span>
+								<span className="price-original">{isAnnual ? "60€" : "75€"}</span>
+								<span className="price-discount-badge">-35%</span>
 							</h2>
 							{isAnnual && (
-								<div
-									className="annual-saving-text"
-									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
-								>
-									{prices.business.saving}
-								</div>
+								<div className="annual-saving-text">{prices.business.saving}</div>
 							)}
-							<div
-								style={{ display: "inline-block", background: "rgba(52, 199, 89, 0.08)", border: "1px solid rgba(52, 199, 89, 0.25)", borderRadius: "6px", padding: "5px 12px", fontSize: "0.78rem", fontWeight: 800, color: "var(--accent-green)", width: "fit-content", marginTop: "0.5rem" }}
-							>
-								🎁 14 jours d&apos;essai gratuit
+							<div className="trial-badge">
+								<i className="fa-solid fa-gift" aria-hidden="true"></i> 14 jours d&apos;essai gratuit
 							</div>
 							<p className="plan-desc" style={{ marginTop: "0.7rem" }}>
 								Le choix idéal pour les restaurants et boutiques physiques dynamiques.
@@ -219,41 +235,47 @@ export default function Pricing() {
 						<div className="plan-divider"></div>
 						<ul className="plan-features-list">
 							<li>
-								<i className="fa-solid fa-check"></i> 1 établissement physique
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>1 établissement physique
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Avis &amp; Scans illimités
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Avis &amp; Scans illimités
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Roue 100% personnalisable (lots illimités)
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> QR Code personnalisable prêt à imprimer
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>QR Code personnalisable prêt à imprimer
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Filtrage intelligent (retours négatifs en privé)
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Filtrage intelligent (retours négatifs en privé)
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Logo personnalisé et charte graphique
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Logo personnalisé et charte graphique
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Image d&apos;accueil mobile personnalisée
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Image d&apos;accueil mobile personnalisée
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Statistiques avancées (heures, conversion)
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Support client prioritaire 7j/7
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Support client prioritaire 7j/7
 							</li>
 						</ul>
 						<button className="btn-plan-select featured" onClick={handlePlanClick}>
 							Essayer gratuitement
 						</button>
-						<p
-							className="plan-reassurance"
-							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
-						>
-							{getReassurance()}
+						<p className="plan-reassurance">
+							<i className="fa-solid fa-lock" aria-hidden="true"></i> {getReassurance()}
 						</p>
 					</div>
 
@@ -261,56 +283,52 @@ export default function Pricing() {
 					<div className="pricing-card reveal reveal-slide-up delay-300">
 						<div className="plan-header">
 							<span className="plan-tier">Franchise &amp; Réseau</span>
-							<h2 className="plan-price" id="price-franchise">
+							<h2 className="plan-price" id="price-franchise" key={isAnnual ? "annual" : "monthly"}>
 								{getPrice("franchise")}<span>/mois</span>
 							</h2>
 							{isAnnual && (
-								<div
-									className="annual-saving-text"
-									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
-								>
-									{prices.franchise.saving}
-								</div>
+								<div className="annual-saving-text">{prices.franchise.saving}</div>
 							)}
 							<p className="plan-desc" style={{ marginTop: "0.5rem", marginBottom: "0.25rem" }}>
 								Tout ce qui est inclus dans Business, multiplié par 5 établissements — avec un tableau de
 								bord centralisé pour piloter l&apos;ensemble.
 							</p>
-							<div
-								style={{ display: "inline-block", background: "rgba(229, 9, 20, 0.05)", border: "1px solid rgba(229, 9, 20, 0.15)", borderRadius: "6px", padding: "4px 10px", fontSize: "0.72rem", fontWeight: 600, color: "var(--primary)", width: "fit-content" }}
-							>
+							<div className="addon-note">
 								+19€/mois par adresse supplémentaire
 							</div>
 						</div>
 						<div className="plan-divider" style={{ marginTop: "1rem" }}></div>
 						<ul className="plan-features-list">
 							<li>
-								<i className="fa-solid fa-check"></i> <strong>Jusqu&apos;à 5 adresses incluses</strong>
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span><strong>Jusqu&apos;à 5 adresses incluses</strong>
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Tableau de bord multi-commerces centralisé
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Tableau de bord multi-commerces centralisé
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> QR codes uniques par table et serveur
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>QR codes uniques par table et serveur
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Statistiques par serveur et établissement
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Statistiques par serveur et établissement
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Intégrations caisse &amp; API
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Intégrations caisse &amp; API
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> Accompagnement et conseiller dédié
+								<span className="feature-icon included"><i className="fa-solid fa-check" aria-hidden="true"></i></span>
+								<span className="sr-only">Inclus : </span>Accompagnement et conseiller dédié
 							</li>
 						</ul>
 						<button className="btn-plan-select" onClick={handlePlanClick}>
 							Contacter le service commercial
 						</button>
-						<p
-							className="plan-reassurance"
-							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
-						>
-							{getReassurance()}
+						<p className="plan-reassurance">
+							<i className="fa-solid fa-lock" aria-hidden="true"></i> {getReassurance()}
 						</p>
 					</div>
 				</section>
@@ -352,15 +370,28 @@ export default function Pricing() {
 							<div
 								className={`faq-accordion-item ${openFaq[idx] ? "open" : ""}`}
 								key={idx}
-								onClick={() => toggleFaq(idx)}
 							>
-								<div className="faq-question-bar">
-									<h3>{item.q}</h3>
-									<span className="faq-icon-toggle">
-										<i className="fa-solid fa-chevron-down"></i>
-									</span>
-								</div>
-								<div className="faq-answer-wrapper">
+								<h3>
+									<button
+										type="button"
+										className="faq-question-bar"
+										id={`faq-question-${idx}`}
+										aria-expanded={!!openFaq[idx]}
+										aria-controls={`faq-answer-${idx}`}
+										onClick={() => toggleFaq(idx)}
+									>
+										{item.q}
+										<span className="faq-icon-toggle" aria-hidden="true">
+											<i className="fa-solid fa-chevron-down"></i>
+										</span>
+									</button>
+								</h3>
+								<div
+									className="faq-answer-wrapper"
+									id={`faq-answer-${idx}`}
+									role="region"
+									aria-labelledby={`faq-question-${idx}`}
+								>
 									<div className="faq-answer-content">
 										<p>{item.a}</p>
 									</div>

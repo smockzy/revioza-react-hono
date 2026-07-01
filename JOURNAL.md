@@ -8,6 +8,47 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 06:40 — Refonte apparence /pricing (via skill ui-ux-pro-max)
+
+Contenu métier de P7 (3 cartes, prix, essai 14j, remise -20% annuel, croix grisées
+Starter) était déjà en place — cette tâche portait uniquement sur l'**apparence**,
+demandée explicitement avec le skill `ui-ux-pro-max`. Généré un design system
+(`--design-system`) : le site utilise déjà le style « Modern Dark Cinema » (grain,
+aurora, glass cards, rouge `--primary` #e50914) sur `home.tsx` — objectif : aligner
+`/pricing` sur cette DA plutôt que d'en inventer une nouvelle.
+
+Changements dans `app/routes/pricing.tsx` et `app/styles/pricing.css` :
+- Ajout de la classe `page-landing` sur le wrapper pour hériter de la grille/aurora
+  déjà utilisées sur l'accueil (cohérence visuelle inter-pages).
+- **Accessibilité clavier** (gap réel, pas juste cosmétique) : le toggle mensuel/annuel
+  et les items FAQ étaient des `<div>`/`<span onClick>` — inutilisables au clavier et
+  invisibles pour un lecteur d'écran. Convertis en `<button>` avec `role="switch"` +
+  `aria-checked` pour le toggle, et `aria-expanded`/`aria-controls`/`role="region"` pour
+  l'accordéon FAQ.
+- Remplacé les emojis 🔒/🎁 (utilisés comme icônes) par des icônes Font Awesome
+  (`fa-lock`, `fa-gift`, `fa-star`) — cohérent avec le reste du site qui n'utilise
+  jamais d'emoji comme icône fonctionnelle.
+- Les listes de fonctionnalités (✓/✗) reposaient uniquement sur la couleur pour
+  distinguer inclus/non-inclus : ajouté un badge circulaire par icône + texte
+  `sr-only` (« Inclus : » / « Non inclus : ») pour les lecteurs d'écran.
+- Nettoyé les styles inline dupliqués (prix barré, badge essai, note d'add-on, texte
+  de réduction annuelle) en classes CSS réutilisables (`.price-original`,
+  `.price-discount-badge`, `.trial-badge`, `.addon-note`, `.plan-reassurance`).
+- Ajouté un halo radial derrière la carte Business (glow `--primary-glow`, cohérent
+  avec l'esthétique « ambient light » déjà utilisée ailleurs), `font-variant-numeric:
+  tabular-nums` sur les prix (évite un micro-saut visuel au toggle mensuel/annuel), et
+  des états `:focus-visible` (absents auparavant sur cette page).
+- Aucun changement de logique métier, de prix, ni de wrangler.toml/dépendances.
+
+Vérifié : SSR de `/pricing` (`curl` sur le dev server local, port 5174) rend bien les
+nouvelles classes sans erreur. Pas de screenshot automatisé (pas d'outil browser
+headless disponible dans cet environnement) — **validation visuelle à faire par
+Quentin** (Galaxy S23 / 360px prioritaire, conformément au workflow établi sur cette
+branche). P7 reste marquée comme contenu métier déjà fait ; cette session ne concerne
+que l'habillage visuel.
+
+---
+
 ## 2026-07-01 05:10 — Partie 8 : Auth (redirection + scope couleur)
 
 Avant toute modif : lu l'état exact de `workers/app.ts`, `app/routes/merchant.tsx` et

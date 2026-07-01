@@ -1,5 +1,12 @@
 
+
+
+
 NOTES APRES PROMPT   : 
+
+Quand on perd sur la roue il y a ecrit "Vous avez gagné" au dessus de réesssayez une prochaine fois
+
+ajouter l'effet aurora rouge en fond dans la page /pricing
 
 revoir l'apparence de la roue à l'acceuil
 
@@ -10,6 +17,11 @@ retirer completement l'image de pizza par défaut quand on arrive sur une app cl
 en bas de page supprimer société : ... et siren : ...
 
 je n'arrive plus à obtenir l'interface d'impression du QR code, il n'y a pas non plus de popup
+
+
+
+
+
 NOTES :
 
 revoir l'apparence de la roue à l'acceuil
