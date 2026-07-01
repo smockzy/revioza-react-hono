@@ -1232,7 +1232,7 @@ export default function Demo() {
 													updateAndSave({ restaurantName: e.target.value });
 													setCookie("admin_rest_name", e.target.value);
 												}}
-												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }}
+												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: identityEdited ? "#fff" : "var(--text-muted)", fontStyle: identityEdited ? "normal" : "italic", outline: "none" }}
 											/>
 										</div>
 
@@ -1256,7 +1256,7 @@ export default function Demo() {
 													updateAndSave({ restaurantSub: e.target.value });
 													setCookie("admin_rest_sub", e.target.value);
 												}}
-												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "#fff", outline: "none" }}
+												style={{ width: "100%", padding: "0.6rem 0.8rem", borderRadius: "8px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: identityEdited ? "#fff" : "var(--text-muted)", fontStyle: identityEdited ? "normal" : "italic", outline: "none" }}
 											/>
 										</div>
 
