@@ -55,7 +55,9 @@ export const DEFAULT_HERO_IMAGE = "https://images.unsplash.com/photo-15131048901
 export const DEFAULT_HERO_IMAGE_HQ = "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=800&q=80";
 
 export const GOOGLE_CLIENT_ID = "226741235045-2l3p7d8d5nvmc22dtjdvfs7nfoq90v0m.apps.googleusercontent.com";
-export const IMGBB_API_KEY = "9b8e9f6c0a28f9acb69b22ba20d35a79";
+// IMGBB_API_KEY supprimée : l'hébergement des images est passé sur Supabase Storage
+// (voir uploadWheelImage dans supabase-client.ts). La clé ImgBB exposée côté client
+// n'est plus utilisée. Pensez à la révoquer côté ImgBB lors de l'audit sécurité.
 
 export function getFullGoogleLink(placeId: string): string {
     if (!placeId) return "";

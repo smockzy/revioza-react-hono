@@ -8,7 +8,6 @@ import {
 	type AppState,
 	DEFAULT_PRIZES,
 	DEFAULT_HERO_IMAGE,
-	IMGBB_API_KEY,
 	GOOGLE_CLIENT_ID,
 	getFullGoogleLink,
 	selectPrizeWeighted,
@@ -23,7 +22,7 @@ import {
 	setCookie,
 	getCookie,
 } from "../utils/cookies";
-import { supabase } from "../utils/supabase-client";
+import { supabase, uploadWheelImage } from "../utils/supabase-client";
 import { useMerchantSession } from "../utils/useMerchantSession";
 
 export function meta({ }: Route.MetaArgs) {
@@ -363,45 +362,34 @@ export default function Demo() {
 		async (file: File) => {
 			if (!file || !file.type.startsWith("image/")) return;
 
+			// Aperçu local immédiat (base64) le temps de l'upload — non sauvegardé.
 			const reader = new FileReader();
-			reader.onload = async (e) => {
+			reader.onload = (e) => {
 				const base64 = e.target?.result as string;
 				setHeroSrc(base64);
 				setUploadPreview(base64);
-				setUploadStatus({ msg: "⏳ Hébergement de l'image en cours…", isError: false });
-
-				try {
-					const base64Clean = base64.split(",")[1];
-					const formData = new FormData();
-					formData.append("key", IMGBB_API_KEY);
-					formData.append("image", base64Clean);
-
-					const response = await fetch("https://api.imgbb.com/1/upload", {
-						method: "POST",
-						body: formData,
-					});
-
-					if (!response.ok) throw new Error("Échec de l'upload");
-					const data = (await response.json()) as any;
-					if (!data.success) throw new Error(data.error?.message || "Erreur inconnue");
-
-					const publicUrl = data.data.url;
-					setHeroSrc(publicUrl);
-					updateAndSave({ imageUrl: publicUrl });
-					localStorage.setItem("revioza_custom_hero_image", publicUrl);
-					setCookie("admin_image_url", publicUrl);
-					setUploadStatus({ msg: "✓ Image hébergée — visible sur tous les appareils !", isError: false });
-					setTimeout(() => setUploadStatus(null), 5000);
-				} catch (err) {
-					console.warn("Upload ImgBB échoué:", err);
-					localStorage.setItem("revioza_custom_hero_image", base64);
-					setUploadStatus({
-						msg: "📱 Image enregistrée sur cet appareil. Pour la rendre visible sur tous les appareils, collez son URL dans le champ ci-dessous.",
-						isError: true,
-					});
-				}
 			};
 			reader.readAsDataURL(file);
+			setUploadStatus({ msg: "⏳ Hébergement de l'image en cours…", isError: false });
+
+			try {
+				// Hébergement public fiable sur Supabase Storage (visible par tous).
+				const publicUrl = await uploadWheelImage(file);
+				setHeroSrc(publicUrl);
+				setUploadPreview(publicUrl);
+				updateAndSave({ imageUrl: publicUrl });
+				localStorage.setItem("revioza_custom_hero_image", publicUrl);
+				setCookie("admin_image_url", publicUrl);
+				setUploadStatus({ msg: "✓ Image hébergée — visible par tous les appareils !", isError: false });
+				setTimeout(() => setUploadStatus(null), 5000);
+			} catch (err) {
+				// En cas d'échec on n'enregistre RIEN (pas de base64 invisible pour les autres).
+				console.error("Upload Supabase Storage échoué:", err);
+				setUploadStatus({
+					msg: "❌ Échec de l'hébergement de l'image. Vérifiez votre connexion et réessayez.",
+					isError: true,
+				});
+			}
 		},
 		[updateAndSave]
 	);

@@ -9,7 +9,7 @@ import {
 	handlePrizeDeleted,
 } from "../utils/state";
 import { getCookie, setCookie } from "../utils/cookies";
-import { supabase } from "../utils/supabase-client";
+import { supabase, uploadWheelImage } from "../utils/supabase-client";
 
 export function meta({}: Route.MetaArgs) {
 	return [
@@ -135,10 +135,13 @@ export default function Merchant() {
 	const [statsLoading, setStatsLoading] = useState(true);
 	const [plan, setPlan] = useState("pro");
 
+	const [imageUploadStatus, setImageUploadStatus] = useState<{ msg: string; isError: boolean } | null>(null);
+
 	const chartRef = useRef<HTMLCanvasElement>(null);
 	const chartInstanceRef = useRef<unknown>(null);
 	const userIdRef = useRef<string | null>(null);
 	const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const imageInputRef = useRef<HTMLInputElement>(null);
 
 	// Load config from localStorage
 	useEffect(() => {
@@ -284,6 +287,39 @@ export default function Merchant() {
 				});
 		}, 800);
 	}, []);
+
+	// Upload de l'image d'accueil vers Supabase Storage (hébergement public).
+	// L'URL publique est enregistrée dans merchants.image_url et lue par /play.
+	const handleImageUpload = useCallback(
+		async (file: File) => {
+			if (!file || !file.type.startsWith("image/")) return;
+			setImageUploadStatus({ msg: "⏳ Hébergement de l'image…", isError: false });
+			try {
+				const publicUrl = await uploadWheelImage(file);
+				setMerchantState((prev) => {
+					const next = { ...prev, imageUrl: publicUrl };
+					saveConfig(next);
+					return next;
+				});
+				setImageUploadStatus({ msg: "✓ Image hébergée — visible par vos clients !", isError: false });
+				setTimeout(() => setImageUploadStatus(null), 5000);
+			} catch (err) {
+				console.error("Upload Supabase Storage échoué:", err);
+				setImageUploadStatus({ msg: "❌ Échec de l'hébergement. Réessayez.", isError: true });
+			}
+		},
+		[saveConfig]
+	);
+
+	const handleRemoveImage = useCallback(() => {
+		setMerchantState((prev) => {
+			const next = { ...prev, imageUrl: "" };
+			saveConfig(next);
+			return next;
+		});
+		setImageUploadStatus(null);
+		if (imageInputRef.current) imageInputRef.current.value = "";
+	}, [saveConfig]);
 
 	// Render chart
 	useEffect(() => {
@@ -691,6 +727,55 @@ export default function Merchant() {
 										/>
 										<span id="color-hex-label">{colorHexLabel}</span>
 									</div>
+								</div>
+								<div className="form-group">
+									<label>Image d&apos;accueil (vue par vos clients)</label>
+									<input
+										ref={imageInputRef}
+										type="file"
+										accept="image/*"
+										style={{ display: "none" }}
+										onChange={(e) => {
+											const f = e.target.files?.[0];
+											if (f) handleImageUpload(f);
+										}}
+									/>
+									{merchantState.imageUrl ? (
+										<div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginTop: "0.25rem", flexWrap: "wrap" }}>
+											<img
+												src={merchantState.imageUrl}
+												alt="Aperçu de l'image d'accueil"
+												style={{ width: "64px", height: "64px", objectFit: "cover", borderRadius: "10px", border: "1px solid var(--border-color)" }}
+											/>
+											<button
+												type="button"
+												onClick={() => imageInputRef.current?.click()}
+												style={{ padding: "0.5rem 0.9rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px solid var(--border-color)", color: "var(--text-main)", cursor: "pointer", fontWeight: 600, fontSize: "0.8rem" }}
+											>
+												<i className="fa-solid fa-arrows-rotate"></i> Changer
+											</button>
+											<button
+												type="button"
+												onClick={handleRemoveImage}
+												style={{ padding: "0.5rem 0.9rem", borderRadius: "10px", background: "transparent", border: "1px solid var(--border-color)", color: "var(--text-muted)", cursor: "pointer", fontWeight: 600, fontSize: "0.8rem" }}
+											>
+												<i className="fa-solid fa-trash"></i> Retirer
+											</button>
+										</div>
+									) : (
+										<button
+											type="button"
+											onClick={() => imageInputRef.current?.click()}
+											style={{ display: "inline-flex", alignItems: "center", gap: "0.5rem", padding: "0.7rem 1rem", borderRadius: "10px", background: "var(--bg-input)", border: "1px dashed var(--border-color)", color: "var(--text-main)", cursor: "pointer", fontWeight: 600, fontSize: "0.85rem", marginTop: "0.25rem" }}
+										>
+											<i className="fa-solid fa-image"></i> Choisir une image
+										</button>
+									)}
+									{imageUploadStatus && (
+										<p style={{ fontSize: "0.78rem", marginTop: "0.45rem", color: imageUploadStatus.isError ? "var(--primary)" : "var(--accent-green)" }}>
+											{imageUploadStatus.msg}
+										</p>
+									)}
 								</div>
 							</div>
 

@@ -8,6 +8,34 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 02:00 — Partie 6c : images → Supabase Storage (fin Partie 6)
+
+Migration de l'hébergement des images d'ImgBB (+ fallback base64 local invisible)
+vers **Supabase Storage** (bucket public, hébergement fiable visible par tous).
+
+- **Bucket + policies** : `supabase/storage_wheel_images.sql` (bucket public
+  `wheel-images`, INSERT autorisé anon + authenticated, SELECT public). ⚠️ à appliquer.
+- **Helper partagé** : `uploadWheelImage(file)` dans `app/utils/supabase-client.ts`
+  (upload + renvoi de l'URL publique).
+- **demo.tsx** : upload anonyme → Storage (plus d'ImgBB ni de fallback base64). En cas
+  d'échec, on n'enregistre rien (jamais d'image invisible). base64 = aperçu temporaire.
+- **merchant.tsx** : **nouveau champ d'upload d'image** dans le formulaire (le gérant
+  n'avait aucun moyen d'uploader). Upload → Storage → `merchants.image_url` (via
+  saveConfig/upsert) → lu par /play.
+- **home.tsx** : le `handleFileUpload` (code mort) basculé aussi sur Storage.
+- **Clé ImgBB supprimée** de `app/utils/state.ts` (plus utilisée). À révoquer côté
+  ImgBB lors de l'audit (voir mémoire sécurité).
+- **Chaîne vérifiée** : `get_public_wheel` renvoie `image_url` (qr_scans.sql L96/104),
+  /play le lit (`wheel.image_url`).
+
+⚠️ **ACTION REQUISE QUENTIN** : appliquer `supabase/storage_wheel_images.sql` (SQL editor)
+OU créer un bucket public `wheel-images` via Dashboard → Storage puis exécuter les policies.
+
+⏭️ Reporté en Partie 5 (refonte /demo) : placeholder noir « Image de votre établissement »
+dans le téléphone de /demo tant qu'aucune image (le téléphone /demo sera refait en P5).
+
+typecheck OK. En attente de validation.
+
 ## 2026-07-01 01:25 — Partie 6 (a+b) : QR — connexion + gating cadenas
 
 Partie 4 validée et mergée sur `main`.
