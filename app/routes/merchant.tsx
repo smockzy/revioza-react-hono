@@ -216,7 +216,6 @@ export default function Merchant() {
 				};
 				setMerchantState(loaded);
 				setColorHexLabel(loaded.primaryColor);
-				document.documentElement.style.setProperty("--primary", loaded.primaryColor);
 				localStorage.setItem("revioza_merchant_config", JSON.stringify(loaded));
 			}
 		});
@@ -228,16 +227,11 @@ export default function Merchant() {
 				setMerchantState((prev) => ({ ...prev, ...parsed }));
 				if (parsed.primaryColor) {
 					setColorHexLabel(parsed.primaryColor);
-					document.documentElement.style.setProperty("--primary", parsed.primaryColor);
 				}
 			} catch (e) {
 				console.error("Error loading config", e);
 			}
 		}
-
-
-		// Apply primary color
-		document.documentElement.style.setProperty("--primary", merchantState.primaryColor);
 
 		// Cookie bindings
 		const cookieName = getCookie("merchant_rest_name");
@@ -250,7 +244,6 @@ export default function Merchant() {
 		if (cookieColor) {
 			setMerchantState((prev) => ({ ...prev, primaryColor: cookieColor }));
 			setColorHexLabel(cookieColor);
-			document.documentElement.style.setProperty("--primary", cookieColor);
 		}
 	}, []);
 
@@ -261,7 +254,6 @@ export default function Merchant() {
 		} else {
 			localStorage.removeItem("revioza_custom_hero_image");
 		}
-		document.documentElement.style.setProperty("--primary", state.primaryColor);
 
 		// Sync vers Supabase (debounce pour éviter une requête à chaque frappe)
 		if (!userIdRef.current) return;
@@ -726,7 +718,16 @@ export default function Merchant() {
 											}}
 										/>
 										<span id="color-hex-label">{colorHexLabel}</span>
+										<span
+											className="color-picker-scoped-preview"
+											title="Aperçu de la couleur sur la roue et le QR code de vos clients"
+											style={{ backgroundColor: merchantState.primaryColor }}
+										></span>
 									</div>
+									<p className="color-picker-hint">
+										Cette couleur s&apos;applique uniquement à la roue et à l&apos;écran vus par vos
+										clients — pas à votre espace gérant.
+									</p>
 								</div>
 								<div className="form-group">
 									<label>Image d&apos;accueil (vue par vos clients)</label>

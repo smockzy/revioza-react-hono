@@ -457,6 +457,23 @@ input[type="range"] {
     font-weight: 600;
 }
 
+/* Pastille scopée : montre la couleur choisie sans reteindre tout le dashboard
+   (contrairement à l'ancienne mutation de --primary sur :root). */
+.color-picker-scoped-preview {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+
+.color-picker-hint {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+    line-height: 1.35;
+}
+
 /* Prizes Editor Mobile */
 .prizes-editor-mobile {
     display: flex;

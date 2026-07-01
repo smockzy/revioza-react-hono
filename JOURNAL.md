@@ -8,6 +8,40 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 05:10 — Partie 8 : Auth (redirection + scope couleur)
+
+Avant toute modif : lu l'état exact de `workers/app.ts`, `app/routes/merchant.tsx` et
+`app/routes/auth.callback.tsx` (règle CLAUDE.md n°7). Vérifié la compatibilité middleware
+Hono (règle n°5) : `workers/app.ts` ne fait AUCUNE gestion de session (juste des RPC
+`/api/scan*` + passthrough SSR) — aucun risque de casser un middleware auth, il n'y en a
+pas côté Worker. Les 3 points du plan :
+
+- **(1) « revioza.com » sur l'écran Google** : confirmé **reporté** (Custom Domain
+  Supabase payant, pas du code). Non fait, documenté seulement (voir aussi mémoire
+  `project_auth_plan`).
+- **(2) Fix redirection post-login** (`auth.callback.tsx`) : le bug venait d'un
+  `getSession()` appelé immédiatement au montage, qui peut résoudre **avant** que le
+  client Supabase ait fini d'échanger le code/hash de l'URL OAuth en session réelle
+  (race condition = redirection aléatoire vers `/demo` au lieu de `/merchant`). Remplacé
+  par une écoute `onAuthStateChange` (se déclenche quand la session est réellement
+  établie) + fallback `getSession()` immédiat (si déjà résolue) + timeout de sécurité
+  6s → `/demo?login=required` si rien ne se passe. Un seul flag `redirected` évite une
+  double redirection.
+- **(3) Palette de couleur scopée** (`merchant.tsx`) : supprimé les **5 mutations**
+  `document.documentElement.style.setProperty("--primary", ...)` qui reteignaient TOUT
+  le dashboard gérant (boutons, badges, icônes) à chaque changement de couleur — alors
+  qu'il n'y a **aucun aperçu téléphone en direct** dans `merchant.tsx` (contrairement à
+  `/demo` qui a `.phone-simulator-wrapper`/`.demo-phone-scope`) : la vraie prévisualisation
+  client se fait sur `/play` (page séparée, déjà correcte). Ajout d'une **pastille de
+  couleur scopée localement** à côté du color-picker (`.color-picker-scoped-preview`,
+  `app/styles/merchant.css`) + texte d'aide expliquant que la couleur ne s'applique qu'à
+  la roue/QR vus par les clients, pas à l'espace gérant.
+
+typecheck OK. **Sensible (auth)** : je m'arrête ici pour validation manuelle du flow de
+connexion (Google + redirection /merchant, et vérifier que le dashboard gérant reste bien
+sur les couleurs de marque quel que soit le choix de couleur de la roue) avant tout merge
+sur `main`.
+
 ## 2026-07-01 04:20 — Fix P5 : roulement d'exemples gelé par cookies/config
 
 Bug remonté : le roulement nom+type ne tournait pas. Cause : `identityEdited` passait à
