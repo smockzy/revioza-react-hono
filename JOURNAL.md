@@ -8,6 +8,40 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 03:55 — Partie 5 : refonte /demo (habillage, 7 leviers)
+
+Refonte visuelle de `/demo` (`app/routes/demo.tsx` + `app/styles/style.css`).
+**Habillage uniquement** : la logique roue / upload Storage / lots / étapes / modales
+n'a PAS été touchée. Les 7 leviers d'engagement validés sont en place :
+
+1. **Aperçu live instantané** — déjà présent (chaque réglage met à jour le téléphone).
+2. **Roue en autoplay au repos** — classe `.idle-spin` sur le canvas à l'étape 3 hors
+   spin → rotation lente CSS (`idleWheelSpin` 22 s). Retirée dès qu'un lancer démarre :
+   la logique de tirage reprend la main via le transform inline (zéro interférence).
+3. **Fond animé** — déjà fourni par `.page-landing` + aurora (body::after) ; /demo en
+   hérite désormais via le layout.
+4. **Layout cockpit compact** — nouveau header `.demo-header` (titre + barre de complétion
+   côte à côte), `main` recompacté (`.demo-main`), contrôles + téléphone côte à côte
+   desktop / empilés mobile (grille `.demo-layout` existante conservée).
+5. **Micro-interactions** — confettis déjà là (gain) ; lignes de lots réactives au survol.
+6. **Barre de complétion « roue prête à X% »** — 5 jalons (nom perso, type perso, couleur
+   changée, image, ≥3 lots), calcul live, barre animée dans le header.
+7. **CTA sticky** — barre fixe en bas sur mobile (≤900 px, cible S23) : `%` + « Tester ma
+   page » (→ `handleOpenClient`).
+
+Autres livrables P5 :
+- **Roulement d'exemples nom + type en fondu** : `IDENTITY_EXAMPLES` (10 commerces
+  inventés cohérents type↔nom) défile toutes les 3,5 s tant que le gérant n'a rien
+  personnalisé. Le téléphone reflète l'exemple courant (légende `.demo-hero-caption` +
+  écran 4). Dès qu'un champ est édité (ou config/cookie déjà personnalisé au chargement),
+  le roulement se fige (`identityEdited`). Respecte `prefers-reduced-motion`.
+- **Placeholder image noir « Image de votre établissement »** dans le téléphone tant
+  qu'aucune image (upload ou URL) → clic = ouvre l'upload (`fileInputRef`). Style aligné
+  sur le placeholder de l'accueil.
+
+typecheck OK (seules erreurs préexistantes `process`/node dans `supabase.ts`, non liées).
+En attente de validation visuelle (S23 ~360 px) avant merge fast-forward sur `main`.
+
 ## 2026-07-01 03:10 — Partie 7 : Tarifs — retour aux 3 forfaits
 
 Refonte complète de `app/routes/pricing.tsx` (100% code, aucun changement CSS : le

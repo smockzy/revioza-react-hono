@@ -51,6 +51,22 @@ const DEFAULT_APP_STATE: AppState = {
 	timerSeconds: 7183,
 };
 
+// Roulement d'exemples affichés tant que le gérant n'a pas personnalisé les champs
+// nom + type (noms inventés cohérents avec le type de commerce). Le téléphone reflète
+// l'exemple courant. Dès que l'utilisateur édite, le roulement s'arrête. (Partie 5)
+const IDENTITY_EXAMPLES: { name: string; sub: string }[] = [
+	{ name: "Bella Napoli", sub: "Pizzeria" },
+	{ name: "Le Petit Gourmet", sub: "Restaurant gastronomique" },
+	{ name: "Salon Élégance", sub: "Coiffeur" },
+	{ name: "Café des Arts", sub: "Café & Brunch" },
+	{ name: "Sushi Zen", sub: "Restaurant japonais" },
+	{ name: "La Belle Époque", sub: "Boulangerie-Pâtisserie" },
+	{ name: "Ô Jardin Fleuri", sub: "Fleuriste" },
+	{ name: "Chez Marco", sub: "Trattoria" },
+	{ name: "Le Comptoir 34", sub: "Bar à vins" },
+	{ name: "Douceurs Sucrées", sub: "Salon de thé" },
+];
+
 const getGlowColor = (hexColor: string) => {
 	const hex = hexColor.replace("#", "");
 	if (hex.length === 3) {
@@ -83,6 +99,9 @@ export default function Demo() {
 	const [overlayRules, setOverlayRules] = useState(false);
 	const [overlayProfile, setOverlayProfile] = useState(false);
 	const [isMounted, setIsMounted] = useState(false);
+	// Roulement d'exemples nom+type (Partie 5) : actif tant que non personnalisé.
+	const [identityEdited, setIdentityEdited] = useState(false);
+	const [exampleIdx, setExampleIdx] = useState(0);
 	const prefersReducedMotion = useReducedMotion();
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -103,6 +122,15 @@ export default function Demo() {
 		saved.isSpinning = false;
 		setAppState(saved);
 
+		// Si une identité personnalisée existe déjà, on fige le roulement d'exemples
+		// (on ne veut pas écraser les valeurs du gérant par des exemples animés).
+		if (
+			saved.restaurantName !== DEFAULT_APP_STATE.restaurantName ||
+			saved.restaurantSub !== DEFAULT_APP_STATE.restaurantSub
+		) {
+			setIdentityEdited(true);
+		}
+
 		const savedHero = localStorage.getItem("revioza_custom_hero_image");
 		if (savedHero) {
 			setHeroSrc(savedHero);
@@ -116,6 +144,10 @@ export default function Demo() {
 		const cookieGoogle = getCookie("admin_google_link");
 		const cookieColor = getCookie("admin_theme_color");
 		const cookieImage = getCookie("admin_image_url");
+
+		if (cookieName || cookieSub) {
+			setIdentityEdited(true);
+		}
 
 		if (cookieName || cookieSub || cookieGoogle || cookieColor || cookieImage) {
 			setAppState((prev) => ({
@@ -487,6 +519,34 @@ export default function Demo() {
 		}
 	}, [handleGoogleError]);
 
+	// Roulement d'exemples : on fait défiler nom+type toutes les 3,5 s tant que le
+	// gérant n'a rien personnalisé (et hors préférence "mouvement réduit").
+	useEffect(() => {
+		if (identityEdited || prefersReducedMotion) return;
+		const id = setInterval(() => {
+			setExampleIdx((i) => (i + 1) % IDENTITY_EXAMPLES.length);
+		}, 3500);
+		return () => clearInterval(id);
+	}, [identityEdited, prefersReducedMotion]);
+
+	// Valeurs effectivement affichées (exemple courant tant que non personnalisé).
+	const identityExample = IDENTITY_EXAMPLES[exampleIdx % IDENTITY_EXAMPLES.length];
+	const effectiveName = identityEdited ? appState.restaurantName : identityExample.name;
+	const effectiveSub = identityEdited ? appState.restaurantSub : identityExample.sub;
+	const hasHeroImage = Boolean(uploadPreview || appState.imageUrl);
+
+	// Barre de complétion « roue prête à X% » : 5 jalons de personnalisation.
+	const completionChecks = [
+		identityEdited && appState.restaurantName.trim() !== "",
+		identityEdited && appState.restaurantSub.trim() !== "",
+		appState.primaryColor.toLowerCase() !== DEFAULT_APP_STATE.primaryColor.toLowerCase(),
+		hasHeroImage,
+		appState.prizes.length >= 3,
+	];
+	const completionPct = Math.round(
+		(completionChecks.filter(Boolean).length / completionChecks.length) * 100
+	);
+
 	const stepTitles = [
 		"1. Connexion Client",
 		"2. Avis sur Google",
@@ -496,8 +556,8 @@ export default function Demo() {
 
 	const renderPhoneSimulator = (isHero: boolean) => {
 		const displayHeroSrc = isHero ? DEFAULT_HERO_IMAGE : heroSrc;
-		const displayName = isHero ? "Bella Napoli" : appState.restaurantName;
-		const displaySub = isHero ? "Pizzeria" : appState.restaurantSub;
+		const displayName = isHero ? "Bella Napoli" : effectiveName;
+		const displaySub = isHero ? "Pizzeria" : effectiveSub;
 
 		return (
 			<div
@@ -543,12 +603,32 @@ export default function Demo() {
 						>
 							<div className="app-screen-content">
 								<div className="hero-pizza-image">
-									<img
-										id={isHero ? "hero-display-img" : "hero-simulator-img"}
-										src={displayHeroSrc}
-										alt={displayName}
-									/>
-									<div className="hero-pizza-overlay"></div>
+									{!isHero && !hasHeroImage ? (
+										<button
+											type="button"
+											className="demo-hero-placeholder"
+											onClick={() => fileInputRef.current?.click()}
+										>
+											<i className="fa-solid fa-camera"></i>
+											<span>Image de votre établissement</span>
+											<small>Cliquez pour ajouter une photo</small>
+										</button>
+									) : (
+										<>
+											<img
+												id={isHero ? "hero-display-img" : "hero-simulator-img"}
+												src={displayHeroSrc}
+												alt={displayName}
+											/>
+											<div className="hero-pizza-overlay"></div>
+										</>
+									)}
+									{!isHero && (
+										<div className="demo-hero-caption" key={identityEdited ? "edited" : exampleIdx}>
+											<span className="demo-hero-caption-name">{displayName}</span>
+											<span className="demo-hero-caption-sub">{displaySub}</span>
+										</div>
+									)}
 								</div>
 								<h2 className="app-title-large">
 									DONNEZ VOTRE AVIS <span>ET TENTEZ DE GAGNER !</span>
@@ -718,7 +798,11 @@ export default function Demo() {
 										<div className="wheel-outer-container">
 											<div className="wheel-pointer" id="wheel-pointer"></div>
 											<div className="wheel-bezel"></div>
-											<canvas className="wheel-canvas" id="roulette-canvas" ref={canvasRef}></canvas>
+											<canvas
+												className={`wheel-canvas${appState.currentStep === 3 && !appState.isSpinning ? " idle-spin" : ""}`}
+												id="roulette-canvas"
+												ref={canvasRef}
+											></canvas>
 											<div className="wheel-center-pin">
 												<img
 													src="/assets/logo_icon.png"
@@ -789,9 +873,9 @@ export default function Demo() {
 											</div>
 											<div>
 												<span className="restaurant-name-bind" style={{ fontWeight: 700 }}>
-													{appState.restaurantName}
+													{effectiveName}
 												</span>{" "}
-												- <span className="restaurant-sub-bind">{appState.restaurantSub}</span>
+												- <span className="restaurant-sub-bind">{effectiveSub}</span>
 											</div>
 										</div>
 										<a href="https://maps.google.com" target="_blank" className="btn-review-google-link" rel="noreferrer">
@@ -1084,15 +1168,29 @@ export default function Demo() {
 				</div>
 			</header>
 
-			<main style={{ flex: 1, padding: "5rem 2rem" }}>
+			<main className="demo-main" style={{ flex: 1 }}>
 				<div className="section-inner">
-					<div style={{ textAlign: "center", marginBottom: "3rem" }}>
-						<h1 style={{ fontFamily: "var(--font-display)", fontSize: "2.5rem", fontWeight: 800, color: "var(--text-main)", textTransform: "uppercase" }}>
-							Personnalisez votre Roue
-						</h1>
-						<p style={{ color: "var(--text-muted)", fontSize: "1rem", marginTop: "0.5rem" }}>
-							Prévisualisez le rendu avant de vous lancer
-						</p>
+					<div className="demo-header">
+						<div className="demo-header-text">
+							<h1>Personnalisez votre Roue</h1>
+							<p>Prévisualisez le rendu en temps réel — votre roue prend vie à chaque réglage.</p>
+						</div>
+						<div className="demo-completion" role="status" aria-label={`Roue prête à ${completionPct}%`}>
+							<div className="demo-completion-top">
+								<span className="demo-completion-label">
+									<i className="fa-solid fa-wand-magic-sparkles"></i> Votre roue est prête à
+								</span>
+								<span className="demo-completion-pct">{completionPct}%</span>
+							</div>
+							<div className="demo-completion-track">
+								<div className="demo-completion-fill" style={{ width: `${completionPct}%` }}></div>
+							</div>
+							<span className="demo-completion-hint">
+								{completionPct === 100
+									? "Parfait, tout est configuré 🎉"
+									: "Complétez les réglages ci-dessous pour finaliser votre roue"}
+							</span>
+						</div>
 					</div>
 
 					<div className="demo-layout">
@@ -1123,8 +1221,11 @@ export default function Demo() {
 											<input
 												type="text"
 												id="admin-rest-name"
-												value={appState.restaurantName}
+												key={identityEdited ? "name-edited" : "name-ex-" + exampleIdx}
+												className="identity-fade-input"
+												value={effectiveName}
 												onChange={(e) => {
+													setIdentityEdited(true);
 													updateAndSave({ restaurantName: e.target.value });
 													setCookie("admin_rest_name", e.target.value);
 												}}
@@ -1137,8 +1238,11 @@ export default function Demo() {
 											<input
 												type="text"
 												id="admin-rest-sub"
-												value={appState.restaurantSub}
+												key={identityEdited ? "sub-edited" : "sub-ex-" + exampleIdx}
+												className="identity-fade-input"
+												value={effectiveSub}
 												onChange={(e) => {
+													setIdentityEdited(true);
 													updateAndSave({ restaurantSub: e.target.value });
 													setCookie("admin_rest_sub", e.target.value);
 												}}
@@ -1383,6 +1487,17 @@ export default function Demo() {
 					</div>
 				</div>
 			</main>
+
+			{/* CTA sticky (mobile) : accès permanent à l'action clé « Tester ma page » */}
+			<div className="demo-sticky-cta">
+				<div className="demo-sticky-info">
+					<span className="demo-sticky-pct">{completionPct}%</span>
+					<span className="demo-sticky-txt">Roue prête</span>
+				</div>
+				<button className="btn-primary demo-sticky-btn" onClick={handleOpenClient}>
+					<i className="fa-solid fa-mobile-screen-button"></i> Tester ma page
+				</button>
+			</div>
 
 			{/* Registration/Login Modal */}
 			{overlayRegister && (
