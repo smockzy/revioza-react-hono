@@ -21,7 +21,9 @@ interface PlanConfig {
 }
 
 const prices: Record<string, PlanConfig> = {
-	unique: { monthly: "29€", annual: "23€", saving: "soit 72€ économisés par an" },
+	starter: { monthly: "29€", annual: "23€", saving: "soit 72€ économisés par an" },
+	business: { monthly: "49€", annual: "39€", saving: "soit 120€ économisés par an" },
+	franchise: { monthly: "149€", annual: "119€", saving: "soit 360€ économisés par an" },
 };
 
 export default function Pricing() {
@@ -56,7 +58,7 @@ export default function Pricing() {
 	const getReassurance = () =>
 		isAnnual
 			? "🔒 Facturé en une fois · Non remboursable · Accès garanti 12 mois complets"
-			: "🔒 Sans engagement · Résiliation en 1 clic · Aucune carte requise pour l'essai";
+			: "🔒 Sans engagement · Résiliation en 1 clic";
 
 	const handlePlanClick = () => {
 		window.location.href = "/?register=true";
@@ -122,39 +124,96 @@ export default function Pricing() {
 				</section>
 
 				{/* Pricing Grid */}
-				<section className="pricing-grid-plans" style={{ display: "flex", justifyContent: "center", width: "100%", gap: 0 }}>
-					{/* Plan Unique - Featured */}
-					<div className="pricing-card featured reveal reveal-slide-up delay-200" style={{ maxWidth: "500px", width: "100%" }}>
-						<div className="featured-ribbon">Offre Unique</div>
+				<section className="pricing-grid-plans">
+					{/* Plan 1 : Starter */}
+					<div className="pricing-card reveal reveal-slide-up delay-100">
 						<div className="plan-header">
-							<span className="plan-tier">Plan Pro Tout-Inclus</span>
-							<h2 className="plan-price" id="price-unique" style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
-								{getPrice("unique")}<span>/mois</span>
-								<span style={{ fontSize: "1.3rem", textDecoration: "line-through", color: "var(--text-muted)", fontWeight: 500, marginLeft: "0.5rem" }}>
-									{isAnnual ? "46€" : "59€"}
+							<span className="plan-tier">Solo / Starter</span>
+							<h2 className="plan-price" id="price-starter">
+								{getPrice("starter")}<span>/mois</span>
+							</h2>
+							{isAnnual && (
+								<div
+									className="annual-saving-text"
+									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
+								>
+									{prices.starter.saving}
+								</div>
+							)}
+							<p className="plan-desc" style={{ marginTop: "0.5rem" }}>
+								Idéal pour les petits commerces de quartier et les food-trucks.
+							</p>
+						</div>
+						<div className="plan-divider"></div>
+						<ul className="plan-features-list">
+							<li>
+								<i className="fa-solid fa-check"></i> 1 établissement physique
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Jusqu&apos;à 250 avis / mois
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Roue de loterie standard (5 lots max)
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> QR Code de table prêt à imprimer
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Statistiques de base (scans)
+							</li>
+							<li className="disabled">
+								<i className="fa-solid fa-xmark"></i> Logo personnalisé au centre de la roue
+							</li>
+							<li className="disabled">
+								<i className="fa-solid fa-xmark"></i> Filtrage intelligent des avis négatifs
+							</li>
+							<li className="disabled">
+								<i className="fa-solid fa-xmark"></i> Essai gratuit 14 jours
+							</li>
+						</ul>
+						<button className="btn-plan-select" onClick={handlePlanClick}>
+							Commencer
+						</button>
+						<p
+							className="plan-reassurance"
+							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
+						>
+							{getReassurance()}
+						</p>
+					</div>
+
+					{/* Plan 2 : Business (Featured — offre exclusive) */}
+					<div className="pricing-card featured reveal reveal-slide-up delay-200">
+						<div className="featured-ribbon">Offre exclusive</div>
+						<div className="plan-header">
+							<span className="plan-tier">Business / Growth</span>
+							<h2 className="plan-price" id="price-business" style={{ display: "flex", alignItems: "baseline", flexWrap: "wrap", gap: "0.5rem" }}>
+								{getPrice("business")}<span>/mois</span>
+								<span style={{ fontSize: "1.3rem", textDecoration: "line-through", color: "var(--text-muted)", fontWeight: 500, marginLeft: "0.25rem" }}>
+									{isAnnual ? "60€" : "75€"}
 								</span>
-								<span className="discount-badge" style={{ fontSize: "0.75rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}>
-									-50% À VIE
+								<span
+									className="discount-badge"
+									style={{ fontSize: "0.7rem", padding: "2px 8px", borderRadius: "99px", background: "rgba(52, 199, 89, 0.15)", color: "var(--accent-green)", fontWeight: 700 }}
+								>
+									-35%
 								</span>
 							</h2>
 							{isAnnual && (
 								<div
 									className="annual-saving-text"
-									style={{
-										fontSize: "0.72rem",
-										color: "var(--accent-green)",
-										fontWeight: 700,
-										marginTop: "0.2rem",
-									}}
+									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
 								>
-									{prices.unique.saving}
+									{prices.business.saving}
 								</div>
 							)}
-							<div style={{ display: "inline-block", background: "rgba(229, 9, 20, 0.05)", border: "1px solid rgba(229, 9, 20, 0.15)", borderRadius: "6px", padding: "4px 10px", fontSize: "0.75rem", fontWeight: 700, color: "var(--primary)", width: "fit-content", marginTop: "0.4rem" }}>
-								🚀 + 1 MOIS GRATUIT
+							<div
+								style={{ display: "inline-block", background: "rgba(52, 199, 89, 0.08)", border: "1px solid rgba(52, 199, 89, 0.25)", borderRadius: "6px", padding: "5px 12px", fontSize: "0.78rem", fontWeight: 800, color: "var(--accent-green)", width: "fit-content", marginTop: "0.5rem" }}
+							>
+								🎁 14 jours d&apos;essai gratuit
 							</div>
-							<p className="plan-desc" style={{ marginTop: "0.8rem" }}>
-								Toutes nos fonctionnalités pro pour démultiplier vos avis sans limite de scans ni d&apos;avis.
+							<p className="plan-desc" style={{ marginTop: "0.7rem" }}>
+								Le choix idéal pour les restaurants et boutiques physiques dynamiques.
 							</p>
 						</div>
 						<div className="plan-divider"></div>
@@ -169,13 +228,16 @@ export default function Pricing() {
 								<i className="fa-solid fa-check"></i> Roue 100% personnalisable (lots illimités)
 							</li>
 							<li>
-								<i className="fa-solid fa-check"></i> QR Code de table personnalisé prêt à imprimer
+								<i className="fa-solid fa-check"></i> QR Code personnalisable prêt à imprimer
 							</li>
 							<li>
 								<i className="fa-solid fa-check"></i> Filtrage intelligent (retours négatifs en privé)
 							</li>
 							<li>
 								<i className="fa-solid fa-check"></i> Logo personnalisé et charte graphique
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Image d&apos;accueil mobile personnalisée
 							</li>
 							<li>
 								<i className="fa-solid fa-check"></i> Statistiques avancées (heures, conversion)
@@ -189,14 +251,64 @@ export default function Pricing() {
 						</button>
 						<p
 							className="plan-reassurance"
-							style={{
-								fontSize: "0.7rem",
-								color: "var(--text-muted)",
-								textAlign: "center",
-								marginTop: "0.6rem",
-								opacity: 0.8,
-								lineHeight: 1.3,
-							}}
+							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
+						>
+							{getReassurance()}
+						</p>
+					</div>
+
+					{/* Plan 3 : Franchise & Réseau */}
+					<div className="pricing-card reveal reveal-slide-up delay-300">
+						<div className="plan-header">
+							<span className="plan-tier">Franchise &amp; Réseau</span>
+							<h2 className="plan-price" id="price-franchise">
+								{getPrice("franchise")}<span>/mois</span>
+							</h2>
+							{isAnnual && (
+								<div
+									className="annual-saving-text"
+									style={{ fontSize: "0.72rem", color: "var(--accent-green)", fontWeight: 700, marginTop: "0.2rem" }}
+								>
+									{prices.franchise.saving}
+								</div>
+							)}
+							<p className="plan-desc" style={{ marginTop: "0.5rem", marginBottom: "0.25rem" }}>
+								Tout ce qui est inclus dans Business, multiplié par 5 établissements — avec un tableau de
+								bord centralisé pour piloter l&apos;ensemble.
+							</p>
+							<div
+								style={{ display: "inline-block", background: "rgba(229, 9, 20, 0.05)", border: "1px solid rgba(229, 9, 20, 0.15)", borderRadius: "6px", padding: "4px 10px", fontSize: "0.72rem", fontWeight: 600, color: "var(--primary)", width: "fit-content" }}
+							>
+								+19€/mois par adresse supplémentaire
+							</div>
+						</div>
+						<div className="plan-divider" style={{ marginTop: "1rem" }}></div>
+						<ul className="plan-features-list">
+							<li>
+								<i className="fa-solid fa-check"></i> <strong>Jusqu&apos;à 5 adresses incluses</strong>
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Tableau de bord multi-commerces centralisé
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> QR codes uniques par table et serveur
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Statistiques par serveur et établissement
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Intégrations caisse &amp; API
+							</li>
+							<li>
+								<i className="fa-solid fa-check"></i> Accompagnement et conseiller dédié
+							</li>
+						</ul>
+						<button className="btn-plan-select" onClick={handlePlanClick}>
+							Contacter le service commercial
+						</button>
+						<p
+							className="plan-reassurance"
+							style={{ fontSize: "0.7rem", color: "var(--text-muted)", textAlign: "center", marginTop: "0.6rem", opacity: 0.8, lineHeight: 1.3 }}
 						>
 							{getReassurance()}
 						</p>
@@ -213,8 +325,8 @@ export default function Pricing() {
 								a: "Non, toutes nos offres mensuelles sont 100% sans engagement. Vous pouvez suspendre, résilier ou modifier votre abonnement à tout moment en un clic depuis votre espace gérant.",
 							},
 							{
-								q: "Comment fonctionne l'offre d'essai de 14 jours ?",
-								a: "L'essai gratuit de 14 jours est universel et disponible sur toutes nos formules. Aucune carte bancaire n'est requise. Vous pouvez configurer votre compte, imprimer des QR codes temporaires et tester le système immédiatement.",
+								q: "Comment fonctionne l'essai gratuit de 14 jours ?",
+								a: "L'essai gratuit de 14 jours est réservé à la formule Business. Pour en profiter, vous souscrivez dès aujourd'hui en renseignant vos coordonnées bancaires : rien n'est prélevé pendant 14 jours. À l'issue de cette période, si vous n'avez pas résilié, votre abonnement Business démarre automatiquement et le premier paiement est prélevé. Vous pouvez résilier à tout moment avant la fin de l'essai, en un clic, sans être facturé.",
 							},
 							{
 								q: "Qu'est-ce que le filtrage intelligent des avis ?",

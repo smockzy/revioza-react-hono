@@ -8,6 +8,31 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 03:10 — Partie 7 : Tarifs — retour aux 3 forfaits
+
+Refonte complète de `app/routes/pricing.tsx` (100% code, aucun changement CSS : le
+`pricing.css` supportait déjà la grille 3 colonnes, `.featured`, `.disabled`+`fa-xmark`).
+
+- **3 forfaits rétablis** : Starter **29€** / Business **49€** (mis en avant) / Franchise
+  **149€**. Toggle annuel **-20%** → **23 / 39 / 119€/mois** (arrondi). Textes d'économie
+  annuelle recalculés (72 / 120 / 360€ économisés par an).
+- **Business = offre exclusive** : prix barré/grisé **75€ → 49€** (60€ → 39€ en annuel),
+  badge **« Offre exclusive »** (featured-ribbon) + badge **-35%**, et encart vert mis en
+  avant **« 🎁 14 jours d'essai gratuit »** (réservé au Business).
+- **Features par carte** (listes reprises de `old_site_static/pricing.html`) : Starter
+  affiche 3 croix grisées (`fa-xmark`) sur ce qui manque — logo perso, filtrage
+  intelligent, **essai 14 jours** (souligne l'exclusivité Business).
+- **CTA** : Starter « Commencer » / Business « Essayer gratuitement » / Franchise
+  « Contacter le service commercial » — **tous** → `/?register=true` (ouvre la modale).
+- **FAQ corrigée** : suppression de « essai universel sans carte bancaire ». Nouveau cadre
+  (présentation only, Stripe = autre session) : essai réservé Business, souscription avec
+  CB, rien prélevé pendant 14 j, prélèvement auto à J+14 sauf résiliation.
+- Ligne de réassurance mensuelle nettoyée (« Aucune carte requise pour l'essai » retiré,
+  car incompatible avec le nouveau cadre).
+
+typecheck OK (seules erreurs préexistantes `process`/node dans `supabase.ts`, non liées).
+En attente de validation visuelle avant merge fast-forward sur `main`.
+
 ## 2026-07-01 02:00 — Partie 6c : images → Supabase Storage (fin Partie 6)
 
 Migration de l'hébergement des images d'ImgBB (+ fallback base64 local invisible)
