@@ -122,14 +122,9 @@ export default function Demo() {
 		saved.isSpinning = false;
 		setAppState(saved);
 
-		// Si une identité personnalisée existe déjà, on fige le roulement d'exemples
-		// (on ne veut pas écraser les valeurs du gérant par des exemples animés).
-		if (
-			saved.restaurantName !== DEFAULT_APP_STATE.restaurantName ||
-			saved.restaurantSub !== DEFAULT_APP_STATE.restaurantSub
-		) {
-			setIdentityEdited(true);
-		}
+		// Le roulement d'exemples est un showcase : il tourne toujours au chargement et
+		// ne se fige que lorsque le gérant clique dans un champ (voir onFocus). On ne le
+		// gèle donc PAS ici, même si une config est déjà sauvegardée.
 
 		const savedHero = localStorage.getItem("revioza_custom_hero_image");
 		if (savedHero) {
@@ -144,10 +139,6 @@ export default function Demo() {
 		const cookieGoogle = getCookie("admin_google_link");
 		const cookieColor = getCookie("admin_theme_color");
 		const cookieImage = getCookie("admin_image_url");
-
-		if (cookieName || cookieSub) {
-			setIdentityEdited(true);
-		}
 
 		if (cookieName || cookieSub || cookieGoogle || cookieColor || cookieImage) {
 			setAppState((prev) => ({
@@ -442,9 +433,14 @@ export default function Demo() {
 	}, [appState]);
 
 	const handleOpenClient = useCallback(() => {
+		// Si le roulement d'exemples tourne encore, on teste avec l'exemple affiché
+		// (cohérence avec ce que voit le gérant à l'écran).
+		const idExample = IDENTITY_EXAMPLES[exampleIdx % IDENTITY_EXAMPLES.length];
+		const idName = identityEdited ? appState.restaurantName : idExample.name;
+		const idSub = identityEdited ? appState.restaurantSub : idExample.sub;
 		const url = new URL("/play", window.location.origin);
-		url.searchParams.set("name", appState.restaurantName);
-		url.searchParams.set("sub", appState.restaurantSub);
+		url.searchParams.set("name", idName);
+		url.searchParams.set("sub", idSub);
 		url.searchParams.set("color", appState.primaryColor);
 		url.searchParams.set("google_link", getFullGoogleLink(appState.googleLink));
 		if (appState.imageUrl) url.searchParams.set("image", appState.imageUrl);
@@ -453,7 +449,7 @@ export default function Demo() {
 		url.searchParams.set("prizes", prizeNames);
 		url.searchParams.set("weights", prizeWeights);
 		window.open(url.toString(), "_blank");
-	}, [appState]);
+	}, [appState, identityEdited, exampleIdx]);
 
 	const handleFormLogin = useCallback(
 		(e: React.FormEvent) => {
@@ -1224,6 +1220,13 @@ export default function Demo() {
 												key={identityEdited ? "name-edited" : "name-ex-" + exampleIdx}
 												className="identity-fade-input"
 												value={effectiveName}
+												onFocus={() => {
+													if (identityEdited) return;
+													setIdentityEdited(true);
+													updateAndSave({ restaurantName: effectiveName, restaurantSub: effectiveSub });
+													setCookie("admin_rest_name", effectiveName);
+													setCookie("admin_rest_sub", effectiveSub);
+												}}
 												onChange={(e) => {
 													setIdentityEdited(true);
 													updateAndSave({ restaurantName: e.target.value });
@@ -1241,6 +1244,13 @@ export default function Demo() {
 												key={identityEdited ? "sub-edited" : "sub-ex-" + exampleIdx}
 												className="identity-fade-input"
 												value={effectiveSub}
+												onFocus={() => {
+													if (identityEdited) return;
+													setIdentityEdited(true);
+													updateAndSave({ restaurantName: effectiveName, restaurantSub: effectiveSub });
+													setCookie("admin_rest_name", effectiveName);
+													setCookie("admin_rest_sub", effectiveSub);
+												}}
 												onChange={(e) => {
 													setIdentityEdited(true);
 													updateAndSave({ restaurantSub: e.target.value });

@@ -8,6 +8,23 @@ Format date : `AAAA-MM-JJ HH:MM`.
 
 ---
 
+## 2026-07-01 04:20 — Fix P5 : roulement d'exemples gelé par cookies/config
+
+Bug remonté : le roulement nom+type ne tournait pas. Cause : `identityEdited` passait à
+`true` dès le montage si une config sauvegardée OU des cookies `admin_rest_name/_sub`
+existaient (ce qui est le cas après tout test sur /demo — les cookies sont écrits à chaque
+frappe). Le showcase était donc gelé sur les navigateurs déjà utilisés.
+
+Correctif (`app/routes/demo.tsx`) :
+- Suppression des deux gels au chargement (config sauvegardée + cookies). Le roulement est
+  un **showcase** : il tourne toujours au chargement.
+- Il ne se fige plus qu'au **focus** d'un champ nom/type (nouveau `onFocus`), qui **adopte
+  l'exemple courant** comme valeur éditable (pas de saut, édition fluide).
+- `handleOpenClient` (« Tester ma page ») utilise l'exemple affiché tant que le roulement
+  tourne → cohérence entre l'écran et la page /play ouverte.
+
+typecheck OK. À redéployer pour retest.
+
 ## 2026-07-01 03:55 — Partie 5 : refonte /demo (habillage, 7 leviers)
 
 Refonte visuelle de `/demo` (`app/routes/demo.tsx` + `app/styles/style.css`).
